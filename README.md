@@ -1,36 +1,48 @@
 # HelloWorld Mobile App
 
-Ứng dụng mobile giúp người dùng nhận biết khi nào họ đang **trì hoãn công việc (procrastination)** và đưa ra **gợi ý giải pháp phù hợp** thông qua một số câu hỏi ngắn.
+Ứng dụng giúp người dùng phân biệt giữa **mệt mỏi thật sự** và **trì hoãn công việc**.
 
-Ứng dụng được phát triển trong khuôn khổ **bài tập lớn môn Phát triển ứng dụng di động**.
+Ứng dụng nằm trong khuôn khổ BTL môn phát triển ứng dụng cho thiết bị di động của trường ĐH Bách Khoa
 
----
+## Techstack
 
-## 📱 Giới thiệu
+- **React Native** + **Expo**
+- **Gluestack** for building UI (https://gluestack.io/ui/docs/home/overview/quick-start)
 
-Nhiều người thường khó phân biệt giữa **mệt mỏi thật sự** và **trì hoãn công việc**. Ứng dụng này giúp người dùng:
+## Requirement
 
-- Trả lời một số câu hỏi nhanh về trạng thái hiện tại
-- Phân tích câu trả lời
-- Đưa ra gợi ý phù hợp như:
-  - Nghỉ ngơi
-  - Chia nhỏ công việc
-  - Bắt đầu với một bước nhỏ
-  - Thay đổi môi trường làm việc
+- **Node >= 20**
+- **Android SDK 35**
+- **NPM** (không dùng yarn)
 
-Mục tiêu là giúp người dùng **hiểu rõ trạng thái của bản thân** và **bắt đầu hành động dễ dàng hơn**.
+## Setup
 
----
+### 1. Đảm bảo đã cài android studio và android SDK 35, chạy 1 máy ảo
 
-## 🛠 Công nghệ sử dụng
+[Expo Environment Setup Guide](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=simulated)
 
-- **React Native**
+### 2. Run command
 
----
+```
+npm install
+```
 
-## ⚙️ Cài đặt và chạy dự án
+```
+npx expo start // sau đó nhấn a (open Android)
+```
 
-### 1. Clone repository
+### 3. Cách sử dụng 1 component trong Gluestack
 
-```bash
-git clone git@github.com:L01-MobileApp-HelloWorld/energy-app-source.git
+1. Cài đặt component thông qua CLI
+
+- `npx gluestack-ui add heading`
+
+2. Import và sử dụng
+
+```
+import { Heading } from '@/components/ui/heading';
+
+function Example() {
+  return <Heading>I am a Heading</Heading>;
+}
+```
