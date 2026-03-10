@@ -2,7 +2,7 @@
 
 Ứng dụng giúp người dùng phân biệt giữa **mệt mỏi thật sự** và **trì hoãn công việc**.
 
-Ứng dụng nằm trong khuôn khổ BTL môn phát triển ứng dụng cho thiết bị di động của trường ĐH Bách Khoa
+Ứng dụng nằm trong khuôn khổ BTL môn phát triển ứng dụng cho thiết bị di động của trường ĐH Bách Khoa TPHCM
 
 ## Techstack
 
