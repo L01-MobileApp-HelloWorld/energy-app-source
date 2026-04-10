@@ -1,155 +1,201 @@
-import { Image } from "expo-image";
-import { Platform, StyleSheet } from "react-native";
-
-import { HelloWave } from "@/components/hello-wave";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import {
-  AlertDialog,
-  AlertDialogBackdrop,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Text } from "@/components/ui/text";
-import { Link } from "expo-router";
-import { useState } from "react";
+import React from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+function getCurrentDateTime() {
+  const now = new Date();
+  const days = ["CN", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+  const day = days[now.getDay()];
+  const h = now.getHours().toString().padStart(2, "0");
+  const m = now.getMinutes().toString().padStart(2, "0");
+  return `${day}, ${h}:${m}`;
+}
+
+const CARD_STYLE = {
+  backgroundColor: "#fff",
+  borderRadius: 16,
+  padding: 20,
+  shadowColor: "#000",
+  shadowOpacity: 0.06,
+  shadowRadius: 8,
+  shadowOffset: { width: 0, height: 2 },
+  elevation: 2,
+};
 
 export default function HomeScreen() {
-  const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const handleClose = () => setShowAlertDialog(false);
-
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <Button onPress={() => setShowAlertDialog(true)}>
-        <ButtonText>Open Dialog</ButtonText>
-      </Button>
-      <AlertDialog isOpen={showAlertDialog} onClose={handleClose} size="md">
-        <AlertDialogBackdrop />
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <Heading className="text-typography-950 font-semibold" size="md">
-              Are you sure you want to delete this post?
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8FAFC" }}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 16,
+          paddingBottom: 32,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 20,
+          }}
+        >
+          <View>
+            <Heading size="2xl" style={{ color: "#000" }}>
+              Chào Huy! 👋
             </Heading>
-          </AlertDialogHeader>
-          <AlertDialogBody className="mt-3 mb-4">
-            <Text size="sm">
-              Deleting the post will remove it permanently and cannot be undone.
-              Please confirm if you want to proceed.
+            <Text size="sm" style={{ color: "#94A3B8", marginTop: 4 }}>
+              {getCurrentDateTime()}
             </Text>
-          </AlertDialogBody>
-          <AlertDialogFooter className="">
-            <Button
-              variant="outline"
-              action="secondary"
-              onPress={handleClose}
-              size="sm"
-            >
-              <ButtonText>Cancel</ButtonText>
-            </Button>
-            <Button size="sm" onPress={handleClose}>
-              <ButtonText>Delete</ButtonText>
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          </View>
+          <View
+            style={{
+              width: 46,
+              height: 46,
+              borderRadius: 23,
+              backgroundColor: "#E2E8F0",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+            }}
+          >
+            <Text size="xl">🧑</Text>
+          </View>
+        </View>
 
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction
-              title="Action"
-              icon="cube"
-              onPress={() => alert("Action pressed")}
-            />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert("Share pressed")}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert("Delete pressed")}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+        {/* Check-in Card */}
+        <View style={{ ...CARD_STYLE, alignItems: "center", marginBottom: 16 }}>
+          <View
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              backgroundColor: "#EEF2FF",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 16,
+            }}
+          >
+            <Text style={{ fontSize: 36, lineHeight: 50 }}>😊</Text>
+          </View>
+          <Heading
+            size="lg"
+            style={{ color: "#000", textAlign: "center", marginBottom: 8 }}
+          >
+            Hôm nay bạn cảm thấy thế nào?
+          </Heading>
+          <Text
+            size="sm"
+            style={{ color: "#94A3B8", textAlign: "center", marginBottom: 20 }}
+          >
+            Dành 1 phút để thấu hiểm cảm xúc của mình
+          </Text>
+          <Button size="lg" className="w-full rounded-xl">
+            <ButtonText>Bắt đầu kiểm tra</ButtonText>
+          </Button>
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">
-            npm run reset-project
-          </ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        {/* Previous Result Card */}
+        <View
+          style={{
+            backgroundColor: "#fff",
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: "#508DF7",
+            borderLeftWidth: 3,
+            borderLeftColor: "#508DF7",
+            paddingVertical: 16,
+            paddingHorizontal: 16,
+            marginBottom: 16,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 8,
+              backgroundColor: "#508DF7",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: 12,
+            }}
+          >
+            <Text style={{ fontSize: 20 }}>💪</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text size="xs" style={{ color: "#94A3B8" }}>
+              Lần trước,
+            </Text>
+            <Text size="lg" bold style={{ color: "#508DF7", marginTop: 2 }}>
+              Tỉnh táo, sẵn sàng
+            </Text>
+            <Text size="xs" style={{ color: "#94A3B8", marginTop: 2 }}>
+              Hôm nay, 12:00
+            </Text>
+          </View>
+        </View>
+
+        {/* Kiểm tra lịch sử */}
+        <View style={styles.menuCard}>
+          <View style={styles.menuIconBox}>
+            <IconSymbol
+              name="clock.arrow.circlepath"
+              size={20}
+              color="#64748B"
+            />
+          </View>
+          <Text size="md" bold style={styles.menuLabel}>
+            Kiểm tra lịch sử
+          </Text>
+          <IconSymbol name="chevron.right" size={20} color="#CBD5E1" />
+        </View>
+
+        {/* Xem nhắc nhở */}
+        <View style={[styles.menuCard, { marginBottom: 0 }]}>
+          <View style={styles.menuIconBox}>
+            <IconSymbol name="alarm" size={20} color="#64748B" />
+          </View>
+          <Text size="md" bold style={styles.menuLabel}>
+            Xem nhắc nhở
+          </Text>
+          <IconSymbol name="chevron.right" size={20} color="#CBD5E1" />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  menuCard: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E6E6E6",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    marginBottom: 12,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  menuIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#F5F6F8",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  menuLabel: {
+    flex: 1,
+    color: "#0F172A",
   },
 });
