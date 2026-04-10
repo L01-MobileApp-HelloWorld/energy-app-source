@@ -1,0 +1,140 @@
+import React, { useRef, useState } from 'react';
+import {
+  Dimensions,
+  Image,
+  Pressable,
+  ScrollView,
+  View,
+} from 'react-native';
+import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button, ButtonText } from '@/components/ui/button';
+import { Heading } from '@/components/ui/heading';
+import { Text } from '@/components/ui/text';
+
+const { width } = Dimensions.get('window');
+
+const slides = [
+  {
+    id: '1',
+    image: require('@/assets/images/onboarding_1.png'),
+    title: 'Mệt thật hay lười thật',
+    description: 'Bạn có đang phân vân không biết nên làm việc hay nghỉ ngơi',
+  },
+  {
+    id: '2',
+    image: require('@/assets/images/onboarding_2.png'),
+    title: 'Trả lời 10 câu hỏi\nchỉ trong 60 giây',
+    description: 'Bạn có đang phân vân không biết nên làm việc hay nghỉ ngơi',
+  },
+  {
+    id: '3',
+    image: require('@/assets/images/onboarding_3.png'),
+    title: 'Sẵn sàng!!',
+    description: 'Bắt đầu hành trình hiểu rõ bản thân',
+  },
+];
+
+export default function OnboardingScreen() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
+
+  const isLastSlide = currentIndex === slides.length - 1;
+
+  const handleNext = () => {
+    if (!isLastSlide) {
+      const nextIndex = currentIndex + 1;
+      scrollRef.current?.scrollTo({ x: nextIndex * width, animated: true });
+      setCurrentIndex(nextIndex);
+    } else {
+      router.replace('/(tabs)');
+    }
+  };
+
+  const handleSkip = () => {
+    router.replace('/(tabs)');
+  };
+
+  const handleScroll = (e: { nativeEvent: { contentOffset: { x: number } } }) => {
+    const index = Math.round(e.nativeEvent.contentOffset.x / width);
+    if (index !== currentIndex) {
+      setCurrentIndex(index);
+    }
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      {/* Skip button */}
+      <View style={{ height: 48, alignItems: 'flex-end', justifyContent: 'center', paddingHorizontal: 24 }}>
+        {!isLastSlide && (
+          <Pressable onPress={handleSkip} hitSlop={12}>
+            <Text size="md" className="text-primary-500 font-medium">
+              Bỏ qua
+            </Text>
+          </Pressable>
+        )}
+      </View>
+
+      {/* Slides */}
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={handleScroll}
+        scrollEventThrottle={16}
+        style={{ flex: 1 }}
+      >
+        {slides.map((slide) => (
+          <View
+            key={slide.id}
+            style={{ width, flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}
+          >
+            <Image
+              source={slide.image}
+              style={{ width: width * 0.72, height: width * 0.72 }}
+              resizeMode="contain"
+            />
+            <Heading
+              size="xl"
+              style={{ marginTop: 40, textAlign: 'center', color: '#000000' }}
+            >
+              {slide.title}
+            </Heading>
+            <Text
+              size="md"
+              style={{ marginTop: 16, textAlign: 'center', lineHeight: 24, color: '#64748B' }}
+            >
+              {slide.description}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Bottom section */}
+      <View style={{ paddingHorizontal: 24, paddingBottom: 32 }}>
+        {/* Pagination dots */}
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginBottom: 32 }}>
+          {slides.map((_, index) => (
+            <View
+              key={index}
+              style={{
+                height: 8,
+                width: index === currentIndex ? 24 : 8,
+                borderRadius: 4,
+                backgroundColor: index === currentIndex ? '#3B82F6' : '#D1D5DB',
+              }}
+            />
+          ))}
+        </View>
+
+        {/* CTA button */}
+        <Button size="xl" onPress={handleNext} className="w-full rounded-2xl">
+          <ButtonText>
+            {isLastSlide ? 'Bắt đầu' : 'Tiếp theo  →'}
+          </ButtonText>
+        </Button>
+      </View>
+    </SafeAreaView>
+  );
+}
