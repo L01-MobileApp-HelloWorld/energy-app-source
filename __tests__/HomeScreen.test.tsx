@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { ScrollView } from "react-native";
 import HomeScreen from "../app/(tabs)/index";
@@ -77,6 +77,11 @@ describe("HomeScreen", () => {
   test("render start button", () => {
     const { getByText } = render(<HomeScreen />);
     expect(getByText("Bắt đầu kiểm tra")).toBeTruthy();
+  });
+
+  test("press start button without crash", () => {
+    const { getByText } = render(<HomeScreen />);
+    expect(() => fireEvent.press(getByText("Bắt đầu kiểm tra"))).not.toThrow();
   });
 
   test("render formatted current date and time", () => {

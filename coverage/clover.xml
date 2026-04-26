@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1777218838221" clover="3.2.0">
-  <project timestamp="1777218838221" name="All files">
+<coverage generated="1777219389287" clover="3.2.0">
+  <project timestamp="1777219389287" name="All files">
     <metrics statements="35" coveredstatements="35" conditionals="12" coveredconditionals="11" methods="12" coveredmethods="12" elements="59" coveredelements="58" complexity="0" loc="35" ncloc="35" packages="2" files="5" classes="5"/>
     <package name="app">
       <metrics statements="25" coveredstatements="25" conditionals="12" coveredconditionals="11" methods="9" coveredmethods="9"/>
@@ -43,14 +43,14 @@
       <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
       <file name="index.tsx" path="/Users/huynhat/HCMUT/energy-app-source/app/(tabs)/index.tsx">
         <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
-        <line num="10" count="15" type="stmt"/>
-        <line num="11" count="15" type="stmt"/>
-        <line num="12" count="15" type="stmt"/>
-        <line num="13" count="15" type="stmt"/>
-        <line num="14" count="15" type="stmt"/>
-        <line num="15" count="15" type="stmt"/>
+        <line num="10" count="16" type="stmt"/>
+        <line num="11" count="16" type="stmt"/>
+        <line num="12" count="16" type="stmt"/>
+        <line num="13" count="16" type="stmt"/>
+        <line num="14" count="16" type="stmt"/>
+        <line num="15" count="16" type="stmt"/>
         <line num="18" count="1" type="stmt"/>
-        <line num="30" count="15" type="stmt"/>
+        <line num="30" count="16" type="stmt"/>
         <line num="176" count="1" type="stmt"/>
       </file>
       <file name="settings.tsx" path="/Users/huynhat/HCMUT/energy-app-source/app/(tabs)/settings.tsx">
