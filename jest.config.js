@@ -13,6 +13,9 @@ module.exports = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },
+  collectCoverage: true,
+  coverageDirectory: "coverage",
+  coverageReporters: ["lcov", "text", "clover"],
 };
 
 // module.exports = {
