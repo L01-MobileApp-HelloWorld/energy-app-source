@@ -1,5 +1,8 @@
 # HelloWorld Mobile App
 
+[![GitHub Actions](https://github.com/L01-MobileApp-HelloWorld/energy-app-source/actions/workflows/test.yml/badge.svg)](https://github.com/L01-MobileApp-HelloWorld/energy-app-source/actions/workflows/test.yml)
+[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=L01-MobileApp-HelloWorld_energy-app-source&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=L01-MobileApp-HelloWorld_energy-app-source)
+
 Ứng dụng giúp người dùng phân biệt giữa **mệt mỏi thật sự** và **trì hoãn công việc**.
 
 Ứng dụng nằm trong khuôn khổ BTL môn phát triển ứng dụng cho thiết bị di động của trường ĐH Bách Khoa TPHCM
