@@ -1,0 +1,36 @@
+name: Run Tests and Generate Report
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Tests with Coverage
+        # --watchAll=false để nó chạy xong rồi thoát, không bị treo workflow
+        run: npm test -- --coverage --watchAll=false
+
+      - name: Upload Test Report Artifact
+        if: always() # Luôn chạy bước này kể cả test fail để xem lỗi ở đâu
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          # Đường dẫn này là nơi Jest xuất file HTML sau khi chạy --coverage
+          path: coverage/lcov-report/

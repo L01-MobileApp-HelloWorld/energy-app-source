@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1777213676510" clover="3.2.0">
+  <project timestamp="1777213676510" name="All files">
+    <metrics statements="90" coveredstatements="70" conditionals="43" coveredconditionals="16" methods="16" coveredmethods="12" elements="149" coveredelements="98" complexity="0" loc="90" ncloc="90" packages="6" files="10" classes="10"/>
+    <package name="app">
+      <metrics statements="22" coveredstatements="14" conditionals="12" coveredconditionals="7" methods="7" coveredmethods="5"/>
+      <file name="onboarding.tsx" path="D:\Mobile App\Folder dự án\energy-app-source\app\onboarding.tsx">
+        <metrics statements="22" coveredstatements="14" conditionals="12" coveredconditionals="7" methods="7" coveredmethods="5"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="33" count="3" type="stmt"/>
+        <line num="34" count="3" type="stmt"/>
+        <line num="36" count="3" type="stmt"/>
+        <line num="38" count="3" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="43" count="3" type="stmt"/>
+        <line num="44" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="49" count="0" type="stmt"/>
+        <line num="53" count="3" type="stmt"/>
+        <line num="54" count="1" type="stmt"/>
+        <line num="57" count="3" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="61" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="66" count="3" type="stmt"/>
+        <line num="97" count="9" type="stmt"/>
+        <line num="146" count="9" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.(tabs)">
+      <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+      <file name="index.tsx" path="D:\Mobile App\Folder dự án\energy-app-source\app\(tabs)\index.tsx">
+        <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="10" count="3" type="stmt"/>
+        <line num="11" count="3" type="stmt"/>
+        <line num="12" count="3" type="stmt"/>
+        <line num="13" count="3" type="stmt"/>
+        <line num="14" count="3" type="stmt"/>
+        <line num="15" count="3" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="30" count="3" type="stmt"/>
+        <line num="176" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="assets.images">
+      <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="onboarding_1.png" path="D:\Mobile App\Folder dự án\energy-app-source\assets\images\onboarding_1.png">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+      </file>
+      <file name="onboarding_2.png" path="D:\Mobile App\Folder dự án\energy-app-source\assets\images\onboarding_2.png">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+      </file>
+      <file name="onboarding_3.png" path="D:\Mobile App\Folder dự án\energy-app-source\assets\images\onboarding_3.png">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.ui.button">
+      <metrics statements="28" coveredstatements="21" conditionals="13" coveredconditionals="2" methods="4" coveredmethods="2"/>
+      <file name="index.tsx" path="D:\Mobile App\Folder dự án\energy-app-source\components\ui\button\index.tsx">
+        <metrics statements="28" coveredstatements="21" conditionals="13" coveredconditionals="2" methods="4" coveredmethods="2"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="16" count="2" type="stmt"/>
+        <line num="18" count="2" type="stmt"/>
+        <line num="26" count="2" type="stmt"/>
+        <line num="39" count="2" type="stmt"/>
+        <line num="121" count="2" type="stmt"/>
+        <line num="200" count="2" type="stmt"/>
+        <line num="256" count="2" type="stmt"/>
+        <line num="287" count="2" type="stmt"/>
+        <line num="295" count="6" type="stmt"/>
+        <line num="309" count="2" type="stmt"/>
+        <line num="317" count="6" type="stmt"/>
+        <line num="319" count="6" type="stmt"/>
+        <line num="338" count="2" type="stmt"/>
+        <line num="348" count="2" type="stmt"/>
+        <line num="356" count="0" type="stmt"/>
+        <line num="358" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="359" count="0" type="stmt"/>
+        <line num="367" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="371" count="0" type="stmt"/>
+        <line num="379" count="0" type="stmt"/>
+        <line num="399" count="2" type="stmt"/>
+        <line num="413" count="0" type="stmt"/>
+        <line num="428" count="2" type="stmt"/>
+        <line num="429" count="2" type="stmt"/>
+        <line num="430" count="2" type="stmt"/>
+        <line num="431" count="2" type="stmt"/>
+        <line num="432" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.ui.heading">
+      <metrics statements="23" coveredstatements="18" conditionals="15" coveredconditionals="5" methods="2" coveredmethods="2"/>
+      <file name="index.tsx" path="D:\Mobile App\Folder dự án\energy-app-source\components\ui\heading\index.tsx">
+        <metrics statements="21" coveredstatements="16" conditionals="13" coveredconditionals="4" methods="2" coveredmethods="2"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="13" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="15" count="2" type="stmt"/>
+        <line num="16" count="2" type="stmt"/>
+        <line num="17" count="2" type="stmt"/>
+        <line num="19" count="2" type="stmt"/>
+        <line num="36" count="15" type="cond" truecount="3" falsecount="7"/>
+        <line num="40" count="0" type="stmt"/>
+        <line num="59" count="3" type="stmt"/>
+        <line num="78" count="9" type="stmt"/>
+        <line num="97" count="3" type="stmt"/>
+        <line num="116" count="0" type="stmt"/>
+        <line num="136" count="0" type="stmt"/>
+        <line num="155" count="0" type="stmt"/>
+        <line num="178" count="2" type="stmt"/>
+        <line num="191" count="15" type="stmt"/>
+        <line num="193" count="15" type="cond" truecount="1" falsecount="1"/>
+        <line num="194" count="0" type="stmt"/>
+        <line num="212" count="15" type="stmt"/>
+        <line num="218" count="2" type="stmt"/>
+      </file>
+      <file name="styles.tsx" path="D:\Mobile App\Folder dự án\energy-app-source\components\ui\heading\styles.tsx">
+        <metrics statements="2" coveredstatements="2" conditionals="2" coveredconditionals="1" methods="0" coveredmethods="0"/>
+        <line num="3" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="7" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.ui.text">
+      <metrics statements="5" coveredstatements="5" conditionals="3" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <file name="index.tsx" path="D:\Mobile App\Folder dự án\energy-app-source\components\ui\text\index.tsx">
+        <metrics statements="3" coveredstatements="3" conditionals="1" coveredconditionals="1" methods="1" coveredmethods="1"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="26" count="42" type="stmt"/>
+        <line num="46" count="2" type="stmt"/>
+      </file>
+      <file name="styles.tsx" path="D:\Mobile App\Folder dự án\energy-app-source\components\ui\text\styles.tsx">
+        <metrics statements="2" coveredstatements="2" conditionals="2" coveredconditionals="1" methods="0" coveredmethods="0"/>
+        <line num="4" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="8" count="2" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>
