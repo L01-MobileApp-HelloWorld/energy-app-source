@@ -14,6 +14,15 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/$1",
   },
   collectCoverage: true,
+  collectCoverageFrom: [
+    "app/**/*.{ts,tsx}",
+  ],
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "<rootDir>/app/_layout.tsx",
+    "<rootDir>/app/\\(tabs\\)/_layout.tsx",
+    "<rootDir>/app/\\(tabs\\)/explore.tsx",
+  ],
   coverageDirectory: "coverage",
   coverageReporters: ["lcov", "text", "clover"],
 };
