@@ -1,36 +1,27 @@
-name: Run Tests and Generate Report
+name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
 
 jobs:
-  build-and-test:
+  sonar:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v3
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm install --legacy-peer-deps
 
-      - name: Run Tests with Coverage
-        # --watchAll=false để nó chạy xong rồi thoát, không bị treo workflow
-        run: npm test -- --coverage --watchAll=false
+      - run: npm run test
 
-      - name: Upload Test Report Artifact
-        if: always() # Luôn chạy bước này kể cả test fail để xem lỗi ở đâu
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report
-          # Đường dẫn này là nơi Jest xuất file HTML sau khi chạy --coverage
-          path: coverage/lcov-report/
+      - run: npm install -g sonarqube-scanner
+
+      - run: sonar-scanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
