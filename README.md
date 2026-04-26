@@ -46,3 +46,29 @@ function Example() {
   return <Heading>I am a Heading</Heading>;
 }
 ```
+
+## Chạy Test Locally
+
+### 1. Cài dependencies
+
+```bash
+npm install
+```
+
+### 2. Chạy toàn bộ test và coverage
+
+```bash
+npm test -- --runInBand
+```
+
+Kết quả coverage sẽ được tạo trong thư mục `coverage/`.
+
+### 3. Chạy riêng từng file test
+
+```bash
+npx jest __tests__/HomeScreen.test.tsx --runInBand
+```
+
+```bash
+npx jest __tests__/OnboardingScreen.test.tsx --runInBand
+```
