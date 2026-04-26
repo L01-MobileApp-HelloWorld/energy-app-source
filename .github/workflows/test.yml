@@ -15,10 +15,17 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
+          cache: npm
 
       - run: npm install --legacy-peer-deps
 
-      - run: npm run test
+      - run: npm run test -- --coverage
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: coverage/lcov-report
 
       - run: npm install -g sonarqube-scanner
 
