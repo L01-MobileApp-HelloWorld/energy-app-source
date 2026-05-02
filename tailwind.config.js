@@ -15,10 +15,17 @@ module.exports = {
       pattern:
         /(bg|border|text|stroke|fill)-(primary|secondary|tertiary|error|success|warning|info|typography|outline|background|indicator)-(0|50|100|200|300|400|500|600|700|800|900|950|white|gray|black|error|warning|muted|success|info|light|dark|primary)/,
     },
+    // App-specific tokens used dynamically (e.g. state colors in StateBadge)
+    {
+      pattern:
+        /(bg|border|text)-(state)-(exhausted|tired|lazy|ready|focused|unmotivated)/,
+      variants: ['data-[selected=true]'],
+    },
   ],
   theme: {
     extend: {
       colors: {
+        // ── Gluestack standard tokens ──────────────────────────────────────────
         primary: {
           0: 'rgb(var(--color-primary-0)/<alpha-value>)',
           50: 'rgb(var(--color-primary-50)/<alpha-value>)',
@@ -173,23 +180,80 @@ module.exports = {
           info: 'rgb(var(--color-indicator-info)/<alpha-value>)',
           error: 'rgb(var(--color-indicator-error)/<alpha-value>)',
         },
+
+        // ── App-specific tokens ────────────────────────────────────────────────
+
+        // Background layers — used for nesting cards/panels
+        // dark:  base=#0E0E16, surface-1=#111118, surface-2=#13131E, surface-3=#1A1A2E
+        // light: base=#F5F5FA, surface-1=#FFF,    surface-2=#F8F8FD, surface-3=#F0F0FA
+        surface: {
+          base: 'rgb(var(--color-app-bg-base)/<alpha-value>)',
+          1: 'rgb(var(--color-app-surface-1)/<alpha-value>)',
+          2: 'rgb(var(--color-app-surface-2)/<alpha-value>)',
+          3: 'rgb(var(--color-app-surface-3)/<alpha-value>)',
+        },
+
+        // Dividers / viền ngăn cách
+        border: {
+          default: 'rgb(var(--color-app-border)/<alpha-value>)',
+        },
+
+        // Accent — alias ngắn gọn hơn cho purple/teal
+        accent: {
+          purple: 'rgb(var(--color-primary-500)/<alpha-value>)',
+          'purple-dark': 'rgb(var(--color-primary-600)/<alpha-value>)',
+          'purple-light': 'rgb(var(--color-primary-400)/<alpha-value>)',
+          'purple-surface': 'rgb(var(--color-primary-0)/<alpha-value>)',
+          teal: 'rgb(var(--color-app-teal)/<alpha-value>)',
+        },
+
+        // State colors — màu cho từng kết quả khảo sát
+        state: {
+          exhausted: 'rgb(var(--color-state-exhausted)/<alpha-value>)',
+          tired: 'rgb(var(--color-state-tired)/<alpha-value>)',
+          lazy: 'rgb(var(--color-state-lazy)/<alpha-value>)',
+          ready: 'rgb(var(--color-state-ready)/<alpha-value>)',
+          focused: 'rgb(var(--color-state-focused)/<alpha-value>)',
+          unmotivated: 'rgb(var(--color-state-unmotivated)/<alpha-value>)',
+        },
+
+        // App text — 5 mức độ nổi bật
+        apptext: {
+          primary: 'rgb(var(--color-app-text-primary)/<alpha-value>)',
+          secondary: 'rgb(var(--color-app-text-secondary)/<alpha-value>)',
+          muted: 'rgb(var(--color-app-text-muted)/<alpha-value>)',
+          disabled: 'rgb(var(--color-app-text-disabled)/<alpha-value>)',
+          ghost: 'rgb(var(--color-app-text-ghost)/<alpha-value>)',
+        },
       },
+
       fontFamily: {
         heading: undefined,
         body: undefined,
         mono: undefined,
-        jakarta: ['var(--font-plus-jakarta-sans)'],
-        roboto: ['var(--font-roboto)'],
-        code: ['var(--font-source-code-pro)'],
-        inter: ['var(--font-inter)'],
-        'space-mono': ['var(--font-space-mono)'],
+        // Fonts — tên phải khớp chính xác với key trong useFonts() ở _layout.tsx
+        jakarta: ['PlusJakartaSans_400Regular'],
+        'jakarta-medium': ['PlusJakartaSans_500Medium'],
+        'jakarta-semibold': ['PlusJakartaSans_600SemiBold'],
+        'jakarta-bold': ['PlusJakartaSans_700Bold'],
+        'jakarta-extrabold': ['PlusJakartaSans_800ExtraBold'],
+        'dm-mono': ['DMMono_400Regular'],
+        'dm-mono-medium': ['DMMono_500Medium'],
       },
+
       fontWeight: {
         extrablack: '950',
       },
+
       fontSize: {
         '2xs': '10px',
       },
+
+      letterSpacing: {
+        // Caption style theo design system: +0.08em
+        caption: '0.08em',
+      },
+
       boxShadow: {
         'hard-1': '-2px 2px 8px 0px rgba(38, 38, 38, 0.20)',
         'hard-2': '0px 3px 10px 0px rgba(38, 38, 38, 0.20)',

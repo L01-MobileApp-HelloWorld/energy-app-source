@@ -3,20 +3,21 @@ import { vars } from "nativewind";
 
 export const config = {
   light: vars({
-    "--color-primary-0": "240 247 255",
-    "--color-primary-50": "219 234 254",
-    "--color-primary-100": "191 219 254",
-    "--color-primary-200": "147 197 253",
-    "--color-primary-300": "96 165 250",
-    "--color-primary-400": "59 130 246",
-    "--color-primary-500": "80 141 247",
-    "--color-primary-600": "37 99 235",
-    "--color-primary-700": "29 78 216",
-    "--color-primary-800": "30 64 175",
-    "--color-primary-900": "30 58 138",
-    "--color-primary-950": "23 37 84",
+    // ─── Primary: Purple (brand color) ────────────────────────────────────────
+    "--color-primary-0": "247 244 255",
+    "--color-primary-50": "238 234 255",
+    "--color-primary-100": "224 216 255",
+    "--color-primary-200": "205 192 255",
+    "--color-primary-300": "182 162 255",
+    "--color-primary-400": "156 118 255",
+    "--color-primary-500": "108 71 255",
+    "--color-primary-600": "74 46 204",
+    "--color-primary-700": "55 34 160",
+    "--color-primary-800": "38 24 122",
+    "--color-primary-900": "24 15 84",
+    "--color-primary-950": "12 8 45",
 
-    /* Secondary  */
+    // ─── Secondary ────────────────────────────────────────────────────────────
     "--color-secondary-0": "253 253 253",
     "--color-secondary-50": "251 251 251",
     "--color-secondary-100": "246 246 246",
@@ -30,7 +31,7 @@ export const config = {
     "--color-secondary-900": "165 164 164",
     "--color-secondary-950": "157 157 157",
 
-    /* Tertiary */
+    // ─── Tertiary ─────────────────────────────────────────────────────────────
     "--color-tertiary-0": "255 250 245",
     "--color-tertiary-50": "255 242 229",
     "--color-tertiary-100": "255 233 213",
@@ -44,7 +45,7 @@ export const config = {
     "--color-tertiary-900": "108 61 19",
     "--color-tertiary-950": "84 49 18",
 
-    /* Error */
+    // ─── Error ────────────────────────────────────────────────────────────────
     "--color-error-0": "254 233 233",
     "--color-error-50": "254 226 226",
     "--color-error-100": "254 202 202",
@@ -58,7 +59,7 @@ export const config = {
     "--color-error-900": "127 29 29",
     "--color-error-950": "83 19 19",
 
-    /* Success */
+    // ─── Success ──────────────────────────────────────────────────────────────
     "--color-success-0": "228 255 244",
     "--color-success-50": "202 255 232",
     "--color-success-100": "162 241 192",
@@ -72,7 +73,7 @@ export const config = {
     "--color-success-900": "20 83 45",
     "--color-success-950": "27 50 36",
 
-    /* Warning */
+    // ─── Warning ──────────────────────────────────────────────────────────────
     "--color-warning-0": "255 249 245",
     "--color-warning-50": "255 244 236",
     "--color-warning-100": "255 231 213",
@@ -86,7 +87,7 @@ export const config = {
     "--color-warning-900": "108 56 19",
     "--color-warning-950": "84 45 18",
 
-    /* Info */
+    // ─── Info ─────────────────────────────────────────────────────────────────
     "--color-info-0": "236 248 254",
     "--color-info-50": "199 235 252",
     "--color-info-100": "162 221 250",
@@ -100,7 +101,7 @@ export const config = {
     "--color-info-900": "5 64 93",
     "--color-info-950": "3 38 56",
 
-    /* Typography */
+    // ─── Typography ───────────────────────────────────────────────────────────
     "--color-typography-0": "254 254 255",
     "--color-typography-50": "245 245 245",
     "--color-typography-100": "229 229 229",
@@ -114,7 +115,7 @@ export const config = {
     "--color-typography-900": "38 38 39",
     "--color-typography-950": "23 23 23",
 
-    /* Outline */
+    // ─── Outline ──────────────────────────────────────────────────────────────
     "--color-outline-0": "253 254 254",
     "--color-outline-50": "243 243 243",
     "--color-outline-100": "230 230 230",
@@ -128,7 +129,7 @@ export const config = {
     "--color-outline-900": "39 38 36",
     "--color-outline-950": "26 23 23",
 
-    /* Background */
+    // ─── Background ───────────────────────────────────────────────────────────
     "--color-background-0": "255 255 255",
     "--color-background-50": "246 246 246",
     "--color-background-100": "242 241 241",
@@ -141,34 +142,59 @@ export const config = {
     "--color-background-800": "65 64 64",
     "--color-background-900": "39 38 37",
     "--color-background-950": "18 18 18",
-
-    /* Background Special */
     "--color-background-error": "254 241 241",
     "--color-background-warning": "255 243 234",
     "--color-background-success": "237 252 242",
     "--color-background-muted": "247 248 247",
     "--color-background-info": "235 248 254",
 
-    /* Focus Ring Indicator  */
-    "--color-indicator-primary": "80 141 247",
+    // ─── Focus Ring ───────────────────────────────────────────────────────────
+    "--color-indicator-primary": "108 71 255",
     "--color-indicator-info": "83 153 236",
     "--color-indicator-error": "185 28 28",
-  }),
-  dark: vars({
-    "--color-primary-0": "23 37 84",
-    "--color-primary-50": "30 58 138",
-    "--color-primary-100": "30 64 175",
-    "--color-primary-200": "29 78 216",
-    "--color-primary-300": "37 99 235",
-    "--color-primary-400": "59 130 246",
-    "--color-primary-500": "80 141 247",
-    "--color-primary-600": "96 165 250",
-    "--color-primary-700": "147 197 253",
-    "--color-primary-800": "191 219 254",
-    "--color-primary-900": "219 234 254",
-    "--color-primary-950": "240 247 255",
 
-    /* Secondary  */
+    // ─── App: Background Layers (Light mode) ──────────────────────────────────
+    "--color-app-bg-base": "245 245 250",
+    "--color-app-surface-1": "255 255 255",
+    "--color-app-surface-2": "248 248 253",
+    "--color-app-surface-3": "240 240 250",
+    "--color-app-border": "220 220 232",
+
+    // ─── App: Accent ──────────────────────────────────────────────────────────
+    "--color-app-teal": "62 207 207",
+
+    // ─── App: State Colors (same in both modes) ───────────────────────────────
+    "--color-state-exhausted": "239 83 80",
+    "--color-state-tired": "255 167 38",
+    "--color-state-lazy": "255 214 0",
+    "--color-state-ready": "6 214 160",
+    "--color-state-focused": "41 182 246",
+    "--color-state-unmotivated": "156 118 255",
+
+    // ─── App: Text Colors (Light mode) ────────────────────────────────────────
+    "--color-app-text-primary": "23 23 35",
+    "--color-app-text-secondary": "60 60 90",
+    "--color-app-text-muted": "120 120 150",
+    "--color-app-text-disabled": "180 180 200",
+    "--color-app-text-ghost": "210 210 225",
+  }),
+
+  dark: vars({
+    // ─── Primary: Purple (brand color, inverted scale) ────────────────────────
+    "--color-primary-0": "12 8 45",
+    "--color-primary-50": "24 15 84",
+    "--color-primary-100": "38 24 122",
+    "--color-primary-200": "55 34 160",
+    "--color-primary-300": "74 46 204",
+    "--color-primary-400": "108 71 255",
+    "--color-primary-500": "108 71 255",
+    "--color-primary-600": "156 118 255",
+    "--color-primary-700": "182 162 255",
+    "--color-primary-800": "205 192 255",
+    "--color-primary-900": "224 216 255",
+    "--color-primary-950": "247 244 255",
+
+    // ─── Secondary ────────────────────────────────────────────────────────────
     "--color-secondary-0": "20 20 20",
     "--color-secondary-50": "23 23 23",
     "--color-secondary-100": "31 31 31",
@@ -182,7 +208,7 @@ export const config = {
     "--color-secondary-900": "150 150 150",
     "--color-secondary-950": "164 164 164",
 
-    /* Tertiary */
+    // ─── Tertiary ─────────────────────────────────────────────────────────────
     "--color-tertiary-0": "84 49 18",
     "--color-tertiary-50": "108 61 19",
     "--color-tertiary-100": "130 73 23",
@@ -196,7 +222,7 @@ export const config = {
     "--color-tertiary-900": "255 242 229",
     "--color-tertiary-950": "255 250 245",
 
-    /* Error */
+    // ─── Error ────────────────────────────────────────────────────────────────
     "--color-error-0": "83 19 19",
     "--color-error-50": "127 29 29",
     "--color-error-100": "153 27 27",
@@ -210,7 +236,7 @@ export const config = {
     "--color-error-900": "254 226 226",
     "--color-error-950": "254 233 233",
 
-    /* Success */
+    // ─── Success ──────────────────────────────────────────────────────────────
     "--color-success-0": "27 50 36",
     "--color-success-50": "20 83 45",
     "--color-success-100": "22 101 52",
@@ -224,7 +250,7 @@ export const config = {
     "--color-success-900": "202 255 232",
     "--color-success-950": "228 255 244",
 
-    /* Warning */
+    // ─── Warning ──────────────────────────────────────────────────────────────
     "--color-warning-0": "84 45 18",
     "--color-warning-50": "108 56 19",
     "--color-warning-100": "130 68 23",
@@ -238,7 +264,7 @@ export const config = {
     "--color-warning-900": "255 244 237",
     "--color-warning-950": "255 249 245",
 
-    /* Info */
+    // ─── Info ─────────────────────────────────────────────────────────────────
     "--color-info-0": "3 38 56",
     "--color-info-50": "5 64 93",
     "--color-info-100": "7 90 131",
@@ -252,7 +278,7 @@ export const config = {
     "--color-info-900": "199 235 252",
     "--color-info-950": "236 248 254",
 
-    /* Typography */
+    // ─── Typography ───────────────────────────────────────────────────────────
     "--color-typography-0": "23 23 23",
     "--color-typography-50": "38 38 39",
     "--color-typography-100": "64 64 64",
@@ -266,7 +292,7 @@ export const config = {
     "--color-typography-900": "245 245 245",
     "--color-typography-950": "254 254 255",
 
-    /* Outline */
+    // ─── Outline ──────────────────────────────────────────────────────────────
     "--color-outline-0": "26 23 23",
     "--color-outline-50": "39 38 36",
     "--color-outline-100": "65 65 65",
@@ -280,7 +306,7 @@ export const config = {
     "--color-outline-900": "243 243 243",
     "--color-outline-950": "253 254 254",
 
-    /* Background */
+    // ─── Background ───────────────────────────────────────────────────────────
     "--color-background-0": "18 18 18",
     "--color-background-50": "39 38 37",
     "--color-background-100": "65 64 64",
@@ -293,17 +319,40 @@ export const config = {
     "--color-background-800": "242 241 241",
     "--color-background-900": "246 246 246",
     "--color-background-950": "255 255 255",
-
-    /* Background Special */
     "--color-background-error": "66 43 43",
     "--color-background-warning": "65 47 35",
     "--color-background-success": "28 43 33",
     "--color-background-muted": "51 51 51",
     "--color-background-info": "26 40 46",
 
-    /* Focus Ring Indicator  */
-    "--color-indicator-primary": "80 141 247",
+    // ─── Focus Ring ───────────────────────────────────────────────────────────
+    "--color-indicator-primary": "108 71 255",
     "--color-indicator-info": "161 199 245",
     "--color-indicator-error": "232 70 69",
+
+    // ─── App: Background Layers (Dark mode) ───────────────────────────────────
+    "--color-app-bg-base": "14 14 22",
+    "--color-app-surface-1": "17 17 24",
+    "--color-app-surface-2": "19 19 30",
+    "--color-app-surface-3": "26 26 46",
+    "--color-app-border": "37 37 53",
+
+    // ─── App: Accent ──────────────────────────────────────────────────────────
+    "--color-app-teal": "62 207 207",
+
+    // ─── App: State Colors (same in both modes) ───────────────────────────────
+    "--color-state-exhausted": "239 83 80",
+    "--color-state-tired": "255 167 38",
+    "--color-state-lazy": "255 214 0",
+    "--color-state-ready": "6 214 160",
+    "--color-state-focused": "41 182 246",
+    "--color-state-unmotivated": "156 118 255",
+
+    // ─── App: Text Colors (Dark mode) ─────────────────────────────────────────
+    "--color-app-text-primary": "240 240 255",
+    "--color-app-text-secondary": "208 208 232",
+    "--color-app-text-muted": "136 136 153",
+    "--color-app-text-disabled": "85 85 112",
+    "--color-app-text-ghost": "68 68 96",
   }),
 };
