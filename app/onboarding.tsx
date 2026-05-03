@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import { AppColors } from "@/constants/theme";
+import { useAppColors } from "@/hooks/use-app-theme";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Dimensions, Image, Pressable, ScrollView, View } from "react-native";
@@ -33,6 +33,7 @@ const slides = [
 ];
 
 export default function OnboardingScreen() {
+  const colors = useAppColors();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
@@ -67,7 +68,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: AppColors.bgSurface1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bgSurface1 }}>
       {/* Skip button */}
       <View
         style={{
@@ -79,7 +80,10 @@ export default function OnboardingScreen() {
       >
         {!isLastSlide && (
           <Pressable onPress={handleSkip} hitSlop={12}>
-            <Text className="text-black font-jakarta-bold" style={{ fontSize: scale(22), lineHeight: scale(30) }}>
+            <Text
+              className="font-jakarta-bold"
+              style={{ fontSize: scale(22), lineHeight: scale(30), color: colors.textPrimary }}
+            >
               Bỏ qua
             </Text>
           </Pressable>
@@ -113,18 +117,19 @@ export default function OnboardingScreen() {
               resizeMode="contain"
             />
             <Heading
-              className="font-jakarta-bold text-center text-black"
-              style={{ marginTop: 40, fontSize: scale(28), lineHeight: scale(38) }}
+              className="font-jakarta-bold text-center"
+              style={{
+                marginTop: 40,
+                fontSize: scale(28),
+                lineHeight: scale(38),
+                color: colors.textPrimary,
+              }}
             >
               {slide.title}
             </Heading>
             <Text
               className="font-jakarta-medium text-center"
-              style={{
-                marginTop: 16,
-                fontSize: scale(16),
-                color: AppColors.textMuted,
-              }}
+              style={{ marginTop: 16, fontSize: scale(16), color: colors.textMuted }}
             >
               {slide.description}
             </Text>
@@ -151,7 +156,7 @@ export default function OnboardingScreen() {
                 height: 8,
                 width: index === currentIndex ? 24 : 8,
                 borderRadius: 4,
-                backgroundColor: index === currentIndex ? AppColors.primaryMain : AppColors.textGhost,
+                backgroundColor: index === currentIndex ? colors.primaryMain : colors.textGhost,
               }}
             />
           ))}

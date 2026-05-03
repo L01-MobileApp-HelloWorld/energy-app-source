@@ -22,20 +22,24 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { Text } from "react-native";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { ThemePreferencesProvider, useAppTheme } from "@/hooks/use-app-theme";
 import "@/global.css";
 
 SplashScreen.preventAutoHideAsync();
 
-Text.defaultProps = {
-  ...Text.defaultProps,
-  style: [{ fontFamily: "PlusJakartaSans_400Regular" }, Text.defaultProps?.style],
+const TextWithDefaults = Text as typeof Text & {
+  defaultProps?: {
+    style?: unknown;
+  };
+};
+
+TextWithDefaults.defaultProps = {
+  ...TextWithDefaults.defaultProps,
+  style: [{ fontFamily: "PlusJakartaSans_400Regular" }, TextWithDefaults.defaultProps?.style],
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   const [fontsLoaded, fontError] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_500Medium,
@@ -57,24 +61,45 @@ export default function RootLayout() {
   }
 
   return (
-    <GluestackUIProvider mode="dark">
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="survey" options={{ headerShown: false }} />
-          <Stack.Screen name="analystic" options={{ headerShown: false }} />
-          <Stack.Screen name="result" options={{ headerShown: false }} />
-          <Stack.Screen name="reminder" options={{ headerShown: false }} />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="register" options={{ headerShown: false }} />
+    <ThemePreferencesProvider>
+      <RootNavigator />
+    </ThemePreferencesProvider>
+  );
+}
+
+function RootNavigator() {
+  const { resolvedTheme } = useAppTheme();
+
+  return (
+    <GluestackUIProvider mode={resolvedTheme}>
+      <ThemeProvider value={resolvedTheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: "slide_from_right",
+            gestureEnabled: true,
+            fullScreenGestureEnabled: true,
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="survey" />
+          <Stack.Screen name="analystic" />
+          <Stack.Screen name="result" />
+          <Stack.Screen name="reminder" />
+          <Stack.Screen name="login" />
+          <Stack.Screen name="register" />
           <Stack.Screen
             name="modal"
-            options={{ presentation: "modal", title: "Modal" }}
+            options={{
+              presentation: "modal",
+              title: "Modal",
+              headerShown: true,
+            }}
           />
         </Stack>
-        <StatusBar style="auto" />
+        <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />
       </ThemeProvider>
     </GluestackUIProvider>
   );

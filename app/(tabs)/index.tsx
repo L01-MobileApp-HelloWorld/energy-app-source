@@ -2,10 +2,11 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Text } from "@/components/ui/text";
-import { AppColors } from "@/constants/theme";
+import { AppColorsType } from "@/constants/theme";
+import { useAppColors } from "@/hooks/use-app-theme";
 import { router } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function getCurrentDateTime() {
@@ -17,20 +18,22 @@ function getCurrentDateTime() {
   return `${day}, ${h}:${m}`;
 }
 
-const CARD_STYLE = {
-  backgroundColor: AppColors.bgSurface1,
-  borderRadius: 16,
-  padding: 20,
-  shadowColor: AppColors.black,
-  shadowOpacity: 0.06,
-  shadowRadius: 8,
-  shadowOffset: { width: 0, height: 2 },
-  elevation: 2,
-};
-
 export default function HomeScreen() {
+  const colors = useAppColors();
+  const styles = createStyles(colors);
+  const cardStyle = {
+    backgroundColor: colors.bgSurface1,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: colors.black,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  } as const;
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: AppColors.bgApp }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bgApp }}>
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
@@ -49,10 +52,10 @@ export default function HomeScreen() {
           }}
         >
           <View>
-            <Heading size="2xl" style={{ color: AppColors.black }}>
+            <Heading size="2xl" style={{ color: colors.textPrimary }}>
               Chào Huy! 👋
             </Heading>
-            <Text size="sm" style={{ color: AppColors.textDisabled, marginTop: 4 }}>
+            <Text size="sm" style={{ color: colors.textDisabled, marginTop: 4 }}>
               {getCurrentDateTime()}
             </Text>
           </View>
@@ -61,7 +64,7 @@ export default function HomeScreen() {
               width: 46,
               height: 46,
               borderRadius: 23,
-              backgroundColor: AppColors.bgSurface3,
+              backgroundColor: colors.bgSurface3,
               alignItems: "center",
               justifyContent: "center",
               overflow: "hidden",
@@ -72,13 +75,13 @@ export default function HomeScreen() {
         </View>
 
         {/* Check-in Card */}
-        <View style={{ ...CARD_STYLE, alignItems: "center", marginBottom: 16 }}>
+        <View style={{ ...cardStyle, alignItems: "center", marginBottom: 16 }}>
           <View
             style={{
               width: 80,
               height: 80,
               borderRadius: 40,
-              backgroundColor: AppColors.primarySurface,
+              backgroundColor: colors.primarySurface,
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 16,
@@ -88,13 +91,13 @@ export default function HomeScreen() {
           </View>
           <Heading
             size="lg"
-            style={{ color: AppColors.black, textAlign: "center", marginBottom: 8 }}
+            style={{ color: colors.textPrimary, textAlign: "center", marginBottom: 8 }}
           >
             Hôm nay bạn cảm thấy thế nào?
           </Heading>
           <Text
             size="sm"
-            style={{ color: AppColors.textDisabled, textAlign: "center", marginBottom: 20 }}
+            style={{ color: colors.textDisabled, textAlign: "center", marginBottom: 20 }}
           >
             Dành 1 phút để thấu hiểm cảm xúc của mình
           </Text>
@@ -106,12 +109,12 @@ export default function HomeScreen() {
         {/* Previous Result Card */}
         <View
           style={{
-            backgroundColor: AppColors.bgSurface1,
+            backgroundColor: colors.bgSurface1,
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: AppColors.primaryMain,
+            borderColor: colors.primaryMain,
             borderLeftWidth: 3,
-            borderLeftColor: AppColors.primaryMain,
+            borderLeftColor: colors.primaryMain,
             paddingVertical: 16,
             paddingHorizontal: 16,
             marginBottom: 16,
@@ -124,7 +127,7 @@ export default function HomeScreen() {
               width: 40,
               height: 40,
               borderRadius: 8,
-              backgroundColor: AppColors.primaryMain,
+              backgroundColor: colors.primaryMain,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 12,
@@ -133,13 +136,13 @@ export default function HomeScreen() {
             <Text style={{ fontSize: 20 }}>💪</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text size="xs" style={{ color: AppColors.textDisabled }}>
+            <Text size="xs" style={{ color: colors.textDisabled }}>
               Lần trước,
             </Text>
-            <Text size="lg" bold style={{ color: AppColors.primaryMain, marginTop: 2 }}>
+            <Text size="lg" bold style={{ color: colors.primaryMain, marginTop: 2 }}>
               Tỉnh táo, sẵn sàng
             </Text>
-            <Text size="xs" style={{ color: AppColors.textDisabled, marginTop: 2 }}>
+            <Text size="xs" style={{ color: colors.textDisabled, marginTop: 2 }}>
               Hôm nay, 12:00
             </Text>
           </View>
@@ -151,13 +154,13 @@ export default function HomeScreen() {
             <IconSymbol
               name="clock.arrow.circlepath"
               size={20}
-              color={AppColors.textMuted}
+              color={colors.textMuted}
             />
           </View>
           <Text size="md" bold style={styles.menuLabel}>
             Kiểm tra lịch sử
           </Text>
-          <IconSymbol name="chevron.right" size={20} color={AppColors.textGhost} />
+          <IconSymbol name="chevron.right" size={20} color={colors.textGhost} />
         </View>
 
         {/* Xem nhắc nhở */}
@@ -170,41 +173,42 @@ export default function HomeScreen() {
           }}
         >
           <View style={styles.menuIconBox}>
-            <IconSymbol name="alarm" size={20} color={AppColors.textMuted} />
+            <IconSymbol name="alarm" size={20} color={colors.textMuted} />
           </View>
           <Text size="md" bold style={styles.menuLabel}>
             Xem nhắc nhở
           </Text>
-          <IconSymbol name="chevron.right" size={20} color={AppColors.textGhost} />
+          <IconSymbol name="chevron.right" size={20} color={colors.textGhost} />
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  menuCard: {
-    backgroundColor: AppColors.bgSurface1,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: AppColors.borderDefault,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  menuIconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: AppColors.bgSurface2,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  menuLabel: {
-    flex: 1,
-    color: AppColors.textPrimary,
-  },
-});
+const createStyles = (colors: AppColorsType) =>
+  StyleSheet.create({
+    menuCard: {
+      backgroundColor: colors.bgSurface1,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.borderDefault,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 12,
+    },
+    menuIconBox: {
+      width: 40,
+      height: 40,
+      borderRadius: 8,
+      backgroundColor: colors.bgSurface2,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 12,
+    },
+    menuLabel: {
+      flex: 1,
+      color: colors.textPrimary,
+    },
+  });

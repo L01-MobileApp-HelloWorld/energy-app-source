@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/21</span>
             </div>
         
             
@@ -173,7 +173,12 @@
 <a name='L108'></a><a href='#L108'>108</a>
 <a name='L109'></a><a href='#L109'>109</a>
 <a name='L110'></a><a href='#L110'>110</a>
-<a name='L111'></a><a href='#L111'>111</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -193,6 +198,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -257,6 +264,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -289,7 +297,8 @@ import { Animated, Dimensions, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 &nbsp;
-import { AppColors, FontFamily } from '@/constants/theme';
+import { AppColorsType, FontFamily } from '@/constants/theme';
+import { useAppColors } from '@/hooks/use-app-theme';
 &nbsp;
 const { width } = <span class="cstat-no" title="statement not covered" >Dimensions.get('window');</span>
 const scale = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(s</span>ize: number) =&gt; <span class="cstat-no" title="statement not covered" >(width / 390) * size;</span></span>
@@ -300,6 +309,8 @@ const R = <span class="cstat-no" title="statement not covered" >(SPINNER - STROK
 const CIRC = <span class="cstat-no" title="statement not covered" >2 * Math.PI * R;</span>
 &nbsp;
 export default function <span class="fstat-no" title="function not covered" >AnalysticScreen(</span>) {
+  const colors = <span class="cstat-no" title="statement not covered" >useAppColors();</span>
+  const styles = <span class="cstat-no" title="statement not covered" >createStyles(colors);</span>
   const { answers } = <span class="cstat-no" title="statement not covered" >useLocalSearchParams&lt;{ answers: string }&gt;();</span>
   const rotateAnim = <span class="cstat-no" title="statement not covered" >useRef(new Animated.Value(0)).current;</span>
   const fadeAnim = <span class="cstat-no" title="statement not covered" >useRef(new Animated.Value(0)).current;</span>
@@ -340,7 +351,7 @@ export default function <span class="fstat-no" title="function not covered" >Ana
               cx={SPINNER / 2}
               cy={SPINNER / 2}
               r={R}
-              stroke={AppColors.bgSurface3}
+              stroke={colors.bgSurface3}
               strokeWidth={STROKE}
               fill="none"
             /&gt;
@@ -348,7 +359,7 @@ export default function <span class="fstat-no" title="function not covered" >Ana
               cx={SPINNER / 2}
               cy={SPINNER / 2}
               r={R}
-              stroke={AppColors.primaryMain}
+              stroke={colors.primaryMain}
               strokeWidth={STROKE}
               fill="none"
               strokeDasharray={CIRC}
@@ -367,10 +378,11 @@ export default function <span class="fstat-no" title="function not covered" >Ana
   );
 }
 &nbsp;
-const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
+const createStyles = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(c</span>olors: AppColorsType) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >  StyleSheet.create({</span>
   screen: {
     flex: 1,
-    backgroundColor: AppColors.bgApp,
+    backgroundColor: colors.bgApp,
   },
   center: {
     flex: 1,
@@ -385,12 +397,12 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
   title: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(22),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
   },
   subtitle: {
     fontFamily: FontFamily.sans,
     fontSize: scale(14),
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
 });
 &nbsp;</pre></td></tr></table></pre>
@@ -400,7 +412,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-03T15:06:35.044Z
+                at 2026-05-03T15:38:10.004Z
             </div>
         <script src="../prettify.js"></script>
         <script>

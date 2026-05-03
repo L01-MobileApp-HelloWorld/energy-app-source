@@ -2,7 +2,8 @@ import React from 'react';
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { RadioButton } from '@/components/ui/radio-button';
-import { AppColors, FontFamily } from '@/constants/theme';
+import { AppColorsType, FontFamily } from '@/constants/theme';
+import { useAppColors } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -20,6 +21,9 @@ type SurveyOptionCardProps = {
 };
 
 export function SurveyOptionCard({ option, selected, onPress }: SurveyOptionCardProps) {
+  const colors = useAppColors();
+  const styles = createStyles(colors);
+
   return (
     <Pressable
       onPress={onPress}
@@ -37,39 +41,40 @@ export function SurveyOptionCard({ option, selected, onPress }: SurveyOptionCard
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: AppColors.bgSurface1,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: AppColors.borderDefault,
-    padding: 14,
-    gap: 12,
-  },
-  cardSelected: {
-    borderColor: AppColors.primaryMain,
-    backgroundColor: AppColors.primarySurface,
-  },
-  emojiBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: AppColors.bgSurface2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: { flex: 1 },
-  label: {
-    fontFamily: FontFamily.sansBold,
-    fontSize: scale(14),
-    color: AppColors.textPrimary,
-  },
-  description: {
-    fontFamily: FontFamily.sans,
-    fontSize: scale(12),
-    color: AppColors.textMuted,
-    marginTop: 2,
-  },
-});
+const createStyles = (colors: AppColorsType) =>
+  StyleSheet.create({
+    card: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.bgSurface1,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.borderDefault,
+      padding: 14,
+      gap: 12,
+    },
+    cardSelected: {
+      borderColor: colors.primaryMain,
+      backgroundColor: colors.primarySurface,
+    },
+    emojiBox: {
+      width: 40,
+      height: 40,
+      borderRadius: 8,
+      backgroundColor: colors.bgSurface2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    text: { flex: 1 },
+    label: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(14),
+      color: colors.textPrimary,
+    },
+    description: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(12),
+      color: colors.textMuted,
+      marginTop: 2,
+    },
+  });

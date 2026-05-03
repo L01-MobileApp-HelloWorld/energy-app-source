@@ -5,9 +5,13 @@ import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { CustomTabBar } from '@/components/ui/custom-tab-bar';
-import { AppColors } from '@/constants/theme';
+import { AppColorsType } from '@/constants/theme';
+import { useAppColors } from '@/hooks/use-app-theme';
 
 export default function TabLayout() {
+  const colors = useAppColors();
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.root}>
       <Tabs
@@ -46,9 +50,10 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: AppColors.bgApp,
-  },
-});
+const createStyles = (colors: AppColorsType) =>
+  StyleSheet.create({
+    root: {
+      flex: 1,
+      backgroundColor: colors.bgApp,
+    },
+  });

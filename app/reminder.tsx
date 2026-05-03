@@ -22,7 +22,8 @@ import {
 } from '@/components/ui/actionsheet';
 import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
 import { Ionicons } from '@expo/vector-icons';
-import { AppColors, FontFamily } from '@/constants/theme';
+import { AppColorsType, FontFamily } from '@/constants/theme';
+import { useAppColors } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -42,6 +43,8 @@ const FREQ_OPTIONS: { key: FrequencyKey; label: string }[] = [
 ];
 
 export default function ReminderScreen() {
+  const colors = useAppColors();
+  const styles = createStyles(colors);
   const [isEnabled, setIsEnabled] = useState(true);
   const [time, setTime] = useState(() => new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -100,9 +103,9 @@ export default function ReminderScreen() {
             <Switch
               value={isEnabled}
               onValueChange={setIsEnabled}
-              trackColor={{ false: AppColors.bgSurface3, true: AppColors.primaryMain }}
-              thumbColor={AppColors.bgSurface1}
-              ios_backgroundColor={AppColors.bgSurface3}
+              trackColor={{ false: colors.bgSurface3, true: colors.primaryMain }}
+              thumbColor={colors.bgSurface1}
+              ios_backgroundColor={colors.bgSurface3}
             />
           </View>
         </View>
@@ -161,7 +164,7 @@ export default function ReminderScreen() {
       {Platform.OS === 'ios' && (
         <Actionsheet isOpen={showTimePicker} onClose={() => setShowTimePicker(false)}>
           <ActionsheetBackdrop onPress={() => setShowTimePicker(false)} />
-          <ActionsheetContent style={{ backgroundColor: AppColors.bgSurface1 }}>
+          <ActionsheetContent style={{ backgroundColor: colors.bgSurface1 }}>
             <ActionsheetDragIndicatorWrapper>
               <ActionsheetDragIndicator />
             </ActionsheetDragIndicatorWrapper>
@@ -175,7 +178,7 @@ export default function ReminderScreen() {
           onDismiss={() => setShowTimePicker(false)}
                 is24Hour
                 style={{ width: '100%' }}
-                textColor={AppColors.textPrimary}
+                textColor={colors.textPrimary}
               />
               <Pressable style={styles.saveBtn} onPress={() => setShowTimePicker(false)}>
                 <Text style={styles.saveBtnText}>Xác nhận</Text>
@@ -188,7 +191,7 @@ export default function ReminderScreen() {
       {/* Custom Frequency Bottom Sheet */}
       <Actionsheet isOpen={showFreqSheet} onClose={() => setShowFreqSheet(false)}>
         <ActionsheetBackdrop onPress={() => setShowFreqSheet(false)} />
-        <ActionsheetContent style={{ backgroundColor: AppColors.bgSurface1 }}>
+        <ActionsheetContent style={{ backgroundColor: colors.bgSurface1 }}>
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
@@ -221,8 +224,9 @@ export default function ReminderScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: AppColors.bgApp },
+const createStyles = (colors: AppColorsType) =>
+  StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.bgApp },
   scroll: { flex: 1 },
   scrollContent: { padding: 20, gap: 16 },
 
@@ -231,22 +235,22 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: AppColors.bgSurface1,
+    backgroundColor: colors.bgSurface1,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
+    borderColor: colors.borderDefault,
     padding: 16,
     gap: 12,
   },
   cardLabel: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(15),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
   },
   cardSub: {
     fontFamily: FontFamily.sans,
     fontSize: scale(13),
-    color: AppColors.textMuted,
+    color: colors.textMuted,
     lineHeight: scale(18),
   },
 
@@ -258,14 +262,14 @@ const styles = StyleSheet.create({
   timeRow: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: AppColors.bgSurface1,
+    backgroundColor: colors.bgSurface1,
     borderRadius: 8,
     paddingVertical: 16,
   },
   timeValue: {
     fontFamily: FontFamily.monoMedium,
     fontSize: scale(44),
-    color: AppColors.primaryMain,
+    color: colors.primaryMain,
     letterSpacing: 4,
   },
 
@@ -279,17 +283,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
-    backgroundColor: AppColors.bgSurface2,
+    borderColor: colors.borderDefault,
+    backgroundColor: colors.bgSurface2,
   },
   freqChipActive: {
-    backgroundColor: AppColors.primaryMain,
-    borderColor: AppColors.primaryMain,
+    backgroundColor: colors.primaryMain,
+    borderColor: colors.primaryMain,
   },
   freqChipText: {
     fontFamily: FontFamily.sansSemiBold,
     fontSize: scale(13),
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
   },
   freqChipTextActive: {
     color: '#ffffff',
@@ -303,7 +307,7 @@ const styles = StyleSheet.create({
   saveBtn: {
     height: 52,
     borderRadius: 8,
-    backgroundColor: AppColors.primaryMain,
+    backgroundColor: colors.primaryMain,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -324,7 +328,7 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(16),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
   },
   daysGrid: {
     flexDirection: 'row',
@@ -336,19 +340,19 @@ const styles = StyleSheet.create({
     height: CHIP_SIZE,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
-    backgroundColor: AppColors.bgSurface2,
+    borderColor: colors.borderDefault,
+    backgroundColor: colors.bgSurface2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   dayChipActive: {
-    backgroundColor: AppColors.primaryMain,
-    borderColor: AppColors.primaryMain,
+    backgroundColor: colors.primaryMain,
+    borderColor: colors.primaryMain,
   },
   dayChipText: {
     fontFamily: FontFamily.sansSemiBold,
     fontSize: scale(12),
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   dayChipTextActive: {

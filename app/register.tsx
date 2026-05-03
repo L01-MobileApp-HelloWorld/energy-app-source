@@ -15,12 +15,15 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
-import { AppColors, FontFamily } from '@/constants/theme';
+import { AppColorsType, FontFamily } from '@/constants/theme';
+import { useAppColors } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
 
 export default function RegisterScreen() {
+  const colors = useAppColors();
+  const styles = createStyles(colors);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -72,7 +75,7 @@ export default function RegisterScreen() {
                 onFocus={() => setEmailFocused(true)}
                 onBlur={() => setEmailFocused(false)}
                 placeholder="you@example.com"
-                placeholderTextColor={AppColors.textGhost}
+                placeholderTextColor={colors.textGhost}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -89,7 +92,7 @@ export default function RegisterScreen() {
                   onFocus={() => setPasswordFocused(true)}
                   onBlur={() => setPasswordFocused(false)}
                   placeholder="••••••••"
-                  placeholderTextColor={AppColors.textGhost}
+                  placeholderTextColor={colors.textGhost}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -102,7 +105,7 @@ export default function RegisterScreen() {
                   <Ionicons
                     name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                     size={20}
-                    color={AppColors.textMuted}
+                    color={colors.textMuted}
                   />
                 </Pressable>
               </View>
@@ -124,7 +127,7 @@ export default function RegisterScreen() {
                   onFocus={() => setPasswordConfirmationFocused(true)}
                   onBlur={() => setPasswordConfirmationFocused(false)}
                   placeholder="••••••••"
-                  placeholderTextColor={AppColors.textGhost}
+                  placeholderTextColor={colors.textGhost}
                   secureTextEntry={!showPasswordConfirmation}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -137,7 +140,7 @@ export default function RegisterScreen() {
                   <Ionicons
                     name={showPasswordConfirmation ? 'eye-outline' : 'eye-off-outline'}
                     size={20}
-                    color={AppColors.textMuted}
+                    color={colors.textMuted}
                   />
                 </Pressable>
               </View>
@@ -164,10 +167,11 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: AppColorsType) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: AppColors.bgApp,
+    backgroundColor: colors.bgApp,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -184,9 +188,9 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 20,
-    backgroundColor: AppColors.primarySurface,
+    backgroundColor: colors.primarySurface,
     borderWidth: 1,
-    borderColor: AppColors.primaryLight,
+    borderColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
@@ -197,29 +201,29 @@ const styles = StyleSheet.create({
   appName: {
     fontFamily: FontFamily.sansExtraBold,
     fontSize: scale(28),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
     letterSpacing: -0.5,
   },
   tagline: {
     fontFamily: FontFamily.sans,
     fontSize: scale(14),
     lineHeight: scale(22),
-    color: AppColors.textMuted,
+    color: colors.textMuted,
     textAlign: 'center',
     paddingHorizontal: 20,
   },
   card: {
-    backgroundColor: AppColors.bgSurface1,
+    backgroundColor: colors.bgSurface1,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
+    borderColor: colors.borderDefault,
     padding: 20,
     gap: 16,
   },
   cardTitle: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(18),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   fieldGroup: {
@@ -228,22 +232,22 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: FontFamily.sansSemiBold,
     fontSize: scale(13),
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
   },
   input: {
-    backgroundColor: AppColors.bgSurface2,
+    backgroundColor: colors.bgSurface2,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
+    borderColor: colors.borderDefault,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontFamily: FontFamily.sans,
     fontSize: scale(15),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
   },
   inputFocused: {
-    borderColor: AppColors.primaryMain,
-    backgroundColor: AppColors.bgSurface1,
+    borderColor: colors.primaryMain,
+    backgroundColor: colors.bgSurface1,
   },
   inputRow: {
     flexDirection: 'row',
@@ -256,7 +260,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FontFamily.sans,
     fontSize: scale(15),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
     paddingVertical: 12,
   },
   eyeBtn: {
@@ -264,7 +268,7 @@ const styles = StyleSheet.create({
   },
   registerBtn: {
     height: 52,
-    backgroundColor: AppColors.primaryMain,
+    backgroundColor: colors.primaryMain,
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
@@ -286,11 +290,11 @@ const styles = StyleSheet.create({
   loginText: {
     fontFamily: FontFamily.sans,
     fontSize: scale(14),
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
   loginLink: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(14),
-    color: AppColors.primaryMain,
+    color: colors.primaryMain,
   },
 });

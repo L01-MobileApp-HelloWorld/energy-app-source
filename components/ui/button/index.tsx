@@ -283,6 +283,7 @@ type IButtonProps = Omit<
   "context"
 > &
   VariantProps<typeof buttonStyle> & {
+    children?: React.ReactNode;
     className?: string;
     startIcon?: React.ReactNode;
     endIcon?: React.ReactNode;

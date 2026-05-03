@@ -1,6 +1,7 @@
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent } from "@testing-library/react-native";
 import React from "react";
 import { Dimensions, ScrollView } from "react-native";
+import { renderWithTheme } from "../test-utils";
 
 const mockReplace = jest.fn();
 
@@ -60,64 +61,64 @@ describe("OnboardingScreen", () => {
   });
 
   test("render first slide text", () => {
-    const { getByText } = render(<OnboardingScreen />);
+    const { getByText } = renderWithTheme(<OnboardingScreen />);
     expect(getByText("Mệt thật hay lười thật")).toBeTruthy();
   });
 
   test("skip button works", () => {
-    const { getByText } = render(<OnboardingScreen />);
+    const { getByText } = renderWithTheme(<OnboardingScreen />);
     fireEvent.press(getByText("Bỏ qua"));
     expect(mockReplace).toHaveBeenCalledWith("/login");
   });
 
   test("next button exists", () => {
-    const { getByText } = render(<OnboardingScreen />);
+    const { getByText } = renderWithTheme(<OnboardingScreen />);
     expect(getByText("Tiếp theo")).toBeTruthy();
   });
 
   test("skip button is visible on the first slide", () => {
-    const { getByText } = render(<OnboardingScreen />);
+    const { getByText } = renderWithTheme(<OnboardingScreen />);
     expect(getByText("Bỏ qua")).toBeTruthy();
   });
 
   test("render second slide title", () => {
-    const { getByText } = render(<OnboardingScreen />);
+    const { getByText } = renderWithTheme(<OnboardingScreen />);
     expect(getByText("Trả lời 10 câu hỏi\nchỉ trong 60 giây")).toBeTruthy();
   });
 
   test("render third slide title", () => {
-    const { getByText } = render(<OnboardingScreen />);
+    const { getByText } = renderWithTheme(<OnboardingScreen />);
     expect(getByText("Sẵn sàng!!")).toBeTruthy();
   });
 
   test("render repeated description twice", () => {
-    const { getAllByText } = render(<OnboardingScreen />);
+    const { getAllByText } = renderWithTheme(<OnboardingScreen />);
     expect(
       getAllByText("Bạn có đang phân vân không biết nên làm việc hay nghỉ ngơi")
     ).toHaveLength(2);
   });
 
   test("render last slide description", () => {
-    const { getByText } = render(<OnboardingScreen />);
+    const { getByText } = renderWithTheme(<OnboardingScreen />);
     expect(getByText("Bắt đầu hành trình hiểu rõ bản thân")).toBeTruthy();
   });
 
   test("pressing next twice changes CTA to start button", () => {
-    const { getByText } = render(<OnboardingScreen />);
+    const { getByText } = renderWithTheme(<OnboardingScreen />);
     fireEvent.press(getByText("Tiếp theo"));
     fireEvent.press(getByText("Tiếp theo"));
     expect(getByText("Bắt đầu")).toBeTruthy();
   });
 
   test("skip button disappears on the last slide", () => {
-    const { getByText, queryByText } = render(<OnboardingScreen />);
+    const { getByText, queryByText } = renderWithTheme(<OnboardingScreen />);
     fireEvent.press(getByText("Tiếp theo"));
     fireEvent.press(getByText("Tiếp theo"));
     expect(queryByText("Bỏ qua")).toBeNull();
   });
 
   test("pressing start on the last slide navigates to tabs", () => {
-    const { getByText } = render(<OnboardingScreen />);
+    const { getByText } = renderWithTheme(<OnboardingScreen />);
     fireEvent.press(getByText("Tiếp theo"));
     fireEvent.press(getByText("Tiếp theo"));
     fireEvent.press(getByText("Bắt đầu"));
@@ -125,7 +126,7 @@ describe("OnboardingScreen", () => {
   });
 
   test("momentum scroll to second slide keeps next CTA", () => {
-    const { UNSAFE_getByType, getByText } = render(<OnboardingScreen />);
+    const { UNSAFE_getByType, getByText } = renderWithTheme(<OnboardingScreen />);
     const scrollView = UNSAFE_getByType(ScrollView);
     const slideWidth = Dimensions.get("window").width;
     fireEvent(scrollView, "onMomentumScrollEnd", {
@@ -135,7 +136,7 @@ describe("OnboardingScreen", () => {
   });
 
   test("momentum scroll to second slide keeps skip button visible", () => {
-    const { UNSAFE_getByType, getByText } = render(<OnboardingScreen />);
+    const { UNSAFE_getByType, getByText } = renderWithTheme(<OnboardingScreen />);
     const scrollView = UNSAFE_getByType(ScrollView);
     const slideWidth = Dimensions.get("window").width;
     fireEvent(scrollView, "onMomentumScrollEnd", {
@@ -145,7 +146,7 @@ describe("OnboardingScreen", () => {
   });
 
   test("momentum scroll to last slide changes CTA to start", () => {
-    const { UNSAFE_getByType, getByText } = render(<OnboardingScreen />);
+    const { UNSAFE_getByType, getByText } = renderWithTheme(<OnboardingScreen />);
     const scrollView = UNSAFE_getByType(ScrollView);
     const slideWidth = Dimensions.get("window").width;
     fireEvent(scrollView, "onMomentumScrollEnd", {
@@ -155,7 +156,7 @@ describe("OnboardingScreen", () => {
   });
 
   test("momentum scroll back to first slide restores skip button", () => {
-    const { UNSAFE_getByType, getByText } = render(<OnboardingScreen />);
+    const { UNSAFE_getByType, getByText } = renderWithTheme(<OnboardingScreen />);
     const scrollView = UNSAFE_getByType(ScrollView);
     const slideWidth = Dimensions.get("window").width;
     fireEvent(scrollView, "onMomentumScrollEnd", {

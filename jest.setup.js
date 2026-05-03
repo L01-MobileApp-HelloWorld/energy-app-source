@@ -1,10 +1,35 @@
 import "@testing-library/jest-native/extend-expect";
 
+const asyncStorageState = {};
+
 // mock expo router
 jest.mock("expo-router", () => ({
   Link: "Link",
   Stack: "Stack",
   useRouter: () => ({ push: jest.fn() }),
+}));
+
+jest.mock("@/hooks/use-color-scheme", () => ({
+  useColorScheme: jest.fn(() => "light"),
+}));
+
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  __esModule: true,
+  default: {
+    getItem: jest.fn((key) => Promise.resolve(key in asyncStorageState ? asyncStorageState[key] : null)),
+    setItem: jest.fn((key, value) => {
+      asyncStorageState[key] = value;
+      return Promise.resolve();
+    }),
+    removeItem: jest.fn((key) => {
+      delete asyncStorageState[key];
+      return Promise.resolve();
+    }),
+    clear: jest.fn(() => {
+      Object.keys(asyncStorageState).forEach((key) => delete asyncStorageState[key]);
+      return Promise.resolve();
+    }),
+  },
 }));
 
 // mock expo modules

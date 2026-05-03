@@ -5,7 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
 import { StateBadge, StateKey } from '@/components/ui/state-badge';
-import { AppColors, FontFamily, STATE_COLOR_MAP } from '@/constants/theme';
+import { AppColorsType, FontFamily, getStateColorMap } from '@/constants/theme';
+import { useAppColors, useAppTheme } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -112,7 +113,15 @@ function getState(overall: number): StateKey {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function CircularScore({ score, color }: { score: number; color: string }) {
+function CircularScore({
+  score,
+  color,
+  colors,
+}: {
+  score: number;
+  color: string;
+  colors: AppColorsType;
+}) {
   const SIZE = 164;
   const SW = 12;
   const r = (SIZE - SW) / 2;
@@ -126,7 +135,7 @@ function CircularScore({ score, color }: { score: number; color: string }) {
           cx={SIZE / 2}
           cy={SIZE / 2}
           r={r}
-          stroke={AppColors.bgSurface3}
+          stroke={colors.bgSurface3}
           strokeWidth={SW}
           fill="none"
         />
@@ -148,7 +157,7 @@ function CircularScore({ score, color }: { score: number; color: string }) {
           <Text style={{ fontFamily: FontFamily.monoMedium, fontSize: scale(36), color }}>
             {score.toFixed(1)}
           </Text>
-          <Text style={{ fontFamily: FontFamily.sans, fontSize: scale(12), color: AppColors.textMuted }}>
+          <Text style={{ fontFamily: FontFamily.sans, fontSize: scale(12), color: colors.textMuted }}>
             / 5.0
           </Text>
         </View>
@@ -157,18 +166,28 @@ function CircularScore({ score, color }: { score: number; color: string }) {
   );
 }
 
-function CategoryBar({ label, score, color }: { label: string; score: number; color: string }) {
+function CategoryBar({
+  label,
+  score,
+  color,
+  colors,
+}: {
+  label: string;
+  score: number;
+  color: string;
+  colors: AppColorsType;
+}) {
   return (
     <View style={{ gap: 6 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{ fontFamily: FontFamily.sansMedium, fontSize: scale(13), color: AppColors.textSecondary }}>
+        <Text style={{ fontFamily: FontFamily.sansMedium, fontSize: scale(13), color: colors.textSecondary }}>
           {label}
         </Text>
         <Text style={{ fontFamily: FontFamily.monoMedium, fontSize: scale(12), color }}>
           {score.toFixed(1)}
         </Text>
       </View>
-      <View style={{ height: 6, backgroundColor: AppColors.bgSurface3, borderRadius: 3, overflow: 'hidden' }}>
+      <View style={{ height: 6, backgroundColor: colors.bgSurface3, borderRadius: 3, overflow: 'hidden' }}>
         <View
           style={{ height: 6, width: `${(score / 5) * 100}%`, backgroundColor: color, borderRadius: 3 }}
         />
@@ -180,6 +199,9 @@ function CategoryBar({ label, score, color }: { label: string; score: number; co
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ResultScreen() {
+  const colors = useAppColors();
+  const styles = createStyles(colors);
+  const { resolvedTheme } = useAppTheme();
   const { answers: answersJson } = useLocalSearchParams<{ answers: string }>();
 
   const { overall, categoryScores, stateKey, stateColor } = useMemo(() => {
@@ -192,10 +214,10 @@ export default function ResultScreen() {
     const overall = scores.reduce((a, b) => a + b, 0) / scores.length;
     const categoryScores = CATEGORIES.map((c) => categoryAvg(c.indices, scores));
     const stateKey = getState(overall);
-    const stateColor = STATE_COLOR_MAP[stateKey].text;
+    const stateColor = getStateColorMap(resolvedTheme)[stateKey].text;
 
     return { overall, categoryScores, stateKey, stateColor };
-  }, [answersJson]);
+  }, [answersJson, resolvedTheme]);
 
   const info = STATE_INFO[stateKey];
 
@@ -216,7 +238,7 @@ export default function ResultScreen() {
         <View style={styles.scoreCard}>
           <Text style={styles.emoji}>{info.emoji}</Text>
           <Text style={styles.stateTitle}>{info.title}</Text>
-          <CircularScore score={overall} color={stateColor} />
+          <CircularScore score={overall} color={stateColor} colors={colors} />
         </View>
 
         {/* Category breakdown */}
@@ -229,6 +251,7 @@ export default function ResultScreen() {
                 label={cat.label}
                 score={categoryScores[i]}
                 color={stateColor}
+                colors={colors}
               />
             ))}
           </View>
@@ -271,8 +294,9 @@ export default function ResultScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: AppColors.bgApp },
+const createStyles = (colors: AppColorsType) =>
+  StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.bgApp },
   scroll: { flex: 1 },
   scrollContent: { padding: 20, gap: 20, paddingBottom: 8 },
 
@@ -284,14 +308,14 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(18),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
   },
 
   scoreCard: {
-    backgroundColor: AppColors.bgSurface1,
+    backgroundColor: colors.bgSurface1,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
+    borderColor: colors.borderDefault,
     padding: 24,
     alignItems: 'center',
     gap: 12,
@@ -300,44 +324,44 @@ const styles = StyleSheet.create({
   stateTitle: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(20),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
   },
 
   section: { gap: 12 },
   sectionTitle: {
     fontFamily: FontFamily.sansSemiBold,
     fontSize: scale(15),
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
   },
   card: {
-    backgroundColor: AppColors.bgSurface1,
+    backgroundColor: colors.bgSurface1,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
+    borderColor: colors.borderDefault,
     padding: 16,
     gap: 16,
   },
 
   summaryCard: {
-    backgroundColor: AppColors.bgSurface1,
+    backgroundColor: colors.bgSurface1,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
+    borderColor: colors.borderDefault,
     borderLeftWidth: 4,
     padding: 16,
   },
   summaryText: {
     fontFamily: FontFamily.sans,
     fontSize: scale(14),
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     lineHeight: scale(22),
   },
 
   tipCard: {
-    backgroundColor: AppColors.bgSurface1,
+    backgroundColor: colors.bgSurface1,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
+    borderColor: colors.borderDefault,
     padding: 16,
     flexDirection: 'row',
     gap: 12,
@@ -360,7 +384,7 @@ const styles = StyleSheet.create({
   tipText: {
     fontFamily: FontFamily.sans,
     fontSize: scale(14),
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     lineHeight: scale(22),
     flex: 1,
   },
@@ -377,15 +401,15 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
-    backgroundColor: AppColors.bgSurface1,
+    borderColor: colors.borderDefault,
+    backgroundColor: colors.bgSurface1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   retryBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(14),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
   },
   homeBtn: {
     flex: 2,

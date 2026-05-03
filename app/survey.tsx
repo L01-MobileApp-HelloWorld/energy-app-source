@@ -6,7 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
 import { SurveyOptionCard, SurveyOption } from '@/components/ui/survey-option-card';
-import { AppColors, FontFamily } from '@/constants/theme';
+import { AppColorsType, FontFamily } from '@/constants/theme';
+import { useAppColors } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -139,6 +140,8 @@ const QUESTIONS: Question[] = [
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function SurveyScreen() {
+  const colors = useAppColors();
+  const styles = createStyles(colors);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
 
@@ -176,7 +179,7 @@ export default function SurveyScreen() {
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
       <View style={styles.topBar}>
-        <ScreenBackTitle title="Khảo sát nhanh" onPress={() => router.replace('/(tabs)')} />
+        <ScreenBackTitle title="Khảo sát nhanh" onPress={() => router.back()} />
       </View>
 
       {/* Header */}
@@ -224,7 +227,7 @@ export default function SurveyScreen() {
       <View style={currentIndex > 0 ? styles.footer : styles.footerSingle}>
         {currentIndex > 0 ? (
           <Pressable style={styles.backBtn} onPress={handleBack}>
-            <Ionicons name="chevron-back" size={24} color={AppColors.textPrimary} />
+            <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
           </Pressable>
         ) : null}
         <Pressable
@@ -251,10 +254,11 @@ export default function SurveyScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
+const createStyles = (colors: AppColorsType) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: AppColors.bgApp,
+    backgroundColor: colors.bgApp,
   },
 
   topBar: {
@@ -274,25 +278,25 @@ const styles = StyleSheet.create({
   headerCounter: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(16),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
   },
   headerPercent: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(16),
-    color: AppColors.primaryMain,
+    color: colors.primaryMain,
   },
 
   // Progress
   progressTrack: {
     height: 4,
     marginHorizontal: 20,
-    backgroundColor: AppColors.bgSurface3,
+    backgroundColor: colors.bgSurface3,
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressFill: {
     height: 4,
-    backgroundColor: AppColors.primaryMain,
+    backgroundColor: colors.primaryMain,
     borderRadius: 2,
   },
 
@@ -308,7 +312,7 @@ const styles = StyleSheet.create({
   badge: {
     alignSelf: 'flex-start',
     borderWidth: 1,
-    borderColor: AppColors.stateTiredText,
+    borderColor: colors.stateTiredText,
     borderRadius: 999,
     paddingVertical: 4,
     paddingHorizontal: 12,
@@ -317,14 +321,14 @@ const styles = StyleSheet.create({
   badgeText: {
     fontFamily: FontFamily.sansSemiBold,
     fontSize: scale(12),
-    color: AppColors.stateTiredText,
+    color: colors.stateTiredText,
   },
 
   // Question
   question: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(20),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
     lineHeight: scale(28),
     marginBottom: 24,
   },
@@ -350,8 +354,8 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: AppColors.borderDefault,
-    backgroundColor: AppColors.bgSurface1,
+    borderColor: colors.borderDefault,
+    backgroundColor: colors.bgSurface1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -359,7 +363,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 52,
     borderRadius: 8,
-    backgroundColor: AppColors.primaryMain,
+    backgroundColor: colors.primaryMain,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -369,7 +373,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 52,
     borderRadius: 8,
-    backgroundColor: AppColors.primaryMain,
+    backgroundColor: colors.primaryMain,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -381,6 +385,6 @@ const styles = StyleSheet.create({
   nextBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(14),
-    color: AppColors.bgSurface1,
+    color: colors.bgSurface1,
   },
 });

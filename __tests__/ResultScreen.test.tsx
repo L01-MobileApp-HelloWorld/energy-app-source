@@ -1,5 +1,6 @@
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent } from "@testing-library/react-native";
 import React from "react";
+import { renderWithTheme } from "../test-utils";
 
 const mockReplace = jest.fn();
 let mockParams: { answers?: string } = {};
@@ -65,7 +66,7 @@ describe("ResultScreen", () => {
       }),
     };
 
-    const { getAllByText, getByText } = render(<ResultScreen />);
+    const { getAllByText, getByText } = renderWithTheme(<ResultScreen />);
 
     expect(getByText("Kết quả phân tích")).toBeTruthy();
     expect(getByText("Bạn đang kiệt sức")).toBeTruthy();
@@ -78,7 +79,7 @@ describe("ResultScreen", () => {
   test("falls back safely when answers param is invalid json", () => {
     mockParams = { answers: "not-json" };
 
-    const { getAllByText, getByText } = render(<ResultScreen />);
+    const { getAllByText, getByText } = renderWithTheme(<ResultScreen />);
 
     expect(getByText("Bạn đang lười biếng")).toBeTruthy();
     expect(getAllByText("2.5").length).toBeGreaterThan(0);
@@ -86,7 +87,7 @@ describe("ResultScreen", () => {
 
   test("navigates to survey when pressing retry", () => {
     mockParams = { answers: JSON.stringify({ 0: 1 }) };
-    const { getByText } = render(<ResultScreen />);
+    const { getByText } = renderWithTheme(<ResultScreen />);
 
     fireEvent.press(getByText("Làm lại"));
 
@@ -95,7 +96,7 @@ describe("ResultScreen", () => {
 
   test("navigates to home when pressing home button", () => {
     mockParams = { answers: JSON.stringify({ 0: 1 }) };
-    const { getByText } = render(<ResultScreen />);
+    const { getByText } = renderWithTheme(<ResultScreen />);
 
     fireEvent.press(getByText("Về trang chủ"));
 

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/24</span>
+                <span class='fraction'>0/25</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/23</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
@@ -239,7 +239,12 @@
 <a name='L174'></a><a href='#L174'>174</a>
 <a name='L175'></a><a href='#L175'>175</a>
 <a name='L176'></a><a href='#L176'>176</a>
-<a name='L177'></a><a href='#L177'>177</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -276,27 +281,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -304,6 +293,23 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -338,7 +344,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -419,7 +429,7 @@
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import { AppColors } from "@/constants/theme";
+import { useAppColors } from "@/hooks/use-app-theme";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Dimensions, Image, Pressable, ScrollView, View } from "react-native";
@@ -450,6 +460,7 @@ const slides = <span class="cstat-no" title="statement not covered" >[</span>
 ];
 &nbsp;
 export default function <span class="fstat-no" title="function not covered" >OnboardingScreen(</span>) {
+  const colors = <span class="cstat-no" title="statement not covered" >useAppColors();</span>
   const [currentIndex, setCurrentIndex] = <span class="cstat-no" title="statement not covered" >useState(0);</span>
   const scrollRef = <span class="cstat-no" title="statement not covered" >useRef&lt;ScrollView&gt;(null);</span>
 &nbsp;
@@ -484,7 +495,7 @@ export default function <span class="fstat-no" title="function not covered" >Onb
   };
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
-    &lt;SafeAreaView style={{ flex: 1, backgroundColor: AppColors.bgSurface1 }}&gt;
+    &lt;SafeAreaView style={{ flex: 1, backgroundColor: colors.bgSurface1 }}&gt;
       {/* Skip button */}
       &lt;View
         style={{
@@ -496,7 +507,10 @@ export default function <span class="fstat-no" title="function not covered" >Onb
       &gt;
         {!isLastSlide &amp;&amp; (
           &lt;Pressable onPress={handleSkip} hitSlop={12}&gt;
-            &lt;Text className="text-black font-jakarta-bold" style={{ fontSize: scale(22), lineHeight: scale(30) }}&gt;
+            &lt;Text
+              className="font-jakarta-bold"
+              style={{ fontSize: scale(22), lineHeight: scale(30), color: colors.textPrimary }}
+            &gt;
               Bỏ qua
             &lt;/Text&gt;
           &lt;/Pressable&gt;
@@ -530,18 +544,19 @@ export default function <span class="fstat-no" title="function not covered" >Onb
               resizeMode="contain"
             /&gt;
             &lt;Heading
-              className="font-jakarta-bold text-center text-black"
-              style={{ marginTop: 40, fontSize: scale(28), lineHeight: scale(38) }}
+              className="font-jakarta-bold text-center"
+              style={{
+                marginTop: 40,
+                fontSize: scale(28),
+                lineHeight: scale(38),
+                color: colors.textPrimary,
+              }}
             &gt;
               {slide.title}
             &lt;/Heading&gt;
             &lt;Text
               className="font-jakarta-medium text-center"
-              style={{
-                marginTop: 16,
-                fontSize: scale(16),
-                color: AppColors.textMuted,
-              }}
+              style={{ marginTop: 16, fontSize: scale(16), color: colors.textMuted }}
             &gt;
               {slide.description}
             &lt;/Text&gt;
@@ -568,7 +583,7 @@ export default function <span class="fstat-no" title="function not covered" >Onb
                 height: 8,
                 width: index === currentIndex ? 24 : 8,
                 borderRadius: 4,
-                backgroundColor: index === currentIndex ? AppColors.primaryMain : AppColors.textGhost,
+                backgroundColor: index === currentIndex ? colors.primaryMain : colors.textGhost,
               }}
             /&gt;
           ))}
@@ -598,7 +613,7 @@ export default function <span class="fstat-no" title="function not covered" >Onb
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-03T15:06:35.044Z
+                at 2026-05-03T15:38:10.004Z
             </div>
         <script src="../prettify.js"></script>
         <script>

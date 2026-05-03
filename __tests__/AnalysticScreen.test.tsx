@@ -1,5 +1,6 @@
-import { render } from "@testing-library/react-native";
 import React from "react";
+
+import { renderWithTheme } from "../test-utils";
 
 const mockReplace = jest.fn();
 let mockParams: { answers?: string } = {};
@@ -53,14 +54,14 @@ describe("AnalysticScreen", () => {
   });
 
   test("renders loading texts", () => {
-    const { getByText } = render(<AnalysticScreen />);
+    const { getByText } = renderWithTheme(<AnalysticScreen />);
 
     expect(getByText("Đang phân tích...")).toBeTruthy();
     expect(getByText("Vui lòng đợi trong giây lát")).toBeTruthy();
   });
 
   test("redirects to result after 2 seconds with answers params", () => {
-    render(<AnalysticScreen />);
+    renderWithTheme(<AnalysticScreen />);
 
     jest.advanceTimersByTime(2000);
 

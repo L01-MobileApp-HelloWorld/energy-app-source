@@ -1,5 +1,6 @@
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent } from "@testing-library/react-native";
 import React from "react";
+import { renderWithTheme } from "../test-utils";
 
 const mockBack = jest.fn();
 const mockPush = jest.fn();
@@ -44,7 +45,7 @@ describe("SurveyScreen", () => {
   });
 
   test("renders the first question and progress", () => {
-    const { getByText } = render(<SurveyScreen />);
+    const { getByText } = renderWithTheme(<SurveyScreen />);
 
     expect(getByText("Câu hỏi 1 / 10")).toBeTruthy();
     expect(getByText("10%")).toBeTruthy();
@@ -52,7 +53,7 @@ describe("SurveyScreen", () => {
   });
 
   test("goes back when pressing back on the first question", () => {
-    const { getByText } = render(<SurveyScreen />);
+    const { getByText } = renderWithTheme(<SurveyScreen />);
 
     fireEvent.press(getByText("arrow-back"));
 
@@ -60,7 +61,7 @@ describe("SurveyScreen", () => {
   });
 
   test("moves to the next question after selecting an answer", () => {
-    const { getByText } = render(<SurveyScreen />);
+    const { getByText } = renderWithTheme(<SurveyScreen />);
 
     fireEvent.press(getByText("Khá tốt"));
     fireEvent.press(getByText("Tiếp theo"));
@@ -71,7 +72,7 @@ describe("SurveyScreen", () => {
   });
 
   test("navigates to analystic with serialized answers on the last question", () => {
-    const { getByText } = render(<SurveyScreen />);
+    const { getByText } = renderWithTheme(<SurveyScreen />);
 
     const firstOptionLabels = [
       "Kiệt sức hoàn toàn",

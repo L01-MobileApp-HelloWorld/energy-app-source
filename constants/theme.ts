@@ -1,8 +1,10 @@
 import { Platform } from 'react-native';
 
+export type AppTheme = 'light' | 'dark';
+
 // ─── Design System Color Tokens ───────────────────────────────────────────────
 
-const COLOR_TOKENS = {
+export const COLOR_TOKENS = {
   light: {
     bg: {
       app: '#f8f9fc',
@@ -21,12 +23,12 @@ const COLOR_TOKENS = {
       ghost: '#cbd5e1',
     },
     state: {
-      exhausted:  { bg: '#dc262614', border: '#dc26264d', text: '#dc2626' },
-      tired:      { bg: '#f9731614', border: '#f973164d', text: '#f97316' },
-      lazy:       { bg: '#eab30814', border: '#eab30833', text: '#eab308' },
-      ready:      { bg: '#05966914', border: '#05966940', text: '#059669' },
-      focused:    { bg: '#2563eb14', border: '#2563eb40', text: '#2563eb' },
-      unmotivated:{ bg: '#7c3aed14', border: '#7c3aed40', text: '#7c3aed' },
+      exhausted: { bg: '#dc262614', border: '#dc26264d', text: '#dc2626' },
+      tired: { bg: '#f9731614', border: '#f973164d', text: '#f97316' },
+      lazy: { bg: '#eab30814', border: '#eab30833', text: '#eab308' },
+      ready: { bg: '#05966914', border: '#05966940', text: '#059669' },
+      focused: { bg: '#2563eb14', border: '#2563eb40', text: '#2563eb' },
+      unmotivated: { bg: '#7c3aed14', border: '#7c3aed40', text: '#7c3aed' },
     },
   },
   dark: {
@@ -47,87 +49,76 @@ const COLOR_TOKENS = {
       ghost: '#444460',
     },
     state: {
-      exhausted:  { bg: '#ef535014', border: '#ef53504d', text: '#ef5350' },
-      tired:      { bg: '#ffa72614', border: '#ffa7264d', text: '#ffa726' },
-      lazy:       { bg: '#ffd60014', border: '#ffd60033', text: '#ffd600' },
-      ready:      { bg: '#06d6a014', border: '#06d6a040', text: '#06d6a0' },
-      focused:    { bg: '#29b6f614', border: '#29b6f640', text: '#29b6f6' },
-      unmotivated:{ bg: '#9c76ff14', border: '#9c76ff40', text: '#9c76ff' },
+      exhausted: { bg: '#ef535014', border: '#ef53504d', text: '#ef5350' },
+      tired: { bg: '#ffa72614', border: '#ffa7264d', text: '#ffa726' },
+      lazy: { bg: '#ffd60014', border: '#ffd60033', text: '#ffd600' },
+      ready: { bg: '#06d6a014', border: '#06d6a040', text: '#06d6a0' },
+      focused: { bg: '#29b6f614', border: '#29b6f640', text: '#29b6f6' },
+      unmotivated: { bg: '#9c76ff14', border: '#9c76ff40', text: '#9c76ff' },
     },
   },
 } as const;
 
-// ─── Active mode — đổi dòng này để switch giữa light / dark ─────────────────
-// Sau này: thay bằng useColorScheme() trong một ThemeContext để switch động.
-export const MODE: 'light' | 'dark' = 'light';
+export function getAppColors(theme: AppTheme) {
+  const C = COLOR_TOKENS[theme];
 
-const C = COLOR_TOKENS[MODE];
+  return {
+    bgApp: C.bg.app,
+    bgSurface1: C.bg.surface1,
+    bgSurface2: C.bg.surface2,
+    bgSurface3: C.bg.surface3,
+    borderDefault: C.border.default,
+    primaryMain: C.primary.main,
+    primaryDark: C.primary.dark,
+    primaryLight: C.primary.light,
+    primarySurface: C.primary.surface,
+    accentTeal: C.accent.teal,
+    textPrimary: C.text.primary,
+    textSecondary: C.text.secondary,
+    textMuted: C.text.muted,
+    textDisabled: C.text.disabled,
+    textGhost: C.text.ghost,
+    stateExhaustedText: C.state.exhausted.text,
+    stateTiredText: C.state.tired.text,
+    stateLazyText: C.state.lazy.text,
+    stateReadyText: C.state.ready.text,
+    stateFocusedText: C.state.focused.text,
+    stateUnmotivatedText: C.state.unmotivated.text,
+    black: '#000000',
+  } as const;
+}
 
-export const AppColors = {
-  // Backgrounds
-  bgApp:      C.bg.app,
-  bgSurface1: C.bg.surface1,
-  bgSurface2: C.bg.surface2,
-  bgSurface3: C.bg.surface3,
-  // Border
-  borderDefault: C.border.default,
-  // Primary
-  primaryMain:    C.primary.main,
-  primaryDark:    C.primary.dark,
-  primaryLight:   C.primary.light,
-  primarySurface: C.primary.surface,
-  // Accent
-  accentTeal: C.accent.teal,
-  // Text
-  textPrimary:   C.text.primary,
-  textSecondary: C.text.secondary,
-  textMuted:     C.text.muted,
-  textDisabled:  C.text.disabled,
-  textGhost:     C.text.ghost,
-  // State — text colors (dùng trong code TS; StateBadge dùng Tailwind class)
-  stateExhaustedText:  C.state.exhausted.text,
-  stateTiredText:      C.state.tired.text,
-  stateLazyText:       C.state.lazy.text,
-  stateReadyText:      C.state.ready.text,
-  stateFocusedText:    C.state.focused.text,
-  stateUnmotivatedText:C.state.unmotivated.text,
-  // Utility
-  black: '#000000',
-} as const;
-
-export type AppColorsType = typeof AppColors;
+export type AppColorsType = ReturnType<typeof getAppColors>;
 
 // ─── Legacy: Colors (used by ThemedText / useThemeColor) ─────────────────────
 export const Colors = {
   light: {
-    text:           COLOR_TOKENS.light.text.primary,
-    background:     COLOR_TOKENS.light.bg.app,
-    tint:           COLOR_TOKENS.light.primary.main,
-    icon:           COLOR_TOKENS.light.text.muted,
+    text: COLOR_TOKENS.light.text.primary,
+    background: COLOR_TOKENS.light.bg.app,
+    tint: COLOR_TOKENS.light.primary.main,
+    icon: COLOR_TOKENS.light.text.muted,
     tabIconDefault: COLOR_TOKENS.light.text.disabled,
-    tabIconSelected:COLOR_TOKENS.light.primary.main,
+    tabIconSelected: COLOR_TOKENS.light.primary.main,
   },
   dark: {
-    text:           COLOR_TOKENS.dark.text.primary,
-    background:     COLOR_TOKENS.dark.bg.app,
-    tint:           COLOR_TOKENS.dark.primary.main,
-    icon:           COLOR_TOKENS.dark.text.muted,
+    text: COLOR_TOKENS.dark.text.primary,
+    background: COLOR_TOKENS.dark.bg.app,
+    tint: COLOR_TOKENS.dark.primary.main,
+    icon: COLOR_TOKENS.dark.text.muted,
     tabIconDefault: COLOR_TOKENS.dark.text.disabled,
-    tabIconSelected:COLOR_TOKENS.dark.primary.main,
+    tabIconSelected: COLOR_TOKENS.dark.primary.main,
   },
-};
+} as const;
 
 // ─── State color map (dùng cho logic TS, không phải Tailwind) ────────────────
 export type StateKey = 'exhausted' | 'tired' | 'lazy' | 'ready' | 'focused' | 'unmotivated';
 
-export const STATE_COLOR_MAP: Record<StateKey, { bg: string; border: string; text: string }> = {
-  exhausted:  C.state.exhausted,
-  tired:      C.state.tired,
-  lazy:       C.state.lazy,
-  ready:      C.state.ready,
-  focused:    C.state.focused,
-  unmotivated:C.state.unmotivated,
-};
+export function getStateColorMap(theme: AppTheme): Record<
+  StateKey,
+  { bg: string; border: string; text: string }
+> {
+  return COLOR_TOKENS[theme].state;
+}
 
 // ─── Legacy Fonts ─────────────────────────────────────────────────────────────
 export const Fonts = Platform.select({
@@ -143,64 +134,64 @@ export const Fonts = Platform.select({
 
 // ─── Typography ───────────────────────────────────────────────────────────────
 export const FontFamily = {
-  sans:          'PlusJakartaSans_400Regular',
-  sansMedium:    'PlusJakartaSans_500Medium',
-  sansSemiBold:  'PlusJakartaSans_600SemiBold',
-  sansBold:      'PlusJakartaSans_700Bold',
+  sans: 'PlusJakartaSans_400Regular',
+  sansMedium: 'PlusJakartaSans_500Medium',
+  sansSemiBold: 'PlusJakartaSans_600SemiBold',
+  sansBold: 'PlusJakartaSans_700Bold',
   sansExtraBold: 'PlusJakartaSans_800ExtraBold',
-  mono:          'DMMono_400Regular',
-  monoMedium:    'DMMono_500Medium',
+  mono: 'DMMono_400Regular',
+  monoMedium: 'DMMono_500Medium',
 } as const;
 
 export const FontSize = {
-  display:   28,
-  h1:        22,
-  h2:        18,
-  h3:        15,
-  body:      13,
+  display: 28,
+  h1: 22,
+  h2: 18,
+  h3: 15,
+  body: 13,
   bodySmall: 11,
-  caption:   10,
-  cta:       14,
+  caption: 10,
+  cta: 14,
 } as const;
 
 export const FontWeight = {
-  display:   '800' as const,
-  h1:        '700' as const,
-  h2:        '700' as const,
-  h3:        '600' as const,
-  body:      '400' as const,
+  display: '800' as const,
+  h1: '700' as const,
+  h2: '700' as const,
+  h3: '600' as const,
+  body: '400' as const,
   bodySmall: '400' as const,
-  caption:   '600' as const,
-  cta:       '700' as const,
+  caption: '600' as const,
+  cta: '700' as const,
 };
 
 export const LineHeight = {
-  display:   28 * 1.2,
-  h1:        22 * 1.3,
-  h2:        18 * 1.35,
-  h3:        15 * 1.4,
-  body:      13 * 1.55,
+  display: 28 * 1.2,
+  h1: 22 * 1.3,
+  h2: 18 * 1.35,
+  h3: 15 * 1.4,
+  body: 13 * 1.55,
   bodySmall: 11 * 1.5,
-  caption:   10 * 1.4,
-  cta:       14 * 1.2,
+  caption: 10 * 1.4,
+  cta: 14 * 1.2,
 } as const;
 
 // ─── Spacing (8pt grid) ───────────────────────────────────────────────────────
 export const Spacing = {
-  xs:   4,
-  sm:   8,
-  md:   12,
+  xs: 4,
+  sm: 8,
+  md: 12,
   base: 16,
-  lg:   20,
-  xl:   24,
-  '2xl':32,
+  lg: 20,
+  xl: 24,
+  '2xl': 32,
 } as const;
 
 // ─── Border Radius ────────────────────────────────────────────────────────────
 export const Radius = {
-  sm:   8,
-  md:   12,
-  lg:   16,
-  xl:   20,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
   full: 9999,
 } as const;

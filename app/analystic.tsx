@@ -4,7 +4,8 @@ import { Animated, Dimensions, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
-import { AppColors, FontFamily } from '@/constants/theme';
+import { AppColorsType, FontFamily } from '@/constants/theme';
+import { useAppColors } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -15,6 +16,8 @@ const R = (SPINNER - STROKE) / 2;
 const CIRC = 2 * Math.PI * R;
 
 export default function AnalysticScreen() {
+  const colors = useAppColors();
+  const styles = createStyles(colors);
   const { answers } = useLocalSearchParams<{ answers: string }>();
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -55,7 +58,7 @@ export default function AnalysticScreen() {
               cx={SPINNER / 2}
               cy={SPINNER / 2}
               r={R}
-              stroke={AppColors.bgSurface3}
+              stroke={colors.bgSurface3}
               strokeWidth={STROKE}
               fill="none"
             />
@@ -63,7 +66,7 @@ export default function AnalysticScreen() {
               cx={SPINNER / 2}
               cy={SPINNER / 2}
               r={R}
-              stroke={AppColors.primaryMain}
+              stroke={colors.primaryMain}
               strokeWidth={STROKE}
               fill="none"
               strokeDasharray={CIRC}
@@ -82,10 +85,11 @@ export default function AnalysticScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: AppColorsType) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: AppColors.bgApp,
+    backgroundColor: colors.bgApp,
   },
   center: {
     flex: 1,
@@ -100,11 +104,11 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(22),
-    color: AppColors.textPrimary,
+    color: colors.textPrimary,
   },
   subtitle: {
     fontFamily: FontFamily.sans,
     fontSize: scale(14),
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
 });
