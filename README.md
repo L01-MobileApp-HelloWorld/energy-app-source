@@ -75,3 +75,11 @@ npx jest __tests__/HomeScreen.test.tsx --runInBand
 ```bash
 npx jest __tests__/OnboardingScreen.test.tsx --runInBand
 ```
+
+## Update Expo Go
+
+Khi muốn đẩy bản cập nhật mới để test nhanh qua Expo/EAS update trên kênh `preview`, chạy:
+
+```bash
+eas update --channel preview --message "commit message"
+```
