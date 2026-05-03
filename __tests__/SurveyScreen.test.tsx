@@ -54,7 +54,7 @@ describe("SurveyScreen", () => {
   test("goes back when pressing back on the first question", () => {
     const { getByText } = render(<SurveyScreen />);
 
-    fireEvent.press(getByText("‹"));
+    fireEvent.press(getByText("chevron-back"));
 
     expect(mockBack).toHaveBeenCalledTimes(1);
   });
@@ -63,7 +63,7 @@ describe("SurveyScreen", () => {
     const { getByText } = render(<SurveyScreen />);
 
     fireEvent.press(getByText("Khá tốt"));
-    fireEvent.press(getByText("Tiếp theo  →"));
+    fireEvent.press(getByText("Tiếp theo"));
 
     expect(getByText("Câu hỏi 2 / 10")).toBeTruthy();
     expect(getByText("20%")).toBeTruthy();
@@ -89,7 +89,7 @@ describe("SurveyScreen", () => {
     firstOptionLabels.forEach((label, index) => {
       fireEvent.press(getByText(label));
       fireEvent.press(
-        getByText(index === firstOptionLabels.length - 1 ? "Tiến hành phân tích  ✓" : "Tiếp theo  →")
+        getByText(index === firstOptionLabels.length - 1 ? "Tiến hành phân tích" : "Tiếp theo")
       );
     });
 

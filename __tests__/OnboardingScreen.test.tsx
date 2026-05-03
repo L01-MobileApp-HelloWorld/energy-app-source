@@ -67,7 +67,7 @@ describe("OnboardingScreen", () => {
   test("skip button works", () => {
     const { getByText } = render(<OnboardingScreen />);
     fireEvent.press(getByText("Bỏ qua"));
-    expect(mockReplace).toHaveBeenCalledWith("/(tabs)");
+    expect(mockReplace).toHaveBeenCalledWith("/login");
   });
 
   test("next button exists", () => {
@@ -121,7 +121,7 @@ describe("OnboardingScreen", () => {
     fireEvent.press(getByText("Tiếp theo  →"));
     fireEvent.press(getByText("Tiếp theo  →"));
     fireEvent.press(getByText("Bắt đầu"));
-    expect(mockReplace).toHaveBeenCalledWith("/(tabs)");
+    expect(mockReplace).toHaveBeenCalledWith("/login");
   });
 
   test("momentum scroll to second slide keeps next CTA", () => {
