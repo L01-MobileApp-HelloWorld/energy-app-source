@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SurveyOptionCard, SurveyOption } from '@/components/ui/survey-option-card';
@@ -152,7 +152,12 @@ export default function SurveyScreen() {
 
   const handleNext = () => {
     if (isLastQuestion) {
-      router.replace('/(tabs)');
+      try {
+        console.log('[Survey] navigating to analystic, answers:', answers);
+        router.push({ pathname: '/analystic', params: { answers: JSON.stringify(answers) } });
+      } catch (e) {
+        Alert.alert('Navigation error', String(e));
+      }
     } else {
       setCurrentIndex((i) => i + 1);
     }
