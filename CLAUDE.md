@@ -167,6 +167,7 @@ Icon colors: inactive = `AppColors.textDisabled`, active = `AppColors.primaryMai
 
 ## Coding Rules
 
+- **One component per file** — mỗi file chỉ chứa 1 component. Nếu cần tách sub-component, tạo file riêng trong cùng thư mục (e.g. `components/ui/custom-tab-bar/index.tsx`). Không định nghĩa nhiều component trong cùng 1 file dù chúng nhỏ.
 - **No hardcoded colors** — always use `AppColors.xxx` (inline styles) or Tailwind token classes (`className`). Never use hex strings directly.
 - **No hardcoded font sizes** — use `scale(n)` for inline styles, or Tailwind `text-*` classes.
 - **No arbitrary spacing** — only values in the 8pt spacing scale.

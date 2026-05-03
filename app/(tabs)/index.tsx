@@ -3,6 +3,7 @@ import { Heading } from "@/components/ui/heading";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Text } from "@/components/ui/text";
 import { AppColors } from "@/constants/theme";
+import { router } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -97,7 +98,7 @@ export default function HomeScreen() {
           >
             Dành 1 phút để thấu hiểm cảm xúc của mình
           </Text>
-          <Button size="lg" className="w-full">
+          <Button size="lg" className="w-full" onPress={() => router.push('/survey')}>
             <ButtonText>Bắt đầu kiểm tra</ButtonText>
           </Button>
         </View>
