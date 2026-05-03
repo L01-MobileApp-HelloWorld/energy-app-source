@@ -282,14 +282,27 @@ type IButtonProps = Omit<
   React.ComponentPropsWithoutRef<typeof UIButton>,
   "context"
 > &
-  VariantProps<typeof buttonStyle> & { className?: string };
+  VariantProps<typeof buttonStyle> & {
+    className?: string;
+    startIcon?: React.ReactNode;
+    endIcon?: React.ReactNode;
+  };
 
 const Button = React.forwardRef<
   React.ElementRef<typeof UIButton>,
   IButtonProps
 >(
   (
-    { className, variant = "solid", size = "md", action = "primary", ...props },
+    {
+      children,
+      className,
+      variant = "solid",
+      size = "md",
+      action = "primary",
+      startIcon,
+      endIcon,
+      ...props
+    },
     ref,
   ) => {
     return (
@@ -298,7 +311,11 @@ const Button = React.forwardRef<
         {...props}
         className={buttonStyle({ variant, size, action, class: className })}
         context={{ variant, size, action }}
-      />
+      >
+        {startIcon}
+        {children}
+        {endIcon}
+      </UIButton>
     );
   },
 );

@@ -54,7 +54,7 @@ describe("SurveyScreen", () => {
   test("goes back when pressing back on the first question", () => {
     const { getByText } = render(<SurveyScreen />);
 
-    fireEvent.press(getByText("chevron-back"));
+    fireEvent.press(getByText("arrow-back"));
 
     expect(mockBack).toHaveBeenCalledTimes(1);
   });

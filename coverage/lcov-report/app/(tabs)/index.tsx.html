@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -284,15 +284,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -304,7 +304,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -373,7 +373,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -457,7 +457,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -493,16 +493,16 @@ import React from "react";
 import { Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 &nbsp;
-function getCurrentDateTime() {
-  const now = new Date();
-  const days = ["CN", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
-  const day = days[now.getDay()];
-  const h = now.getHours().toString().padStart(2, "0");
-  const m = now.getMinutes().toString().padStart(2, "0");
-  return `${day}, ${h}:${m}`;
+function <span class="fstat-no" title="function not covered" >getCurrentDateTime(</span>) {
+  const now = <span class="cstat-no" title="statement not covered" >new Date();</span>
+  const days = <span class="cstat-no" title="statement not covered" >["CN", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];</span>
+  const day = <span class="cstat-no" title="statement not covered" >days[now.getDay()];</span>
+  const h = <span class="cstat-no" title="statement not covered" >now.getHours().toString().padStart(2, "0");</span>
+  const m = <span class="cstat-no" title="statement not covered" >now.getMinutes().toString().padStart(2, "0");</span>
+<span class="cstat-no" title="statement not covered" >  return `${day}, ${h}:${m}`;</span>
 }
 &nbsp;
-const CARD_STYLE = {
+const CARD_STYLE = <span class="cstat-no" title="statement not covered" >{</span>
   backgroundColor: AppColors.bgSurface1,
   borderRadius: 16,
   padding: 20,
@@ -513,8 +513,8 @@ const CARD_STYLE = {
   elevation: 2,
 };
 &nbsp;
-export default function HomeScreen() {
-  return (
+export default function <span class="fstat-no" title="function not covered" >HomeScreen(</span>) {
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;SafeAreaView style={{ flex: 1, backgroundColor: AppColors.bgApp }}&gt;
       &lt;ScrollView
         contentContainerStyle={{
@@ -583,7 +583,7 @@ export default function HomeScreen() {
           &gt;
             Dành 1 phút để thấu hiểm cảm xúc của mình
           &lt;/Text&gt;
-          &lt;Button size="lg" className="w-full" onPress={() =&gt; router.push('/survey')}&gt;
+          &lt;Button size="lg" className="w-full" onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >router.push('/survey')}</span>&gt;
             &lt;ButtonText&gt;Bắt đầu kiểm tra&lt;/ButtonText&gt;
           &lt;/Button&gt;
         &lt;/View&gt;
@@ -667,7 +667,7 @@ export default function HomeScreen() {
   );
 }
 &nbsp;
-const styles = StyleSheet.create({
+const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
   menuCard: {
     backgroundColor: AppColors.bgSurface1,
     borderRadius: 8,
@@ -700,7 +700,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-03T14:54:39.404Z
+                at 2026-05-03T15:06:35.044Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

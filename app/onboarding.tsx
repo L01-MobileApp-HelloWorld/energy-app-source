@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -157,8 +158,17 @@ export default function OnboardingScreen() {
         </View>
 
         {/* CTA button */}
-        <Button size="xl" onPress={handleNext} className="w-full">
-          <ButtonText>{isLastSlide ? "Bắt đầu" : "Tiếp theo  →"}</ButtonText>
+        <Button
+          size="xl"
+          onPress={handleNext}
+          className="w-full"
+          endIcon={
+            !isLastSlide ? (
+              <Ionicons name="arrow-forward" size={18} color="#ffffff" />
+            ) : undefined
+          }
+        >
+          <ButtonText>{isLastSlide ? "Bắt đầu" : "Tiếp theo"}</ButtonText>
         </Button>
       </View>
     </SafeAreaView>

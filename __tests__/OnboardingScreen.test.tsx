@@ -72,7 +72,7 @@ describe("OnboardingScreen", () => {
 
   test("next button exists", () => {
     const { getByText } = render(<OnboardingScreen />);
-    expect(getByText("Tiếp theo  →")).toBeTruthy();
+    expect(getByText("Tiếp theo")).toBeTruthy();
   });
 
   test("skip button is visible on the first slide", () => {
@@ -104,22 +104,22 @@ describe("OnboardingScreen", () => {
 
   test("pressing next twice changes CTA to start button", () => {
     const { getByText } = render(<OnboardingScreen />);
-    fireEvent.press(getByText("Tiếp theo  →"));
-    fireEvent.press(getByText("Tiếp theo  →"));
+    fireEvent.press(getByText("Tiếp theo"));
+    fireEvent.press(getByText("Tiếp theo"));
     expect(getByText("Bắt đầu")).toBeTruthy();
   });
 
   test("skip button disappears on the last slide", () => {
     const { getByText, queryByText } = render(<OnboardingScreen />);
-    fireEvent.press(getByText("Tiếp theo  →"));
-    fireEvent.press(getByText("Tiếp theo  →"));
+    fireEvent.press(getByText("Tiếp theo"));
+    fireEvent.press(getByText("Tiếp theo"));
     expect(queryByText("Bỏ qua")).toBeNull();
   });
 
   test("pressing start on the last slide navigates to tabs", () => {
     const { getByText } = render(<OnboardingScreen />);
-    fireEvent.press(getByText("Tiếp theo  →"));
-    fireEvent.press(getByText("Tiếp theo  →"));
+    fireEvent.press(getByText("Tiếp theo"));
+    fireEvent.press(getByText("Tiếp theo"));
     fireEvent.press(getByText("Bắt đầu"));
     expect(mockReplace).toHaveBeenCalledWith("/login");
   });
@@ -131,7 +131,7 @@ describe("OnboardingScreen", () => {
     fireEvent(scrollView, "onMomentumScrollEnd", {
       nativeEvent: { contentOffset: { x: slideWidth } },
     });
-    expect(getByText("Tiếp theo  →")).toBeTruthy();
+    expect(getByText("Tiếp theo")).toBeTruthy();
   });
 
   test("momentum scroll to second slide keeps skip button visible", () => {

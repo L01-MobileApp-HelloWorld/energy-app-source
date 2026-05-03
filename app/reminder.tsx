@@ -20,6 +20,7 @@ import {
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
 } from '@/components/ui/actionsheet';
+import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
 import { Ionicons } from '@expo/vector-icons';
 import { AppColors, FontFamily } from '@/constants/theme';
 
@@ -60,7 +61,8 @@ export default function ReminderScreen() {
   const toggleDay = (idx: number) =>
     setCustomDays((prev) => {
       const next = new Set(prev);
-      next.has(idx) ? next.delete(idx) : next.add(idx);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
       return next;
     });
 
@@ -83,10 +85,7 @@ export default function ReminderScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Pressable onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name="chevron-back" size={20} color={AppColors.textPrimary} />
-          </Pressable>
-          <Text style={styles.headerTitle}>Nhắc nhở thông minh</Text>
+          <ScreenBackTitle title="Nhắc nhở thông minh" onPress={() => router.back()} />
         </View>
 
         {/* Toggle Card */}
@@ -228,25 +227,7 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 20, gap: 16 },
 
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
     marginBottom: 4,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: AppColors.bgSurface1,
-    borderWidth: 1,
-    borderColor: AppColors.borderDefault,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontFamily: FontFamily.sansBold,
-    fontSize: scale(18),
-    color: AppColors.textPrimary,
   },
 
   card: {

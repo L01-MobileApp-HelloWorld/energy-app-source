@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
 import { AppColors, FontFamily } from '@/constants/theme';
 
 const { width } = Dimensions.get('window');
@@ -49,10 +50,7 @@ export default function RegisterScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Pressable style={styles.backRow} onPress={() => router.back()} hitSlop={8}>
-            <Ionicons name="chevron-back" size={20} color={AppColors.textSecondary} />
-            <Text style={styles.backText}>Quay lại đăng nhập</Text>
-          </Pressable>
+          <ScreenBackTitle title="Đăng ký" onPress={() => router.back()} />
 
           <View style={styles.brandSection}>
             <View style={styles.logoBox}>
@@ -176,17 +174,6 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 32,
     gap: 20,
-  },
-  backRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: 4,
-  },
-  backText: {
-    fontFamily: FontFamily.sansSemiBold,
-    fontSize: scale(13),
-    color: AppColors.textSecondary,
   },
   brandSection: {
     alignItems: 'center',

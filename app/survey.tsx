@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
 import { SurveyOptionCard, SurveyOption } from '@/components/ui/survey-option-card';
 import { AppColors, FontFamily } from '@/constants/theme';
 
@@ -174,6 +175,10 @@ export default function SurveyScreen() {
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
+      <View style={styles.topBar}>
+        <ScreenBackTitle title="Khảo sát nhanh" onPress={() => router.replace('/(tabs)')} />
+      </View>
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerCounter}>
@@ -216,12 +221,17 @@ export default function SurveyScreen() {
       </ScrollView>
 
       {/* Bottom actions */}
-      <View style={styles.footer}>
-        <Pressable style={styles.backBtn} onPress={handleBack}>
-          <Ionicons name="chevron-back" size={24} color={AppColors.textPrimary} />
-        </Pressable>
+      <View style={currentIndex > 0 ? styles.footer : styles.footerSingle}>
+        {currentIndex > 0 ? (
+          <Pressable style={styles.backBtn} onPress={handleBack}>
+            <Ionicons name="chevron-back" size={24} color={AppColors.textPrimary} />
+          </Pressable>
+        ) : null}
         <Pressable
-          style={[styles.nextBtn, !hasAnswer && styles.nextBtnDisabled]}
+          style={[
+            currentIndex > 0 ? styles.nextBtn : styles.nextBtnFull,
+            !hasAnswer && styles.nextBtnDisabled,
+          ]}
           onPress={handleNext}
           disabled={!hasAnswer}
         >
@@ -247,13 +257,18 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.bgApp,
   },
 
+  topBar: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+
   // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: 16,
     paddingBottom: 10,
   },
   headerCounter: {
@@ -325,6 +340,11 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     gap: 12,
   },
+  footerSingle: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
+  },
   backBtn: {
     width: 52,
     height: 52,
@@ -337,6 +357,16 @@ const styles = StyleSheet.create({
   },
   nextBtn: {
     flex: 1,
+    height: 52,
+    borderRadius: 8,
+    backgroundColor: AppColors.primaryMain,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  nextBtnFull: {
+    width: '100%',
     height: 52,
     borderRadius: 8,
     backgroundColor: AppColors.primaryMain,
