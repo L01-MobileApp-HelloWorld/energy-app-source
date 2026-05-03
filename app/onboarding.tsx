@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import { useAppColors } from "@/hooks/use-app-theme";
+import { useAppColors, useAppTheme } from "@/hooks/use-app-theme";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Dimensions, Image, Pressable, ScrollView, View } from "react-native";
@@ -34,6 +34,7 @@ const slides = [
 
 export default function OnboardingScreen() {
   const colors = useAppColors();
+  const { resolvedTheme } = useAppTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
@@ -169,7 +170,11 @@ export default function OnboardingScreen() {
           className="w-full"
           endIcon={
             !isLastSlide ? (
-              <Ionicons name="arrow-forward" size={18} color="#ffffff" />
+              <Ionicons
+                name="arrow-forward"
+                size={18}
+                color={resolvedTheme === "dark" ? colors.textPrimary : "#ffffff"}
+              />
             ) : undefined
           }
         >

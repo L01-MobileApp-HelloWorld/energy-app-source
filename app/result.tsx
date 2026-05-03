@@ -379,7 +379,7 @@ const createStyles = (colors: AppColorsType) =>
   tipBadgeText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(12),
-    color: '#ffffff',
+    color: colors.textPrimary,
   },
   tipText: {
     fontFamily: FontFamily.sans,
@@ -421,6 +421,6 @@ const createStyles = (colors: AppColorsType) =>
   homeBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(14),
-    color: '#ffffff',
+    color: colors.textPrimary,
   },
 });

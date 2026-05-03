@@ -23,7 +23,7 @@ import {
 import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
 import { Ionicons } from '@expo/vector-icons';
 import { AppColorsType, FontFamily } from '@/constants/theme';
-import { useAppColors } from '@/hooks/use-app-theme';
+import { useAppColors, useAppTheme } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -44,6 +44,7 @@ const FREQ_OPTIONS: { key: FrequencyKey; label: string }[] = [
 
 export default function ReminderScreen() {
   const colors = useAppColors();
+  const { resolvedTheme } = useAppTheme();
   const styles = createStyles(colors);
   const [isEnabled, setIsEnabled] = useState(true);
   const [time, setTime] = useState(() => new Date());
@@ -144,7 +145,11 @@ export default function ReminderScreen() {
       <View style={styles.footer}>
         <Pressable style={styles.saveBtn} onPress={() => router.back()}>
           <Text style={styles.saveBtnText}>Lưu nhắc nhở</Text>
-          <Ionicons name="checkmark" size={18} color="#ffffff" />
+          <Ionicons
+            name="checkmark"
+            size={18}
+            color={resolvedTheme === 'dark' ? colors.textPrimary : '#ffffff'}
+          />
         </Pressable>
       </View>
 
@@ -215,7 +220,11 @@ export default function ReminderScreen() {
             </View>
             <Pressable style={styles.saveBtn} onPress={handleSaveCustom}>
               <Text style={styles.saveBtnText}>Lưu tần suất</Text>
-              <Ionicons name="checkmark" size={18} color="#ffffff" />
+              <Ionicons
+                name="checkmark"
+                size={18}
+                color={resolvedTheme === 'dark' ? colors.textPrimary : '#ffffff'}
+              />
             </Pressable>
           </View>
         </ActionsheetContent>
@@ -296,7 +305,7 @@ const createStyles = (colors: AppColorsType) =>
     color: colors.textSecondary,
   },
   freqChipTextActive: {
-    color: '#ffffff',
+    color: colors.textPrimary,
   },
 
   footer: {
@@ -316,7 +325,7 @@ const createStyles = (colors: AppColorsType) =>
   saveBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(15),
-    color: '#ffffff',
+    color: colors.textPrimary,
   },
 
   sheetInner: {
@@ -356,6 +365,6 @@ const createStyles = (colors: AppColorsType) =>
     textAlign: 'center',
   },
   dayChipTextActive: {
-    color: '#ffffff',
+    color: colors.textPrimary,
   },
 });

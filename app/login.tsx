@@ -272,7 +272,7 @@ const createStyles = (colors: AppColorsType) =>
   loginBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(15),
-    color: '#ffffff',
+    color: colors.textPrimary,
   },
 
   // Divider

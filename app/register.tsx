@@ -279,7 +279,7 @@ const createStyles = (colors: AppColorsType) =>
   registerBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(15),
-    color: '#ffffff',
+    color: colors.textPrimary,
   },
   loginRow: {
     flexDirection: 'row',

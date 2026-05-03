@@ -135,7 +135,7 @@ const buttonTextStyle = tva({
       link: "data-[hover=true]:underline data-[active=true]:underline",
       outline: "",
       solid:
-        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+        "text-white dark:text-apptext-primary data-[hover=true]:text-white dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-white dark:data-[active=true]:text-apptext-primary",
     },
     size: {
       xs: "text-xs",
@@ -150,25 +150,25 @@ const buttonTextStyle = tva({
       variant: "solid",
       action: "primary",
       class:
-        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+        "text-white dark:text-apptext-primary data-[hover=true]:text-white dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-white dark:data-[active=true]:text-apptext-primary",
     },
     {
       variant: "solid",
       action: "secondary",
       class:
-        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+        "text-white dark:text-apptext-primary data-[hover=true]:text-white dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-white dark:data-[active=true]:text-apptext-primary",
     },
     {
       variant: "solid",
       action: "positive",
       class:
-        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+        "text-white dark:text-apptext-primary data-[hover=true]:text-white dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-white dark:data-[active=true]:text-apptext-primary",
     },
     {
       variant: "solid",
       action: "negative",
       class:
-        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+        "text-white dark:text-apptext-primary data-[hover=true]:text-white dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-white dark:data-[active=true]:text-apptext-primary",
     },
     {
       variant: "outline",
@@ -204,7 +204,7 @@ const buttonIconStyle = tva({
       link: "data-[hover=true]:underline data-[active=true]:underline",
       outline: "",
       solid:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-typography-0 dark:text-apptext-primary data-[hover=true]:text-typography-0 dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-typography-0 dark:data-[active=true]:text-apptext-primary",
     },
     size: {
       xs: "h-3.5 w-3.5",

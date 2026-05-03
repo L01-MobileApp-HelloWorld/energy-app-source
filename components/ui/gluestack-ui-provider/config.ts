@@ -349,7 +349,7 @@ export const config = {
     "--color-state-unmotivated": "156 118 255",
 
     // ─── App: Text Colors (Dark mode) ─────────────────────────────────────────
-    "--color-app-text-primary": "240 240 255",
+    "--color-app-text-primary": "136 136 153",
     "--color-app-text-secondary": "208 208 232",
     "--color-app-text-muted": "136 136 153",
     "--color-app-text-disabled": "85 85 112",

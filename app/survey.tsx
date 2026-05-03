@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
 import { SurveyOptionCard, SurveyOption } from '@/components/ui/survey-option-card';
 import { AppColorsType, FontFamily } from '@/constants/theme';
-import { useAppColors } from '@/hooks/use-app-theme';
+import { useAppColors, useAppTheme } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -141,6 +141,7 @@ const QUESTIONS: Question[] = [
 
 export default function SurveyScreen() {
   const colors = useAppColors();
+  const { resolvedTheme } = useAppTheme();
   const styles = createStyles(colors);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -227,7 +228,11 @@ export default function SurveyScreen() {
       <View style={currentIndex > 0 ? styles.footer : styles.footerSingle}>
         {currentIndex > 0 ? (
           <Pressable style={styles.backBtn} onPress={handleBack}>
-            <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
+            <Ionicons
+              name="chevron-back"
+              size={24}
+              color={resolvedTheme === 'dark' ? colors.textPrimary : '#ffffff'}
+            />
           </Pressable>
         ) : null}
         <Pressable
@@ -244,7 +249,7 @@ export default function SurveyScreen() {
           <Ionicons
             name={isLastQuestion ? 'checkmark' : 'arrow-forward'}
             size={18}
-            color="#ffffff"
+            color={resolvedTheme === 'dark' ? colors.textPrimary : '#ffffff'}
           />
         </Pressable>
       </View>
@@ -385,6 +390,6 @@ const createStyles = (colors: AppColorsType) =>
   nextBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(14),
-    color: colors.bgSurface1,
+    color: colors.textPrimary,
   },
 });

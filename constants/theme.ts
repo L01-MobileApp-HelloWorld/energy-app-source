@@ -42,7 +42,7 @@ export const COLOR_TOKENS = {
     primary: { main: '#6c47ff', dark: '#4a2ecc', light: '#9c76ff', surface: '#1a1a40' },
     accent: { teal: '#3ecfcf' },
     text: {
-      primary: '#f0f0ff',
+      primary: '#888899',
       secondary: '#d0d0e8',
       muted: '#888899',
       disabled: '#555570',
