@@ -1,12 +1,14 @@
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
+import { AppColors } from "@/constants/theme";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Dimensions, Image, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
+const scale = (size: number) => (width / 390) * size;
 
 const slides = [
   {
@@ -64,7 +66,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: AppColors.bgSurface1 }}>
       {/* Skip button */}
       <View
         style={{
@@ -76,7 +78,7 @@ export default function OnboardingScreen() {
       >
         {!isLastSlide && (
           <Pressable onPress={handleSkip} hitSlop={12}>
-            <Text size="md" className="text-black font-medium">
+            <Text className="text-black font-jakarta-bold" style={{ fontSize: scale(22), lineHeight: scale(30) }}>
               Bỏ qua
             </Text>
           </Pressable>
@@ -110,18 +112,17 @@ export default function OnboardingScreen() {
               resizeMode="contain"
             />
             <Heading
-              size="xl"
-              style={{ marginTop: 40, textAlign: "center", color: "#000000" }}
+              className="font-jakarta-bold text-center text-black"
+              style={{ marginTop: 40, fontSize: scale(28), lineHeight: scale(38) }}
             >
               {slide.title}
             </Heading>
             <Text
-              size="md"
+              className="font-jakarta-medium text-center"
               style={{
                 marginTop: 16,
-                textAlign: "center",
-                lineHeight: 24,
-                color: "#64748B",
+                fontSize: scale(16),
+                color: AppColors.textMuted,
               }}
             >
               {slide.description}
@@ -149,14 +150,14 @@ export default function OnboardingScreen() {
                 height: 8,
                 width: index === currentIndex ? 24 : 8,
                 borderRadius: 4,
-                backgroundColor: index === currentIndex ? "#3B82F6" : "#D1D5DB",
+                backgroundColor: index === currentIndex ? AppColors.primaryMain : AppColors.textGhost,
               }}
             />
           ))}
         </View>
 
         {/* CTA button */}
-        <Button size="xl" onPress={handleNext} className="w-full rounded-2xl">
+        <Button size="xl" onPress={handleNext} className="w-full">
           <ButtonText>{isLastSlide ? "Bắt đầu" : "Tiếp theo  →"}</ButtonText>
         </Button>
       </View>

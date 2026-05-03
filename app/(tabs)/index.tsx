@@ -2,6 +2,7 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Text } from "@/components/ui/text";
+import { AppColors } from "@/constants/theme";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,10 +17,10 @@ function getCurrentDateTime() {
 }
 
 const CARD_STYLE = {
-  backgroundColor: "#fff",
+  backgroundColor: AppColors.bgSurface1,
   borderRadius: 16,
   padding: 20,
-  shadowColor: "#000",
+  shadowColor: AppColors.black,
   shadowOpacity: 0.06,
   shadowRadius: 8,
   shadowOffset: { width: 0, height: 2 },
@@ -28,7 +29,7 @@ const CARD_STYLE = {
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8FAFC" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: AppColors.bgApp }}>
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
@@ -47,10 +48,10 @@ export default function HomeScreen() {
           }}
         >
           <View>
-            <Heading size="2xl" style={{ color: "#000" }}>
+            <Heading size="2xl" style={{ color: AppColors.black }}>
               Chào Huy! 👋
             </Heading>
-            <Text size="sm" style={{ color: "#94A3B8", marginTop: 4 }}>
+            <Text size="sm" style={{ color: AppColors.textDisabled, marginTop: 4 }}>
               {getCurrentDateTime()}
             </Text>
           </View>
@@ -59,7 +60,7 @@ export default function HomeScreen() {
               width: 46,
               height: 46,
               borderRadius: 23,
-              backgroundColor: "#E2E8F0",
+              backgroundColor: AppColors.bgSurface3,
               alignItems: "center",
               justifyContent: "center",
               overflow: "hidden",
@@ -76,7 +77,7 @@ export default function HomeScreen() {
               width: 80,
               height: 80,
               borderRadius: 40,
-              backgroundColor: "#EEF2FF",
+              backgroundColor: AppColors.primarySurface,
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 16,
@@ -86,17 +87,17 @@ export default function HomeScreen() {
           </View>
           <Heading
             size="lg"
-            style={{ color: "#000", textAlign: "center", marginBottom: 8 }}
+            style={{ color: AppColors.black, textAlign: "center", marginBottom: 8 }}
           >
             Hôm nay bạn cảm thấy thế nào?
           </Heading>
           <Text
             size="sm"
-            style={{ color: "#94A3B8", textAlign: "center", marginBottom: 20 }}
+            style={{ color: AppColors.textDisabled, textAlign: "center", marginBottom: 20 }}
           >
             Dành 1 phút để thấu hiểm cảm xúc của mình
           </Text>
-          <Button size="lg" className="w-full rounded-xl">
+          <Button size="lg" className="w-full">
             <ButtonText>Bắt đầu kiểm tra</ButtonText>
           </Button>
         </View>
@@ -104,12 +105,12 @@ export default function HomeScreen() {
         {/* Previous Result Card */}
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: AppColors.bgSurface1,
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: "#508DF7",
+            borderColor: AppColors.primaryMain,
             borderLeftWidth: 3,
-            borderLeftColor: "#508DF7",
+            borderLeftColor: AppColors.primaryMain,
             paddingVertical: 16,
             paddingHorizontal: 16,
             marginBottom: 16,
@@ -122,7 +123,7 @@ export default function HomeScreen() {
               width: 40,
               height: 40,
               borderRadius: 8,
-              backgroundColor: "#508DF7",
+              backgroundColor: AppColors.primaryMain,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 12,
@@ -131,13 +132,13 @@ export default function HomeScreen() {
             <Text style={{ fontSize: 20 }}>💪</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text size="xs" style={{ color: "#94A3B8" }}>
+            <Text size="xs" style={{ color: AppColors.textDisabled }}>
               Lần trước,
             </Text>
-            <Text size="lg" bold style={{ color: "#508DF7", marginTop: 2 }}>
+            <Text size="lg" bold style={{ color: AppColors.primaryMain, marginTop: 2 }}>
               Tỉnh táo, sẵn sàng
             </Text>
-            <Text size="xs" style={{ color: "#94A3B8", marginTop: 2 }}>
+            <Text size="xs" style={{ color: AppColors.textDisabled, marginTop: 2 }}>
               Hôm nay, 12:00
             </Text>
           </View>
@@ -149,24 +150,24 @@ export default function HomeScreen() {
             <IconSymbol
               name="clock.arrow.circlepath"
               size={20}
-              color="#64748B"
+              color={AppColors.textMuted}
             />
           </View>
           <Text size="md" bold style={styles.menuLabel}>
             Kiểm tra lịch sử
           </Text>
-          <IconSymbol name="chevron.right" size={20} color="#CBD5E1" />
+          <IconSymbol name="chevron.right" size={20} color={AppColors.textGhost} />
         </View>
 
         {/* Xem nhắc nhở */}
         <View style={[styles.menuCard, { marginBottom: 0 }]}>
           <View style={styles.menuIconBox}>
-            <IconSymbol name="alarm" size={20} color="#64748B" />
+            <IconSymbol name="alarm" size={20} color={AppColors.textMuted} />
           </View>
           <Text size="md" bold style={styles.menuLabel}>
             Xem nhắc nhở
           </Text>
-          <IconSymbol name="chevron.right" size={20} color="#CBD5E1" />
+          <IconSymbol name="chevron.right" size={20} color={AppColors.textGhost} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -175,10 +176,10 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   menuCard: {
-    backgroundColor: "#fff",
+    backgroundColor: AppColors.bgSurface1,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E6E6E6",
+    borderColor: AppColors.borderDefault,
     paddingVertical: 12,
     paddingHorizontal: 16,
     flexDirection: "row",
@@ -189,13 +190,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: "#F5F6F8",
+    backgroundColor: AppColors.bgSurface2,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
   },
   menuLabel: {
     flex: 1,
-    color: "#0F172A",
+    color: AppColors.textPrimary,
   },
 });

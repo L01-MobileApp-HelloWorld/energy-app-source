@@ -21,11 +21,17 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
+import { Text } from "react-native";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import "@/global.css";
 
 SplashScreen.preventAutoHideAsync();
+
+Text.defaultProps = {
+  ...Text.defaultProps,
+  style: [{ fontFamily: "PlusJakartaSans_400Regular" }, Text.defaultProps?.style],
+};
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

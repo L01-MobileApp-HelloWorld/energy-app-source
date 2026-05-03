@@ -3,19 +3,19 @@ import { vars } from "nativewind";
 
 export const config = {
   light: vars({
-    // ─── Primary: Purple (brand color) ────────────────────────────────────────
-    "--color-primary-0": "247 244 255",
-    "--color-primary-50": "238 234 255",
-    "--color-primary-100": "224 216 255",
-    "--color-primary-200": "205 192 255",
-    "--color-primary-300": "182 162 255",
-    "--color-primary-400": "156 118 255",
-    "--color-primary-500": "108 71 255",
-    "--color-primary-600": "74 46 204",
-    "--color-primary-700": "55 34 160",
-    "--color-primary-800": "38 24 122",
-    "--color-primary-900": "24 15 84",
-    "--color-primary-950": "12 8 45",
+    // ─── Primary: Indigo (light mode brand color = #5b5cf6) ──────────────────
+    "--color-primary-0": "240 241 255",
+    "--color-primary-50": "230 231 255",
+    "--color-primary-100": "218 219 253",
+    "--color-primary-200": "200 201 252",
+    "--color-primary-300": "170 171 250",
+    "--color-primary-400": "139 140 248",
+    "--color-primary-500": "91 92 246",
+    "--color-primary-600": "74 71 209",
+    "--color-primary-700": "57 54 170",
+    "--color-primary-800": "40 38 130",
+    "--color-primary-900": "25 24 88",
+    "--color-primary-950": "14 13 52",
 
     // ─── Secondary ────────────────────────────────────────────────────────────
     "--color-secondary-0": "253 253 253",

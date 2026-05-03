@@ -228,8 +228,8 @@ module.exports = {
       },
 
       fontFamily: {
-        heading: undefined,
-        body: undefined,
+        heading: ['PlusJakartaSans_700Bold'],
+        body: ['PlusJakartaSans_400Regular'],
         mono: undefined,
         // Fonts — tên phải khớp chính xác với key trong useFonts() ở _layout.tsx
         jakarta: ['PlusJakartaSans_400Regular'],

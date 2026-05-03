@@ -31,7 +31,7 @@ Requirements: Node >= 20, Android SDK 35 (Android Studio with a running emulator
 1. **Gluestack UI** components from `components/ui/` (locally vendored, not npm imports)
 2. **NativeWind** (Tailwind CSS for React Native) for utility classes
 
-Dark/light mode is handled automatically via `useColorScheme()` hook and CSS custom properties defined in `components/ui/gluestack-ui-provider/config.ts`.
+**Color mode** — Currently **light mode**. The active mode is controlled by `MODE` in `constants/theme.ts`. To switch to dark, change `MODE = 'dark'` — one line, entire app updates. Full token values for both modes live in `COLOR_TOKENS` in that file.
 
 **Adding Gluestack components** — Use the CLI to vendor them locally:
 ```bash
@@ -59,44 +59,56 @@ Full spec: `docs/design-system.md`. Summary below for quick reference.
 
 ### Color Tokens
 
-Never hardcode hex values. Use Tailwind classes or `AppColors` from `constants/theme.ts`.
+**Never hardcode hex values.** Always use `AppColors` from `constants/theme.ts` for inline styles, or Tailwind classes for `className` props.
 
-**Background layers** (dark UI, deepest to shallowest):
+`AppColors` is a flat object derived from the active mode in `COLOR_TOKENS`. Current mode: **light**.
+
+**Backgrounds:**
+```ts
+AppColors.bgApp        // screen background     #f8f9fc
+AppColors.bgSurface1   // cards, panels         #ffffff
+AppColors.bgSurface2   // nested surfaces       #f1f3f9
+AppColors.bgSurface3   // avatars, icon boxes   #e9ecf5
 ```
-bg-surface-base   → #0E0E16  screen background
-bg-surface-1      → #111118  cards, panels
-bg-surface-2      → #13131E  nested cards
-bg-surface-3      → #1A1A2E  modals, dropdowns
-border-border-default → #252535  dividers
+
+**Border:**
+```ts
+AppColors.borderDefault  // dividers, card borders  #d9dce7
+```
+
+**Primary (brand color — đổi ở COLOR_TOKENS để thay toàn app):**
+```ts
+AppColors.primaryMain    // CTA, active, tint        #5b5cf6
+AppColors.primaryDark    // pressed state             #4a47d1
+AppColors.primaryLight   // icons, links              #8b8cf8
+AppColors.primarySurface // tinted bg (selected card) #f0f1ff
 ```
 
 **Accent:**
-```
-bg-accent-purple        → #6C47FF  primary CTA, active state
-bg-accent-purple-dark   → #4A2ECC  pressed state
-bg-accent-purple-light  → #9C76FF  icons, links
-bg-accent-purple-surface → dark purple tint (for selected card bg)
-bg-accent-teal          → #3ECFCF  secondary accent
+```ts
+AppColors.accentTeal  // secondary accent  #14b8a6
 ```
 
-**State colors** (6 survey results):
-```
-text-state-exhausted   / bg-state-exhausted   → #EF5350  red
-text-state-tired       / bg-state-tired       → #FFA726  orange
-text-state-lazy        / bg-state-lazy        → #FFD600  yellow
-text-state-ready       / bg-state-ready       → #06D6A0  green
-text-state-focused     / bg-state-focused     → #29B6F6  blue
-text-state-unmotivated / bg-state-unmotivated → #9C76FF  purple
+**Text hierarchy (5 levels):**
+```ts
+AppColors.textPrimary    // headings, main content  #0f172a
+AppColors.textSecondary  // body, descriptions      #334155
+AppColors.textMuted      // icons, subtle labels    #64748b
+AppColors.textDisabled   // inactive tabs, hints    #94a3b8
+AppColors.textGhost      // least important         #cbd5e1
 ```
 
-**Text hierarchy** (5 levels):
+**State colors** (6 survey results) — for inline styles use `AppColors.state*Text`; for Tailwind className use `text-state-*` / `bg-state-*`:
+```ts
+AppColors.stateExhaustedText   // #dc2626  red
+AppColors.stateTiredText       // #f97316  orange
+AppColors.stateLazyText        // #eab308  yellow
+AppColors.stateReadyText       // #059669  green
+AppColors.stateFocusedText     // #2563eb  blue
+AppColors.stateUnmotivatedText // #7c3aed  purple
 ```
-text-apptext-primary    → #F0F0FF  headings, main content
-text-apptext-secondary  → #D0D0E8  descriptions, body
-text-apptext-muted      → #888899  placeholders, hints
-text-apptext-disabled   → #555570  disabled state
-text-apptext-ghost      → #444460  least important
-```
+
+Full bg/border/text per state: use `STATE_COLOR_MAP[stateKey]` from `constants/theme.ts`.
 
 ### Typography
 
@@ -142,18 +154,24 @@ Located in `components/ui/`. Import example: `import { StateBadge } from '@/comp
 
 `StateKey` values: `'exhausted' \| 'tired' \| 'lazy' \| 'ready' \| 'focused' \| 'unmotivated'`
 
+### Font sizes (responsive)
+
+For inline `style` props, use the `scale()` function (defined per-screen based on `Dimensions.get('window').width / 390`) instead of raw pixel values. Tailwind `text-*` classes are preferred for `className` props.
+
 ### Icons
 
 Use **Phosphor Icons** only (`@expo/vector-icons` or `phosphor-react-native`). Style: Regular, stroke 1.5px.
-Icon colors: inactive = `#555570`, active = `#6C47FF`, on dark bg = `#F0F0FF`.
+Icon colors: inactive = `AppColors.textDisabled`, active = `AppColors.primaryMain`.
 
 ---
 
 ## Coding Rules
 
-- **No hardcoded colors** — always use Tailwind tokens or `AppColors` from `constants/theme.ts`
-- **No arbitrary spacing** — only values in the 8pt spacing scale
-- **Tailwind for styling** — use `className` prop; avoid `StyleSheet.create` for new code
-- **App-specific components first** — use `StateBadge`, `OptionCard`, `ProgressBar` before building new ones
-- **Gluestack for primitives** — `Button`, `Text`, `Heading` from `@/components/ui/`
-- **Dark mode default** — the app is dark-first; `GluestackUIProvider mode="dark"` is set in root layout
+- **No hardcoded colors** — always use `AppColors.xxx` (inline styles) or Tailwind token classes (`className`). Never use hex strings directly.
+- **No hardcoded font sizes** — use `scale(n)` for inline styles, or Tailwind `text-*` classes.
+- **No arbitrary spacing** — only values in the 8pt spacing scale.
+- **Tailwind for styling** — use `className` prop; avoid `StyleSheet.create` for new code.
+- **App-specific components first** — use `StateBadge`, `OptionCard`, `ProgressBar` before building new ones.
+- **Gluestack for primitives** — `Button`, `Text`, `Heading` from `@/components/ui/`.
+- **Light mode current** — `GluestackUIProvider mode="dark"` stays in root layout (Gluestack internal), but app colors come from `AppColors` with `MODE = 'light'` in `constants/theme.ts`.
+- **Adding a new color** — add it to both `light` and `dark` in `COLOR_TOKENS`, then expose via `AppColors`. Never add a one-off hex anywhere else.
