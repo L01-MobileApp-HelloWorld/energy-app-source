@@ -19,15 +19,22 @@ import { AppColors, FontFamily } from '@/constants/theme';
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [passwordConfirmationFocused, setPasswordConfirmationFocused] = useState(false);
 
+  const canSubmit =
+    email.trim().length > 0 &&
+    password.length > 0 &&
+    passwordConfirmation.length > 0;
 
-  const handleLogin = () => {
+  const handleRegister = () => {
     router.replace('/(tabs)');
   };
 
@@ -42,20 +49,22 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Branding */}
+          <Pressable style={styles.backRow} onPress={() => router.back()} hitSlop={8}>
+            <Ionicons name="chevron-back" size={20} color={AppColors.textSecondary} />
+            <Text style={styles.backText}>Quay lại đăng nhập</Text>
+          </Pressable>
+
           <View style={styles.brandSection}>
             <View style={styles.logoBox}>
               <Text style={styles.logoEmoji}>⚡</Text>
             </View>
             <Text style={styles.appName}>Energy Check</Text>
-            <Text style={styles.tagline}>Hiểu rõ bản thân mỗi ngày</Text>
+            <Text style={styles.tagline}>Tạo tài khoản để bắt đầu hành trình theo dõi năng lượng</Text>
           </View>
 
-          {/* Form card */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Đăng nhập</Text>
+            <Text style={styles.cardTitle}>Đăng ký</Text>
 
-            {/* Email */}
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Email</Text>
               <TextInput
@@ -72,7 +81,6 @@ export default function LoginScreen() {
               />
             </View>
 
-            {/* Password */}
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Mật khẩu</Text>
               <View style={[styles.input, styles.inputRow, passwordFocused && styles.inputFocused]}>
@@ -89,7 +97,7 @@ export default function LoginScreen() {
                   autoCorrect={false}
                 />
                 <Pressable
-                  onPress={() => setShowPassword((v) => !v)}
+                  onPress={() => setShowPassword((value) => !value)}
                   hitSlop={8}
                   style={styles.eyeBtn}
                 >
@@ -102,38 +110,54 @@ export default function LoginScreen() {
               </View>
             </View>
 
-            {/* Forgot password */}
-            <Pressable style={styles.forgotRow} hitSlop={8}>
-              <Text style={styles.forgotText}>Quên mật khẩu?</Text>
-            </Pressable>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Xác nhận mật khẩu</Text>
+              <View
+                style={[
+                  styles.input,
+                  styles.inputRow,
+                  passwordConfirmationFocused && styles.inputFocused,
+                ]}
+              >
+                <TextInput
+                  style={styles.passwordInput}
+                  value={passwordConfirmation}
+                  onChangeText={setPasswordConfirmation}
+                  onFocus={() => setPasswordConfirmationFocused(true)}
+                  onBlur={() => setPasswordConfirmationFocused(false)}
+                  placeholder="••••••••"
+                  placeholderTextColor={AppColors.textGhost}
+                  secureTextEntry={!showPasswordConfirmation}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                <Pressable
+                  onPress={() => setShowPasswordConfirmation((value) => !value)}
+                  hitSlop={8}
+                  style={styles.eyeBtn}
+                >
+                  <Ionicons
+                    name={showPasswordConfirmation ? 'eye-outline' : 'eye-off-outline'}
+                    size={20}
+                    color={AppColors.textMuted}
+                  />
+                </Pressable>
+              </View>
+            </View>
           </View>
 
-          {/* Primary CTA */}
           <Pressable
-            style={styles.loginBtn}
-            onPress={handleLogin}
+            style={[styles.registerBtn, !canSubmit && styles.registerBtnDisabled]}
+            onPress={handleRegister}
+            disabled={!canSubmit}
           >
-            <Text style={styles.loginBtnText}>Đăng nhập</Text>
+            <Text style={styles.registerBtnText}>Tạo tài khoản</Text>
           </Pressable>
 
-          {/* Divider */}
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>hoặc</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Google button */}
-          <Pressable style={styles.googleBtn}>
-            <Text style={styles.googleIcon}>G</Text>
-            <Text style={styles.googleBtnText}>Tiếp tục với Google</Text>
-          </Pressable>
-
-          {/* Sign up */}
-          <View style={styles.signupRow}>
-            <Text style={styles.signupText}>Chưa có tài khoản? </Text>
-            <Pressable hitSlop={8} onPress={() => router.push('/register')}>
-              <Text style={styles.signupLink}>Đăng ký</Text>
+          <View style={styles.loginRow}>
+            <Text style={styles.loginText}>Đã có tài khoản? </Text>
+            <Pressable hitSlop={8} onPress={() => router.replace('/login')}>
+              <Text style={styles.loginLink}>Đăng nhập</Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -149,12 +173,21 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 24,
     paddingBottom: 32,
     gap: 20,
   },
-
-  // Branding
+  backRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 4,
+  },
+  backText: {
+    fontFamily: FontFamily.sansSemiBold,
+    fontSize: scale(13),
+    color: AppColors.textSecondary,
+  },
   brandSection: {
     alignItems: 'center',
     gap: 8,
@@ -183,10 +216,11 @@ const styles = StyleSheet.create({
   tagline: {
     fontFamily: FontFamily.sans,
     fontSize: scale(14),
+    lineHeight: scale(22),
     color: AppColors.textMuted,
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
-
-  // Form card
   card: {
     backgroundColor: AppColors.bgSurface1,
     borderRadius: 16,
@@ -201,8 +235,6 @@ const styles = StyleSheet.create({
     color: AppColors.textPrimary,
     marginBottom: 4,
   },
-
-  // Fields
   fieldGroup: {
     gap: 6,
   },
@@ -243,87 +275,33 @@ const styles = StyleSheet.create({
   eyeBtn: {
     padding: 12,
   },
-
-  // Forgot
-  forgotRow: {
-    alignSelf: 'flex-end',
-  },
-  forgotText: {
-    fontFamily: FontFamily.sansSemiBold,
-    fontSize: scale(13),
-    color: AppColors.primaryMain,
-  },
-
-  // Login button
-  loginBtn: {
+  registerBtn: {
     height: 52,
     backgroundColor: AppColors.primaryMain,
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loginBtnDisabled: {
+  registerBtnDisabled: {
     opacity: 0.45,
   },
-  loginBtnText: {
+  registerBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(15),
     color: '#ffffff',
   },
-
-  // Divider
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: AppColors.borderDefault,
-  },
-  dividerText: {
-    fontFamily: FontFamily.sans,
-    fontSize: scale(13),
-    color: AppColors.textMuted,
-  },
-
-  // Google button
-  googleBtn: {
-    height: 52,
-    backgroundColor: AppColors.bgSurface1,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: AppColors.borderDefault,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  googleIcon: {
-    fontFamily: FontFamily.sansBold,
-    fontSize: scale(16),
-    color: AppColors.textPrimary,
-  },
-  googleBtnText: {
-    fontFamily: FontFamily.sansSemiBold,
-    fontSize: scale(14),
-    color: AppColors.textPrimary,
-  },
-
-  // Sign up
-  signupRow: {
+  loginRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 4,
   },
-  signupText: {
+  loginText: {
     fontFamily: FontFamily.sans,
     fontSize: scale(14),
     color: AppColors.textMuted,
   },
-  signupLink: {
+  loginLink: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(14),
     color: AppColors.primaryMain,
