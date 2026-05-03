@@ -39,7 +39,7 @@ export default function OnboardingScreen() {
 
   const completeOnboarding = async () => {
     // Navigate to main app - no need to store state for testing
-    router.replace("/(tabs)");
+    router.replace("/login");
   };
 
   const handleNext = () => {

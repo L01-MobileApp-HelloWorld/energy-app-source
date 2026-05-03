@@ -2,8 +2,9 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { Ionicons } from '@expo/vector-icons';
+
 import { CustomTabBar } from '@/components/ui/custom-tab-bar';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { AppColors } from '@/constants/theme';
 
 export default function TabLayout() {
@@ -17,8 +18,8 @@ export default function TabLayout() {
           name="explore"
           options={{
             title: 'Lịch sử',
-            tabBarIcon: ({ color }) => (
-              <IconSymbol size={24} name="list.bullet.clipboard" color={color} />
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons size={24} name={focused ? 'time' : 'time-outline'} color={color} />
             ),
           }}
         />
@@ -26,8 +27,8 @@ export default function TabLayout() {
           name="index"
           options={{
             title: 'Trang chủ',
-            tabBarIcon: ({ color }) => (
-              <IconSymbol size={24} name="house.fill" color={color} />
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons size={24} name={focused ? 'home' : 'home-outline'} color={color} />
             ),
           }}
         />
@@ -35,8 +36,8 @@ export default function TabLayout() {
           name="settings"
           options={{
             title: 'Cài đặt',
-            tabBarIcon: ({ color }) => (
-              <IconSymbol size={24} name="gearshape.fill" color={color} />
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons size={24} name={focused ? 'settings' : 'settings-outline'} color={color} />
             ),
           }}
         />

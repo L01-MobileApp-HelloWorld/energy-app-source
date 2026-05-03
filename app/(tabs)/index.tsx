@@ -5,7 +5,7 @@ import { Text } from "@/components/ui/text";
 import { AppColors } from "@/constants/theme";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function getCurrentDateTime() {
@@ -161,7 +161,14 @@ export default function HomeScreen() {
         </View>
 
         {/* Xem nhắc nhở */}
-        <View style={[styles.menuCard, { marginBottom: 0 }]}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={[styles.menuCard, { marginBottom: 0 }]}
+          onPress={() => {
+            console.log('[Dashboard] navigate to reminder');
+            router.push('/reminder');
+          }}
+        >
           <View style={styles.menuIconBox}>
             <IconSymbol name="alarm" size={20} color={AppColors.textMuted} />
           </View>
@@ -169,7 +176,7 @@ export default function HomeScreen() {
             Xem nhắc nhở
           </Text>
           <IconSymbol name="chevron.right" size={20} color={AppColors.textGhost} />
-        </View>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );

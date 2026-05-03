@@ -66,6 +66,8 @@ export default function RootLayout() {
           <Stack.Screen name="survey" options={{ headerShown: false }} />
           <Stack.Screen name="analystic" options={{ headerShown: false }} />
           <Stack.Screen name="result" options={{ headerShown: false }} />
+          <Stack.Screen name="reminder" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
           <Stack.Screen
             name="modal"
             options={{ presentation: "modal", title: "Modal" }}

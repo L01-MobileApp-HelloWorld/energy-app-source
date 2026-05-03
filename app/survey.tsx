@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -217,7 +218,7 @@ export default function SurveyScreen() {
       {/* Bottom actions */}
       <View style={styles.footer}>
         <Pressable style={styles.backBtn} onPress={handleBack}>
-          <Text style={styles.backBtnText}>‹</Text>
+          <Ionicons name="chevron-back" size={24} color={AppColors.textPrimary} />
         </Pressable>
         <Pressable
           style={[styles.nextBtn, !hasAnswer && styles.nextBtnDisabled]}
@@ -225,8 +226,13 @@ export default function SurveyScreen() {
           disabled={!hasAnswer}
         >
           <Text style={styles.nextBtnText}>
-            {isLastQuestion ? 'Tiến hành phân tích  ✓' : 'Tiếp theo  →'}
+            {isLastQuestion ? 'Tiến hành phân tích' : 'Tiếp theo'}
           </Text>
+          <Ionicons
+            name={isLastQuestion ? 'checkmark' : 'arrow-forward'}
+            size={18}
+            color="#ffffff"
+          />
         </Pressable>
       </View>
     </SafeAreaView>
@@ -329,18 +335,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backBtnText: {
-    fontSize: scale(24),
-    color: AppColors.textPrimary,
-    lineHeight: scale(28),
-  },
   nextBtn: {
     flex: 1,
     height: 52,
     borderRadius: 8,
     backgroundColor: AppColors.primaryMain,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
   },
   nextBtnDisabled: {
     opacity: 0.45,

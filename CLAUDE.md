@@ -160,8 +160,17 @@ For inline `style` props, use the `scale()` function (defined per-screen based o
 
 ### Icons
 
-Use **Phosphor Icons** only (`@expo/vector-icons` or `phosphor-react-native`). Style: Regular, stroke 1.5px.
-Icon colors: inactive = `AppColors.textDisabled`, active = `AppColors.primaryMain`.
+Use **Ionicons** from `@expo/vector-icons` (already installed, no extra package needed).
+
+```tsx
+import { Ionicons } from '@expo/vector-icons';
+
+<Ionicons name="alarm-outline" size={20} color={AppColors.textMuted} />
+```
+
+- Prefer `-outline` variants for inactive/default state, filled variants for active/selected state.
+- Icon colors: inactive = `AppColors.textMuted`, active = `AppColors.primaryMain`.
+- Do **not** use `IconSymbol` for new code — it requires manual SF Symbols ↔ MaterialIcons mapping and behaves differently per platform. `Ionicons` is cross-platform consistent.
 
 ---
 
