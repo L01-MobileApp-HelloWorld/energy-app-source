@@ -134,8 +134,7 @@ const buttonTextStyle = tva({
     variant: {
       link: "data-[hover=true]:underline data-[active=true]:underline",
       outline: "",
-      solid:
-        "text-white dark:text-apptext-primary data-[hover=true]:text-white dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-white dark:data-[active=true]:text-apptext-primary",
+      solid: "",
     },
     size: {
       xs: "text-xs",
@@ -156,19 +155,19 @@ const buttonTextStyle = tva({
       variant: "solid",
       action: "secondary",
       class:
-        "text-white dark:text-apptext-primary data-[hover=true]:text-white dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-white dark:data-[active=true]:text-apptext-primary",
+        "text-typography-500 data-[hover=true]:text-typography-600 data-[active=true]:text-typography-700",
     },
     {
       variant: "solid",
       action: "positive",
       class:
-        "text-white dark:text-apptext-primary data-[hover=true]:text-white dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-white dark:data-[active=true]:text-apptext-primary",
+        "text-success-600 data-[hover=true]:text-success-600 data-[active=true]:text-success-700",
     },
     {
       variant: "solid",
       action: "negative",
       class:
-        "text-white dark:text-apptext-primary data-[hover=true]:text-white dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-white dark:data-[active=true]:text-apptext-primary",
+        "text-error-600 data-[hover=true]:text-error-600 data-[active=true]:text-error-700",
     },
     {
       variant: "outline",
@@ -203,8 +202,7 @@ const buttonIconStyle = tva({
     variant: {
       link: "data-[hover=true]:underline data-[active=true]:underline",
       outline: "",
-      solid:
-        "text-typography-0 dark:text-apptext-primary data-[hover=true]:text-typography-0 dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-typography-0 dark:data-[active=true]:text-apptext-primary",
+      solid: "",
     },
     size: {
       xs: "h-3.5 w-3.5",
@@ -230,7 +228,7 @@ const buttonIconStyle = tva({
       variant: "solid",
       action: "primary",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-typography-0 dark:text-apptext-primary data-[hover=true]:text-typography-0 dark:data-[hover=true]:text-apptext-primary data-[active=true]:text-typography-0 dark:data-[active=true]:text-apptext-primary",
     },
     {
       variant: "solid",

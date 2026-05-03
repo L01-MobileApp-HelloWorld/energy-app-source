@@ -15,14 +15,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppColorsType, FontFamily } from '@/constants/theme';
-import { useAppColors } from '@/hooks/use-app-theme';
+import { useAppColors, useAppTheme } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
 
 export default function LoginScreen() {
   const colors = useAppColors();
+  const { resolvedTheme } = useAppTheme();
   const styles = createStyles(colors);
+  const primaryForeground = resolvedTheme === 'dark' ? colors.textPrimary : '#ffffff';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -116,7 +118,7 @@ export default function LoginScreen() {
             style={styles.loginBtn}
             onPress={handleLogin}
           >
-            <Text style={styles.loginBtnText}>Đăng nhập</Text>
+            <Text style={[styles.loginBtnText, { color: primaryForeground }]}>Đăng nhập</Text>
           </Pressable>
 
           {/* Divider */}
@@ -272,7 +274,6 @@ const createStyles = (colors: AppColorsType) =>
   loginBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(15),
-    color: colors.textPrimary,
   },
 
   // Divider

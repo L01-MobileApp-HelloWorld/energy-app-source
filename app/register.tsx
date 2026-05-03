@@ -16,14 +16,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
 import { AppColorsType, FontFamily } from '@/constants/theme';
-import { useAppColors } from '@/hooks/use-app-theme';
+import { useAppColors, useAppTheme } from '@/hooks/use-app-theme';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
 
 export default function RegisterScreen() {
   const colors = useAppColors();
+  const { resolvedTheme } = useAppTheme();
   const styles = createStyles(colors);
+  const primaryForeground = resolvedTheme === 'dark' ? colors.textPrimary : '#ffffff';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -152,7 +154,7 @@ export default function RegisterScreen() {
             onPress={handleRegister}
             disabled={!canSubmit}
           >
-            <Text style={styles.registerBtnText}>Tạo tài khoản</Text>
+            <Text style={[styles.registerBtnText, { color: primaryForeground }]}>Tạo tài khoản</Text>
           </Pressable>
 
           <View style={styles.loginRow}>
@@ -279,7 +281,6 @@ const createStyles = (colors: AppColorsType) =>
   registerBtnText: {
     fontFamily: FontFamily.sansBold,
     fontSize: scale(15),
-    color: colors.textPrimary,
   },
   loginRow: {
     flexDirection: 'row',
