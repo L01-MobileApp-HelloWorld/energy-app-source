@@ -4,6 +4,13 @@ import { ScrollView } from "react-native";
 import HomeScreen from "../app/(tabs)/index";
 
 const mockIconSymbol = jest.fn(() => null);
+const mockPush = jest.fn();
+
+jest.mock("expo-router", () => ({
+  router: {
+    push: (...args: any[]) => mockPush(...args),
+  },
+}));
 
 jest.mock("react-native-safe-area-context", () => {
   const React = require("react");
@@ -63,6 +70,7 @@ describe("HomeScreen", () => {
 
   beforeEach(() => {
     mockIconSymbol.mockClear();
+    mockPush.mockClear();
   });
 
   test("render without crash", () => {
@@ -82,6 +90,7 @@ describe("HomeScreen", () => {
   test("press start button without crash", () => {
     const { getByText } = render(<HomeScreen />);
     expect(() => fireEvent.press(getByText("Bắt đầu kiểm tra"))).not.toThrow();
+    expect(mockPush).toHaveBeenCalledWith("/survey");
   });
 
   test("render formatted current date and time", () => {
