@@ -2,8 +2,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle } from 'react-native-svg';
 
+import { CategoryBar } from '@/components/ui/category-bar';
+import { CircularScore } from '@/components/ui/circular-score';
 import { StateBadge, StateKey } from '@/components/ui/state-badge';
 import { AppColorsType, FontFamily, getStateColorMap } from '@/constants/theme';
 import { useAppColors, useAppTheme } from '@/hooks/use-app-theme';
@@ -111,100 +112,47 @@ function getState(overall: number): StateKey {
   return 'focused';
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function CircularScore({
-  score,
-  color,
-  colors,
-}: {
-  score: number;
-  color: string;
-  colors: AppColorsType;
-}) {
-  const SIZE = 164;
-  const SW = 12;
-  const r = (SIZE - SW) / 2;
-  const circ = 2 * Math.PI * r;
-  const offset = circ * (1 - score / 5);
-
-  return (
-    <View style={{ width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }}>
-      <Svg width={SIZE} height={SIZE}>
-        <Circle
-          cx={SIZE / 2}
-          cy={SIZE / 2}
-          r={r}
-          stroke={colors.bgSurface3}
-          strokeWidth={SW}
-          fill="none"
-        />
-        <Circle
-          cx={SIZE / 2}
-          cy={SIZE / 2}
-          r={r}
-          stroke={color}
-          strokeWidth={SW}
-          fill="none"
-          strokeDasharray={circ}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          transform={`rotate(-90, ${SIZE / 2}, ${SIZE / 2})`}
-        />
-      </Svg>
-      <View style={StyleSheet.absoluteFill}>
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: FontFamily.monoMedium, fontSize: scale(36), color }}>
-            {score.toFixed(1)}
-          </Text>
-          <Text style={{ fontFamily: FontFamily.sans, fontSize: scale(12), color: colors.textMuted }}>
-            / 5.0
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
-}
-
-function CategoryBar({
-  label,
-  score,
-  color,
-  colors,
-}: {
-  label: string;
-  score: number;
-  color: string;
-  colors: AppColorsType;
-}) {
-  return (
-    <View style={{ gap: 6 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{ fontFamily: FontFamily.sansMedium, fontSize: scale(13), color: colors.textSecondary }}>
-          {label}
-        </Text>
-        <Text style={{ fontFamily: FontFamily.monoMedium, fontSize: scale(12), color }}>
-          {score.toFixed(1)}
-        </Text>
-      </View>
-      <View style={{ height: 6, backgroundColor: colors.bgSurface3, borderRadius: 3, overflow: 'hidden' }}>
-        <View
-          style={{ height: 6, width: `${(score / 5) * 100}%`, backgroundColor: color, borderRadius: 3 }}
-        />
-      </View>
-    </View>
-  );
-}
-
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ResultScreen() {
   const colors = useAppColors();
   const styles = createStyles(colors);
   const { resolvedTheme } = useAppTheme();
-  const { answers: answersJson } = useLocalSearchParams<{ answers: string }>();
+  const {
+    answers: answersJson,
+    resultData: resultDataJson,
+    surveyAnswers: surveyAnswersJson,
+    fromHistory,
+  } = useLocalSearchParams<{
+    answers?: string;
+    resultData?: string;
+    surveyAnswers?: string;
+    fromHistory?: string;
+  }>();
 
-  const { overall, categoryScores, stateKey, stateColor } = useMemo(() => {
+  const isFromHistory = fromHistory === '1';
+
+  const { overall, categoryScores, stateKey, stateColor, reviewAnswersJson } = useMemo(() => {
+    // History mode: use pre-computed data
+    if (resultDataJson) {
+      try {
+        const d = JSON.parse(resultDataJson) as {
+          stateKey: StateKey;
+          overall: number;
+          categoryScores: number[];
+        };
+        const stateColor = getStateColorMap(resolvedTheme)[d.stateKey].text;
+        return {
+          overall: d.overall,
+          categoryScores: d.categoryScores,
+          stateKey: d.stateKey,
+          stateColor,
+          reviewAnswersJson: surveyAnswersJson ?? '{}',
+        };
+      } catch {}
+    }
+
+    // Survey mode: compute from raw answers
     let parsed: Record<number, number> = {};
     try {
       parsed = JSON.parse(answersJson ?? '{}');
@@ -216,8 +164,8 @@ export default function ResultScreen() {
     const stateKey = getState(overall);
     const stateColor = getStateColorMap(resolvedTheme)[stateKey].text;
 
-    return { overall, categoryScores, stateKey, stateColor };
-  }, [answersJson, resolvedTheme]);
+    return { overall, categoryScores, stateKey, stateColor, reviewAnswersJson: answersJson ?? '{}' };
+  }, [answersJson, resultDataJson, surveyAnswersJson, resolvedTheme]);
 
   const info = STATE_INFO[stateKey];
 
@@ -278,15 +226,34 @@ export default function ResultScreen() {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Pressable style={styles.retryBtn} onPress={() => router.replace('/survey')}>
-          <Text style={styles.retryBtnText}>Làm lại</Text>
-        </Pressable>
         <Pressable
-          style={[styles.homeBtn, { backgroundColor: stateColor }]}
-          onPress={() => router.replace('/(tabs)')}
+          style={styles.reviewBtn}
+          onPress={() => router.push({ pathname: '/survey-review', params: { answersJson: reviewAnswersJson } })}
         >
-          <Text style={styles.homeBtnText}>Về trang chủ</Text>
+          <Text style={styles.reviewBtnText}>Xem lại khảo sát</Text>
         </Pressable>
+        <View style={styles.footerRow}>
+          {isFromHistory ? (
+            <Pressable
+              style={[styles.homeBtn, { backgroundColor: stateColor, flex: 1 }]}
+              onPress={() => router.back()}
+            >
+              <Text style={styles.homeBtnText}>Về lịch sử</Text>
+            </Pressable>
+          ) : (
+            <>
+              <Pressable style={styles.retryBtn} onPress={() => router.replace('/survey')}>
+                <Text style={styles.retryBtnText}>Làm lại</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.homeBtn, { backgroundColor: stateColor }]}
+                onPress={() => router.replace('/(tabs)')}
+              >
+                <Text style={styles.homeBtnText}>Về trang chủ</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -390,10 +357,27 @@ const createStyles = (colors: AppColorsType) =>
   },
 
   footer: {
-    flexDirection: 'row',
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
+    gap: 10,
+  },
+  reviewBtn: {
+    height: 48,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.borderDefault,
+    backgroundColor: colors.bgSurface1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reviewBtnText: {
+    fontFamily: FontFamily.sansBold,
+    fontSize: scale(14),
+    color: colors.textSecondary,
+  },
+  footerRow: {
+    flexDirection: 'row',
     gap: 12,
   },
   retryBtn: {

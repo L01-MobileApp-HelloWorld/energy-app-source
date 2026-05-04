@@ -149,7 +149,11 @@ export default function HomeScreen() {
         </View>
 
         {/* Kiểm tra lịch sử */}
-        <View style={styles.menuCard}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.menuCard}
+          onPress={() => router.push('/(tabs)/history')}
+        >
           <View style={styles.menuIconBox}>
             <IconSymbol
               name="clock.arrow.circlepath"
@@ -161,7 +165,7 @@ export default function HomeScreen() {
             Kiểm tra lịch sử
           </Text>
           <IconSymbol name="chevron.right" size={20} color={colors.textGhost} />
-        </View>
+        </TouchableOpacity>
 
         {/* Xem nhắc nhở */}
         <TouchableOpacity

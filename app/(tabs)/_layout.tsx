@@ -19,7 +19,7 @@ export default function TabLayout() {
         screenOptions={{ headerShown: false }}
       >
         <Tabs.Screen
-          name="explore"
+          name="history"
           options={{
             title: 'Lịch sử',
             tabBarIcon: ({ color, focused }) => (

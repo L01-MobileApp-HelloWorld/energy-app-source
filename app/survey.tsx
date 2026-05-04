@@ -34,7 +34,7 @@ type Question = {
 
 // ─── Hard-coded data (sẽ thay bằng API sau) ──────────────────────────────────
 
-const QUESTIONS: Question[] = [
+export const QUESTIONS: Question[] = [
   {
     category: "Năng lượng và sức khỏe",
     categoryEmoji: "⚡",

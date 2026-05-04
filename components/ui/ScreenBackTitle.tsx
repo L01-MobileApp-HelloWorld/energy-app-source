@@ -8,12 +8,15 @@ import { useAppColors } from "@/hooks/use-app-theme";
 const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 390) * size;
 
+const BTN_SIZE = 36;
+
 type ScreenBackTitleProps = {
   title: string;
   onPress: () => void;
+  rightElement?: React.ReactNode;
 };
 
-export function ScreenBackTitle({ title, onPress }: ScreenBackTitleProps) {
+export function ScreenBackTitle({ title, onPress, rightElement }: ScreenBackTitleProps) {
   const colors = useAppColors();
   const styles = createStyles(colors);
 
@@ -26,13 +29,14 @@ export function ScreenBackTitle({ title, onPress }: ScreenBackTitleProps) {
         accessibilityLabel={`Quay lại từ màn ${title}`}
         style={styles.iconButton}
       >
-        <Ionicons
-          name="arrow-back"
-          size={scale(28)}
-          color={colors.textPrimary}
-        />
+        <Ionicons name="arrow-back" size={scale(28)} color={colors.textPrimary} />
       </Pressable>
-      <Text style={styles.title}>{title}</Text>
+
+      <Text style={styles.title} numberOfLines={1}>{title}</Text>
+
+      <View style={styles.iconButton}>
+        {rightElement ?? null}
+      </View>
     </View>
   );
 }
@@ -42,16 +46,17 @@ const createStyles = (colors: AppColorsType) =>
     container: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 16,
     },
     iconButton: {
-      width: 36,
-      height: 36,
+      width: BTN_SIZE,
+      height: BTN_SIZE,
       alignItems: "center",
       justifyContent: "center",
+      flexShrink: 0,
     },
     title: {
-      flexShrink: 1,
+      flex: 1,
+      textAlign: "center",
       fontFamily: FontFamily.sansExtraBold,
       fontSize: scale(20),
       lineHeight: scale(30),
