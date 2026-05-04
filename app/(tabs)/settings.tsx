@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Dimensions, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
@@ -55,6 +55,22 @@ export default function SettingsScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Account actions — pinned to bottom */}
+      <View style={styles.footer}>
+        <Text style={styles.sectionLabel}>TÀI KHOẢN</Text>
+        <View style={styles.card}>
+          <TouchableOpacity style={styles.accountRow} activeOpacity={0.7}>
+            <Ionicons name="trash-outline" size={20} color={colors.stateTiredText} />
+            <Text style={[styles.accountRowText, { color: colors.stateTiredText }]}>Xóa tài khoản</Text>
+          </TouchableOpacity>
+          <View style={styles.divider} />
+          <TouchableOpacity style={styles.accountRow} activeOpacity={0.7}>
+            <Ionicons name="log-out-outline" size={20} color={colors.stateExhaustedText} />
+            <Text style={[styles.accountRowText, { color: colors.stateExhaustedText }]}>Đăng xuất</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -127,5 +143,27 @@ const createStyles = (colors: AppColorsType) =>
       fontSize: scale(13),
       color: colors.textMuted,
       lineHeight: scale(19),
+    },
+    footer: {
+      paddingHorizontal: 20,
+      paddingTop: 16,
+      paddingBottom: 12,
+      gap: 16,
+    },
+    accountRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 4,
+    },
+    accountRowText: {
+      fontFamily: FontFamily.sansMedium,
+      fontSize: scale(15),
+      color: colors.textSecondary,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.borderDefault,
+      marginVertical: 12,
     },
   });

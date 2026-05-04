@@ -1,10 +1,11 @@
 import { EntryCard, HistoryEntry } from '@/components/ui/entry-card';
 import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
+import { SortOption, SortSheet } from '@/components/ui/sort-sheet';
 import { AppColorsType } from '@/constants/theme';
 import { useAppColors } from '@/hooks/use-app-theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,7 +14,7 @@ type HistorySection = {
   entries: HistoryEntry[];
 };
 
-const MOCK_HISTORY: HistorySection[] = [
+const RAW_HISTORY: HistorySection[] = [
   {
     label: 'HÔM NAY',
     entries: [
@@ -67,9 +68,32 @@ const MOCK_HISTORY: HistorySection[] = [
   },
 ];
 
+function sortSections(sections: HistorySection[], sort: SortOption): HistorySection[] {
+  switch (sort) {
+    case 'date-desc':
+      return sections.map((s) => ({ ...s, entries: [...s.entries] }));
+    case 'date-asc':
+      return [...sections].reverse().map((s) => ({ ...s, entries: [...s.entries].reverse() }));
+    case 'name-asc':
+      return sections.map((s) => ({
+        ...s,
+        entries: [...s.entries].sort((a, b) => a.title.localeCompare(b.title, 'vi')),
+      }));
+    case 'name-desc':
+      return sections.map((s) => ({
+        ...s,
+        entries: [...s.entries].sort((a, b) => b.title.localeCompare(a.title, 'vi')),
+      }));
+  }
+}
+
 export default function HistoryScreen() {
   const colors = useAppColors();
   const styles = createStyles(colors);
+  const [sortVisible, setSortVisible] = useState(false);
+  const [sort, setSort] = useState<SortOption>('date-desc');
+
+  const sections = useMemo(() => sortSections(RAW_HISTORY, sort), [sort]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bgApp }}>
@@ -78,8 +102,12 @@ export default function HistoryScreen() {
           title="Lịch sử"
           onPress={() => router.push('/')}
           rightElement={
-            <TouchableOpacity activeOpacity={0.7}>
-              <Ionicons name="filter-outline" size={22} color={colors.textPrimary} />
+            <TouchableOpacity activeOpacity={0.7} onPress={() => setSortVisible(true)}>
+              <Ionicons
+                name="filter-outline"
+                size={22}
+                color={sort !== 'date-desc' ? colors.primaryMain : colors.textPrimary}
+              />
             </TouchableOpacity>
           }
         />
@@ -89,7 +117,7 @@ export default function HistoryScreen() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
-        {MOCK_HISTORY.map((section) => (
+        {sections.map((section) => (
           <View key={section.label} style={{ marginBottom: 8 }}>
             <Text style={styles.sectionLabel}>{section.label}</Text>
             {section.entries.map((entry) => (
@@ -98,6 +126,13 @@ export default function HistoryScreen() {
           </View>
         ))}
       </ScrollView>
+
+      <SortSheet
+        visible={sortVisible}
+        selected={sort}
+        onSelect={setSort}
+        onClose={() => setSortVisible(false)}
+      />
     </SafeAreaView>
   );
 }
