@@ -26,6 +26,7 @@ const scale = (size: number) => (width / 390) * size;
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Question = {
+  id: number;
   category: string;
   categoryEmoji: string;
   question: string;
@@ -39,6 +40,7 @@ export const QUESTIONS: Question[] = [
     category: "Năng lượng và sức khỏe",
     categoryEmoji: "⚡",
     question: "Mức năng lượng của bạn lúc này như thế nào?",
+    id: 1,
     options: [
       {
         emoji: "😤",
@@ -63,6 +65,7 @@ export const QUESTIONS: Question[] = [
     category: "Giấc ngủ",
     categoryEmoji: "🌙",
     question: "Bạn ngủ được khoảng mấy tiếng tối qua?",
+    id: 2,
     options: [
       {
         emoji: "😵",
@@ -86,6 +89,7 @@ export const QUESTIONS: Question[] = [
     category: "Cơ thể",
     categoryEmoji: "💪",
     question: "Cơ thể bạn đang cảm thấy thế nào?",
+    id: 3,
     options: [
       {
         emoji: "🤕",
@@ -113,6 +117,7 @@ export const QUESTIONS: Question[] = [
     category: "Tâm trạng",
     categoryEmoji: "🧠",
     question: "Tâm trạng chung của bạn lúc này?",
+    id: 4,
     options: [
       {
         emoji: "😞",
@@ -132,6 +137,7 @@ export const QUESTIONS: Question[] = [
     category: "Công việc & học tập",
     categoryEmoji: "📚",
     question: "Khi nghĩ đến công việc / bài vở hôm nay, bạn cảm thấy?",
+    id: 5,
     options: [
       {
         emoji: "😰",
@@ -159,6 +165,7 @@ export const QUESTIONS: Question[] = [
     category: "Ăn uống",
     categoryEmoji: "🍱",
     question: "Bạn đã ăn uống đầy đủ chưa?",
+    id: 6,
     options: [
       {
         emoji: "😵",
@@ -186,6 +193,7 @@ export const QUESTIONS: Question[] = [
     category: "Tập trung",
     categoryEmoji: "🎯",
     question: "Gần đây bạn có thể tập trung vào 1 việc trong bao lâu?",
+    id: 7,
     options: [
       {
         emoji: "😵‍💫",
@@ -213,6 +221,7 @@ export const QUESTIONS: Question[] = [
     category: "Deadline",
     categoryEmoji: "⏰",
     question: "Deadline của bạn đang như thế nào?",
+    id: 8,
     options: [
       {
         emoji: "🔥",
@@ -240,6 +249,7 @@ export const QUESTIONS: Question[] = [
     category: "Cảm xúc với bản thân",
     categoryEmoji: "🪞",
     question: "Bạn nghĩ lý do bạn chưa làm việc là vì?",
+    id: 9,
     options: [
       {
         emoji: "😮‍💨",
@@ -267,6 +277,7 @@ export const QUESTIONS: Question[] = [
     category: "Năng lượng và sức khỏe",
     categoryEmoji: "⚡",
     question: "Mức độ tập trung của bạn hôm nay như thế nào?",
+    id: 10,
     options: [
       {
         emoji: "😤",
