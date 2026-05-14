@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   KeyboardAvoidingView,
@@ -11,36 +11,41 @@ import {
   Text,
   TextInput,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppColorsType, FontFamily } from '@/constants/theme';
-import { useAppColors, useAppTheme } from '@/hooks/use-app-theme';
+import { AppColorsType, FontFamily } from "@/constants/theme";
+import { useAppColors, useAppTheme } from "@/hooks/use-app-theme";
+import { apiClient } from "@/services/api-client";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 390) * size;
 
 export default function LoginScreen() {
   const colors = useAppColors();
   const { resolvedTheme } = useAppTheme();
   const styles = createStyles(colors);
-  const primaryForeground = resolvedTheme === 'dark' ? colors.textPrimary : '#ffffff';
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const primaryForeground =
+    resolvedTheme === "dark" ? colors.textPrimary : "#ffffff";
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
+  useEffect(() => {
+    apiClient.get("/");
+  }, []);
 
   const handleLogin = () => {
-    router.replace('/(tabs)');
+    router.replace("/(tabs)");
   };
 
   return (
-    <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.screen} edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -80,7 +85,13 @@ export default function LoginScreen() {
             {/* Password */}
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Mật khẩu</Text>
-              <View style={[styles.input, styles.inputRow, passwordFocused && styles.inputFocused]}>
+              <View
+                style={[
+                  styles.input,
+                  styles.inputRow,
+                  passwordFocused && styles.inputFocused,
+                ]}
+              >
                 <TextInput
                   style={styles.passwordInput}
                   value={password}
@@ -99,7 +110,7 @@ export default function LoginScreen() {
                   style={styles.eyeBtn}
                 >
                   <Ionicons
-                    name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                    name={showPassword ? "eye-outline" : "eye-off-outline"}
                     size={20}
                     color={colors.textMuted}
                   />
@@ -114,11 +125,10 @@ export default function LoginScreen() {
           </View>
 
           {/* Primary CTA */}
-          <Pressable
-            style={styles.loginBtn}
-            onPress={handleLogin}
-          >
-            <Text style={[styles.loginBtnText, { color: primaryForeground }]}>Đăng nhập</Text>
+          <Pressable style={styles.loginBtn} onPress={handleLogin}>
+            <Text style={[styles.loginBtnText, { color: primaryForeground }]}>
+              Đăng nhập
+            </Text>
           </Pressable>
 
           {/* Divider */}
@@ -137,7 +147,7 @@ export default function LoginScreen() {
           {/* Sign up */}
           <View style={styles.signupRow}>
             <Text style={styles.signupText}>Chưa có tài khoản? </Text>
-            <Pressable hitSlop={8} onPress={() => router.push('/register')}>
+            <Pressable hitSlop={8} onPress={() => router.push("/register")}>
               <Text style={styles.signupLink}>Đăng ký</Text>
             </Pressable>
           </View>
@@ -149,188 +159,188 @@ export default function LoginScreen() {
 
 const createStyles = (colors: AppColorsType) =>
   StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.bgApp,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 32,
-    gap: 20,
-  },
+    screen: {
+      flex: 1,
+      backgroundColor: colors.bgApp,
+    },
+    scrollContent: {
+      paddingHorizontal: 20,
+      paddingTop: 40,
+      paddingBottom: 32,
+      gap: 20,
+    },
 
-  // Branding
-  brandSection: {
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
-  },
-  logoBox: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    backgroundColor: colors.primarySurface,
-    borderWidth: 1,
-    borderColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  logoEmoji: {
-    fontSize: scale(36),
-  },
-  appName: {
-    fontFamily: FontFamily.sansExtraBold,
-    fontSize: scale(28),
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  tagline: {
-    fontFamily: FontFamily.sans,
-    fontSize: scale(14),
-    color: colors.textMuted,
-  },
+    // Branding
+    brandSection: {
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 4,
+    },
+    logoBox: {
+      width: 72,
+      height: 72,
+      borderRadius: 20,
+      backgroundColor: colors.primarySurface,
+      borderWidth: 1,
+      borderColor: colors.primaryLight,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 4,
+    },
+    logoEmoji: {
+      fontSize: scale(36),
+    },
+    appName: {
+      fontFamily: FontFamily.sansExtraBold,
+      fontSize: scale(28),
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+    },
+    tagline: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(14),
+      color: colors.textMuted,
+    },
 
-  // Form card
-  card: {
-    backgroundColor: colors.bgSurface1,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.borderDefault,
-    padding: 20,
-    gap: 16,
-  },
-  cardTitle: {
-    fontFamily: FontFamily.sansBold,
-    fontSize: scale(18),
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
+    // Form card
+    card: {
+      backgroundColor: colors.bgSurface1,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.borderDefault,
+      padding: 20,
+      gap: 16,
+    },
+    cardTitle: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(18),
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
 
-  // Fields
-  fieldGroup: {
-    gap: 6,
-  },
-  label: {
-    fontFamily: FontFamily.sansSemiBold,
-    fontSize: scale(13),
-    color: colors.textSecondary,
-  },
-  input: {
-    backgroundColor: colors.bgSurface2,
-    borderWidth: 1,
-    borderColor: colors.borderDefault,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontFamily: FontFamily.sans,
-    fontSize: scale(15),
-    color: colors.textPrimary,
-  },
-  inputFocused: {
-    borderColor: colors.primaryMain,
-    backgroundColor: colors.bgSurface1,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    paddingLeft: 14,
-  },
-  passwordInput: {
-    flex: 1,
-    fontFamily: FontFamily.sans,
-    fontSize: scale(15),
-    color: colors.textPrimary,
-    paddingVertical: 12,
-  },
-  eyeBtn: {
-    padding: 12,
-  },
+    // Fields
+    fieldGroup: {
+      gap: 6,
+    },
+    label: {
+      fontFamily: FontFamily.sansSemiBold,
+      fontSize: scale(13),
+      color: colors.textSecondary,
+    },
+    input: {
+      backgroundColor: colors.bgSurface2,
+      borderWidth: 1,
+      borderColor: colors.borderDefault,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontFamily: FontFamily.sans,
+      fontSize: scale(15),
+      color: colors.textPrimary,
+    },
+    inputFocused: {
+      borderColor: colors.primaryMain,
+      backgroundColor: colors.bgSurface1,
+    },
+    inputRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 0,
+      paddingHorizontal: 0,
+      paddingLeft: 14,
+    },
+    passwordInput: {
+      flex: 1,
+      fontFamily: FontFamily.sans,
+      fontSize: scale(15),
+      color: colors.textPrimary,
+      paddingVertical: 12,
+    },
+    eyeBtn: {
+      padding: 12,
+    },
 
-  // Forgot
-  forgotRow: {
-    alignSelf: 'flex-end',
-  },
-  forgotText: {
-    fontFamily: FontFamily.sansSemiBold,
-    fontSize: scale(13),
-    color: colors.primaryMain,
-  },
+    // Forgot
+    forgotRow: {
+      alignSelf: "flex-end",
+    },
+    forgotText: {
+      fontFamily: FontFamily.sansSemiBold,
+      fontSize: scale(13),
+      color: colors.primaryMain,
+    },
 
-  // Login button
-  loginBtn: {
-    height: 52,
-    backgroundColor: colors.primaryMain,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginBtnDisabled: {
-    opacity: 0.45,
-  },
-  loginBtnText: {
-    fontFamily: FontFamily.sansBold,
-    fontSize: scale(15),
-  },
+    // Login button
+    loginBtn: {
+      height: 52,
+      backgroundColor: colors.primaryMain,
+      borderRadius: 4,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    loginBtnDisabled: {
+      opacity: 0.45,
+    },
+    loginBtnText: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(15),
+    },
 
-  // Divider
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.borderDefault,
-  },
-  dividerText: {
-    fontFamily: FontFamily.sans,
-    fontSize: scale(13),
-    color: colors.textMuted,
-  },
+    // Divider
+    divider: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: colors.borderDefault,
+    },
+    dividerText: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(13),
+      color: colors.textMuted,
+    },
 
-  // Google button
-  googleBtn: {
-    height: 52,
-    backgroundColor: colors.bgSurface1,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.borderDefault,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  googleIcon: {
-    fontFamily: FontFamily.sansBold,
-    fontSize: scale(16),
-    color: colors.textPrimary,
-  },
-  googleBtnText: {
-    fontFamily: FontFamily.sansSemiBold,
-    fontSize: scale(14),
-    color: colors.textPrimary,
-  },
+    // Google button
+    googleBtn: {
+      height: 52,
+      backgroundColor: colors.bgSurface1,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.borderDefault,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+    },
+    googleIcon: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(16),
+      color: colors.textPrimary,
+    },
+    googleBtnText: {
+      fontFamily: FontFamily.sansSemiBold,
+      fontSize: scale(14),
+      color: colors.textPrimary,
+    },
 
-  // Sign up
-  signupRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  signupText: {
-    fontFamily: FontFamily.sans,
-    fontSize: scale(14),
-    color: colors.textMuted,
-  },
-  signupLink: {
-    fontFamily: FontFamily.sansBold,
-    fontSize: scale(14),
-    color: colors.primaryMain,
-  },
-});
+    // Sign up
+    signupRow: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 4,
+    },
+    signupText: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(14),
+      color: colors.textMuted,
+    },
+    signupLink: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(14),
+      color: colors.primaryMain,
+    },
+  });
