@@ -8,6 +8,7 @@ import { CircularScore } from '@/components/ui/circular-score';
 import { StateBadge, StateKey } from '@/components/ui/state-badge';
 import { AppColorsType, FontFamily, getStateColorMap } from '@/constants/theme';
 import { useAppColors, useAppTheme } from '@/hooks/use-app-theme';
+import type { IServerResult } from '@/typescript';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -134,7 +135,17 @@ export default function ResultScreen() {
 
   const isFromHistory = fromHistory === '1';
 
-  const { overall, categoryScores, stateKey, stateColor, reviewAnswersJson } = useMemo(() => {
+  const {
+    overall,
+    categoryScores,
+    stateKey,
+    stateColor,
+    reviewAnswersJson,
+    displayTitle,
+    displayEmoji,
+    displaySummary,
+    displayTips,
+  } = useMemo(() => {
     // History mode: use pre-computed data
     if (resultDataJson) {
       try {
@@ -150,6 +161,10 @@ export default function ResultScreen() {
           stateKey: d.stateKey,
           stateColor,
           reviewAnswersJson: surveyAnswersJson ?? '{}',
+          displayTitle: STATE_INFO[d.stateKey].title,
+          displayEmoji: STATE_INFO[d.stateKey].emoji,
+          displaySummary: STATE_INFO[d.stateKey].summary,
+          displayTips: STATE_INFO[d.stateKey].tips,
         };
       } catch {}
     }
@@ -157,11 +172,7 @@ export default function ResultScreen() {
     // Server result mode: use API response
     if (serverResultJson) {
       try {
-        const sr = JSON.parse(serverResultJson) as {
-          scores: { energy: number; work: number; psychology: number; environment: number; total: number };
-          state: string;
-          stateDetails: { name: string; emoji: string; description: string; recommendations: string[] };
-        };
+        const sr = JSON.parse(serverResultJson) as IServerResult;
 
         // Map backend state names to frontend StateKey
         const stateMap: Record<string, StateKey> = {
@@ -188,6 +199,14 @@ export default function ResultScreen() {
           stateKey: mappedState,
           stateColor,
           reviewAnswersJson: answersJson ?? '{}',
+          displayTitle: sr.stateDetails.name || STATE_INFO[mappedState].title,
+          displayEmoji: sr.stateDetails.emoji || STATE_INFO[mappedState].emoji,
+          displaySummary:
+            sr.stateDetails.description || STATE_INFO[mappedState].summary,
+          displayTips:
+            sr.stateDetails.recommendations?.length
+              ? sr.stateDetails.recommendations
+              : STATE_INFO[mappedState].tips,
         };
       } catch {}
     }
@@ -204,10 +223,18 @@ export default function ResultScreen() {
     const stateKey = getState(overall);
     const stateColor = getStateColorMap(resolvedTheme)[stateKey].text;
 
-    return { overall, categoryScores, stateKey, stateColor, reviewAnswersJson: answersJson ?? '{}' };
+    return {
+      overall,
+      categoryScores,
+      stateKey,
+      stateColor,
+      reviewAnswersJson: answersJson ?? '{}',
+      displayTitle: STATE_INFO[stateKey].title,
+      displayEmoji: STATE_INFO[stateKey].emoji,
+      displaySummary: STATE_INFO[stateKey].summary,
+      displayTips: STATE_INFO[stateKey].tips,
+    };
   }, [answersJson, resultDataJson, surveyAnswersJson, serverResultJson, resolvedTheme]);
-
-  const info = STATE_INFO[stateKey];
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
@@ -224,8 +251,8 @@ export default function ResultScreen() {
 
         {/* Score card */}
         <View style={styles.scoreCard}>
-          <Text style={styles.emoji}>{info.emoji}</Text>
-          <Text style={styles.stateTitle}>{info.title}</Text>
+          <Text style={styles.emoji}>{displayEmoji}</Text>
+          <Text style={styles.stateTitle}>{displayTitle}</Text>
           <CircularScore score={overall} color={stateColor} colors={colors} />
         </View>
 
@@ -247,13 +274,13 @@ export default function ResultScreen() {
 
         {/* Summary */}
         <View style={[styles.summaryCard, { borderLeftColor: stateColor }]}>
-          <Text style={styles.summaryText}>{info.summary}</Text>
+          <Text style={styles.summaryText}>{displaySummary}</Text>
         </View>
 
         {/* Tips */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Gợi ý cho bạn</Text>
-          {info.tips.map((tip, i) => (
+          {displayTips.map((tip, i) => (
             <View key={i} style={styles.tipCard}>
               <View style={[styles.tipBadge, { backgroundColor: stateColor }]}>
                 <Text style={styles.tipBadgeText}>{i + 1}</Text>

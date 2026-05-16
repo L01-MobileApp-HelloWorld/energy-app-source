@@ -85,7 +85,11 @@ export default function LoginScreen() {
             {/* Error message */}
             {error ? (
               <View style={styles.errorBox}>
-                <Ionicons name="alert-circle" size={16} color={colors.stateExhaustedText} />
+                <Ionicons
+                  name="alert-circle"
+                  size={16}
+                  color={colors.stateExhaustedText}
+                />
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             ) : null}
@@ -96,7 +100,10 @@ export default function LoginScreen() {
               <TextInput
                 style={[styles.input, emailFocused && styles.inputFocused]}
                 value={email}
-                onChangeText={(v) => { setEmail(v); setError(""); }}
+                onChangeText={(v) => {
+                  setEmail(v);
+                  setError("");
+                }}
                 onFocus={() => setEmailFocused(true)}
                 onBlur={() => setEmailFocused(false)}
                 placeholder="you@example.com"
@@ -121,7 +128,10 @@ export default function LoginScreen() {
                 <TextInput
                   style={styles.passwordInput}
                   value={password}
-                  onChangeText={(v) => { setPassword(v); setError(""); }}
+                  onChangeText={(v) => {
+                    setPassword(v);
+                    setError("");
+                  }}
                   onFocus={() => setPasswordFocused(true)}
                   onBlur={() => setPasswordFocused(false)}
                   placeholder="••••••••"
@@ -153,7 +163,10 @@ export default function LoginScreen() {
 
           {/* Primary CTA */}
           <Pressable
-            style={[styles.loginBtn, (!canSubmit || loading) && styles.loginBtnDisabled]}
+            style={[
+              styles.loginBtn,
+              (!canSubmit || loading) && styles.loginBtnDisabled,
+            ]}
             onPress={handleLogin}
             disabled={!canSubmit || loading}
           >
@@ -172,12 +185,6 @@ export default function LoginScreen() {
             <Text style={styles.dividerText}>hoặc</Text>
             <View style={styles.dividerLine} />
           </View>
-
-          {/* Google button */}
-          <Pressable style={styles.googleBtn}>
-            <Text style={styles.googleIcon}>G</Text>
-            <Text style={styles.googleBtnText}>Tiếp tục với Google</Text>
-          </Pressable>
 
           {/* Sign up */}
           <View style={styles.signupRow}>

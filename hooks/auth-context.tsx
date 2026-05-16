@@ -191,13 +191,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = useCallback(async (payload: IUpdateProfilePayload) => {
     const normalizedPayload = {
-      username: payload.username.trim(),
-      ...(payload.displayName?.trim()
-        ? { displayName: payload.displayName.trim() }
-        : { displayName: '' }),
+      displayName: payload.displayName.trim(),
     };
 
-    const res = await apiClient.patch<{ success: boolean; data: { user: IStoredUser } }>(
+    const res = await apiClient.put<{ success: boolean; data: { user: IStoredUser } }>(
       '/api/auth/profile',
       normalizedPayload,
     );
@@ -207,7 +204,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const changePassword = useCallback(async (payload: IChangePasswordPayload) => {
-    await apiClient.patch<{ success: boolean; message?: string }>(
+    await apiClient.put<{ success: boolean; message?: string }>(
       '/api/auth/change-password',
       {
         currentPassword: payload.currentPassword,

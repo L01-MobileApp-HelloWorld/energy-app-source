@@ -34,7 +34,6 @@ export default function ProfileUpdateScreen() {
 
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [usernameFocused, setUsernameFocused] = useState(false);
   const [displayNameFocused, setDisplayNameFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -47,7 +46,7 @@ export default function ProfileUpdateScreen() {
     setDisplayName(user.displayName ?? "");
   }, [user]);
 
-  const canSubmit = username.trim().length >= 3;
+  const canSubmit = displayName.trim().length > 0;
 
   const clearMessages = () => {
     if (error) setError("");
@@ -63,8 +62,7 @@ export default function ProfileUpdateScreen() {
 
     try {
       await updateProfile({
-        username: username.trim(),
-        displayName: displayName.trim() || undefined,
+        displayName: displayName.trim(),
       });
       setSuccess("Cập nhật hồ sơ thành công");
     } catch (e) {
@@ -150,21 +148,12 @@ export default function ProfileUpdateScreen() {
 
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Tên người dùng</Text>
-              <TextInput
-                style={[styles.input, usernameFocused && styles.inputFocused]}
-                value={username}
-                onChangeText={(value) => {
-                  setUsername(value);
-                  clearMessages();
-                }}
-                onFocus={() => setUsernameFocused(true)}
-                onBlur={() => setUsernameFocused(false)}
-                placeholder="username (3-30 ký tự)"
-                placeholderTextColor={colors.textGhost}
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!loading}
-              />
+              <View style={[styles.input, styles.readOnlyInput]}>
+                <Text style={styles.readOnlyText}>{username}</Text>
+              </View>
+              <Text style={styles.helperText}>
+                Username hiện chỉ xem, chưa hỗ trợ chỉnh sửa.
+              </Text>
             </View>
 
             <View style={styles.fieldGroup}>

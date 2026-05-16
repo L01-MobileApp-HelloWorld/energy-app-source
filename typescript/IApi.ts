@@ -24,7 +24,7 @@ export interface IApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
-  errors?: Array<{ field: string; message: string; value?: unknown }>;
+  errors?: { field: string; message: string; value?: unknown }[];
 }
 
 /**
@@ -41,6 +41,8 @@ export interface IApiAnswer {
  * Interface for the server result returned after quiz submission.
  */
 export interface IServerResult {
+  _id?: string;
+  userId?: string;
   scores: {
     energy: number;
     work: number;
@@ -49,9 +51,11 @@ export interface IServerResult {
     total: number;
   };
   state: string;
+  createdAt?: string;
   stateDetails: {
     name: string;
     emoji: string;
+    color?: string;
     description: string;
     recommendations: string[];
   };

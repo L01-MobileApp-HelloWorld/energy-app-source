@@ -33,8 +33,7 @@ export interface IAuthApiResponse {
 }
 
 export interface IUpdateProfilePayload {
-  username: string;
-  displayName?: string;
+  displayName: string;
 }
 
 export interface IChangePasswordPayload {

@@ -1,12 +1,14 @@
+import Constants from 'expo-constants';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Animated, Dimensions, Platform, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
 import { AppColorsType, FontFamily } from '@/constants/theme';
 import { useAppColors } from '@/hooks/use-app-theme';
 import { apiClient } from '@/services/api-client';
+import type { IApiAnswer, IServerResult } from '@/typescript';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -19,7 +21,11 @@ const CIRC = 2 * Math.PI * R;
 export default function AnalysticScreen() {
   const colors = useAppColors();
   const styles = createStyles(colors);
-  const { answers, apiAnswers } = useLocalSearchParams<{ answers: string; apiAnswers: string }>();
+  const { answers, apiAnswers, startedAt } = useLocalSearchParams<{
+    answers: string;
+    apiAnswers: string;
+    startedAt?: string;
+  }>();
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [statusText, setStatusText] = useState('Đang phân tích...');
@@ -46,14 +52,23 @@ export default function AnalysticScreen() {
 
     const submitQuiz = async () => {
       try {
-        const parsedApiAnswers = JSON.parse(apiAnswers || '[]');
+        const parsedApiAnswers = JSON.parse(apiAnswers || '[]') as IApiAnswer[];
+        const parsedStartedAt = Number(startedAt);
+        const completionTime =
+          Number.isFinite(parsedStartedAt) && parsedStartedAt > 0
+            ? Math.max(0, Math.round((Date.now() - parsedStartedAt) / 1000))
+            : 0;
 
         const res = await apiClient.post<{
           success: boolean;
-          data: { history: unknown };
-        }>('/api/history/submit', {
+          data: { history: IServerResult };
+        }>('/api/histories/analyze', {
           answers: parsedApiAnswers,
-          meta: { appVersion: '1.0.0' },
+          meta: {
+            completionTime,
+            deviceInfo: Platform.OS,
+            appVersion: Constants.expoConfig?.version ?? '1.0.0',
+          },
         });
 
         setStatusText('Hoàn tất!');
