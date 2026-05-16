@@ -24,6 +24,7 @@ import "react-native-reanimated";
 import { Text } from "react-native";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { ThemePreferencesProvider, useAppTheme } from "@/hooks/use-app-theme";
+import { AuthProvider } from "@/hooks/auth-context";
 import "@/global.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -62,7 +63,9 @@ export default function RootLayout() {
 
   return (
     <ThemePreferencesProvider>
-      <RootNavigator />
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
     </ThemePreferencesProvider>
   );
 }

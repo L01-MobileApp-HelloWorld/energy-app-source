@@ -10,6 +10,14 @@ export type RequestOptions = Omit<RequestInit, 'body' | 'method'> & {
   query?: QueryParams;
 };
 
+/** Standard API response shape from the backend */
+export type ApiResponse<T = unknown> = {
+  success: boolean;
+  data?: T;
+  message?: string;
+  errors?: Array<{ field: string; message: string; value?: unknown }>;
+};
+
 export class ApiError extends Error {
   status: number;
   data: unknown;
@@ -24,9 +32,18 @@ export class ApiError extends Error {
 
 export class ApiClient {
   private readonly baseUrl: string;
+  private authToken: string | null = null;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl.replace(/\/+$/, '');
+  }
+
+  setAuthToken(token: string) {
+    this.authToken = token;
+  }
+
+  clearAuthToken() {
+    this.authToken = null;
   }
 
   get<T>(endpoint: string, options?: RequestOptions) {
@@ -65,6 +82,10 @@ export class ApiClient {
 
     if (!normalizedHeaders.has('Accept')) {
       normalizedHeaders.set('Accept', 'application/json');
+    }
+
+    if (this.authToken && !normalizedHeaders.has('Authorization')) {
+      normalizedHeaders.set('Authorization', `Bearer ${this.authToken}`);
     }
 
     const response = await fetch(url, {

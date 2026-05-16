@@ -25,12 +25,15 @@ const scale = (size: number) => (width / 390) * size;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+type BackendGroup = 'energy' | 'work' | 'psychology' | 'environment';
+
 type Question = {
   id: number;
   category: string;
   categoryEmoji: string;
   question: string;
   options: SurveyOption[];
+  group: BackendGroup;
 };
 
 // ─── Hard-coded data (sẽ thay bằng API sau) ──────────────────────────────────
@@ -41,6 +44,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "⚡",
     question: "Mức năng lượng của bạn lúc này như thế nào?",
     id: 1,
+    group: 'energy',
     options: [
       {
         emoji: "😤",
@@ -66,6 +70,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "🌙",
     question: "Bạn ngủ được khoảng mấy tiếng tối qua?",
     id: 2,
+    group: 'energy',
     options: [
       {
         emoji: "😵",
@@ -90,6 +95,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "💪",
     question: "Cơ thể bạn đang cảm thấy thế nào?",
     id: 3,
+    group: 'energy',
     options: [
       {
         emoji: "🤕",
@@ -118,6 +124,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "🧠",
     question: "Tâm trạng chung của bạn lúc này?",
     id: 4,
+    group: 'psychology',
     options: [
       {
         emoji: "😞",
@@ -138,6 +145,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "📚",
     question: "Khi nghĩ đến công việc / bài vở hôm nay, bạn cảm thấy?",
     id: 5,
+    group: 'work',
     options: [
       {
         emoji: "😰",
@@ -166,6 +174,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "🍱",
     question: "Bạn đã ăn uống đầy đủ chưa?",
     id: 6,
+    group: 'environment',
     options: [
       {
         emoji: "😵",
@@ -194,6 +203,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "🎯",
     question: "Gần đây bạn có thể tập trung vào 1 việc trong bao lâu?",
     id: 7,
+    group: 'work',
     options: [
       {
         emoji: "😵‍💫",
@@ -222,6 +232,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "⏰",
     question: "Deadline của bạn đang như thế nào?",
     id: 8,
+    group: 'work',
     options: [
       {
         emoji: "🔥",
@@ -250,6 +261,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "🪞",
     question: "Bạn nghĩ lý do bạn chưa làm việc là vì?",
     id: 9,
+    group: 'psychology',
     options: [
       {
         emoji: "😮‍💨",
@@ -278,6 +290,7 @@ export const QUESTIONS: Question[] = [
     categoryEmoji: "⚡",
     question: "Mức độ tập trung của bạn hôm nay như thế nào?",
     id: 10,
+    group: 'psychology',
     options: [
       {
         emoji: "😤",
@@ -327,10 +340,26 @@ export default function SurveyScreen() {
   const handleNext = () => {
     if (isLastQuestion) {
       try {
-        console.log("[Survey] navigating to analystic, answers:", answers);
+        // Format answers for backend API
+        const apiAnswers = QUESTIONS.map((q, i) => {
+          const selectedOption = answers[i] ?? 0;
+          const numOptions = q.options.length;
+          // Map option index to 1-5 score
+          const score = Math.round(((selectedOption) / (numOptions - 1)) * 4) + 1;
+          return {
+            questionId: q.id,
+            group: q.group,
+            selectedOption,
+            score: Math.min(5, Math.max(1, score)),
+          };
+        });
+
         router.push({
           pathname: "/analystic",
-          params: { answers: JSON.stringify(answers) },
+          params: {
+            answers: JSON.stringify(answers),
+            apiAnswers: JSON.stringify(apiAnswers),
+          },
         });
       } catch (e) {
         Alert.alert("Navigation error", String(e));

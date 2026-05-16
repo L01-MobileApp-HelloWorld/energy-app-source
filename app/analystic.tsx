@@ -1,11 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
 import { AppColorsType, FontFamily } from '@/constants/theme';
 import { useAppColors } from '@/hooks/use-app-theme';
+import { apiClient } from '@/services/api-client';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
@@ -18,9 +19,11 @@ const CIRC = 2 * Math.PI * R;
 export default function AnalysticScreen() {
   const colors = useAppColors();
   const styles = createStyles(colors);
-  const { answers } = useLocalSearchParams<{ answers: string }>();
+  const { answers, apiAnswers } = useLocalSearchParams<{ answers: string; apiAnswers: string }>();
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [statusText, setStatusText] = useState('Đang phân tích...');
+  const hasSubmitted = useRef(false);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -37,11 +40,46 @@ export default function AnalysticScreen() {
       })
     ).start();
 
-    const timer = setTimeout(() => {
-      router.replace({ pathname: '/result', params: { answers } });
-    }, 2000);
+    // Submit to API
+    if (hasSubmitted.current) return;
+    hasSubmitted.current = true;
 
-    return () => clearTimeout(timer);
+    const submitQuiz = async () => {
+      try {
+        const parsedApiAnswers = JSON.parse(apiAnswers || '[]');
+
+        const res = await apiClient.post<{
+          success: boolean;
+          data: { history: unknown };
+        }>('/api/history/submit', {
+          answers: parsedApiAnswers,
+          meta: { appVersion: '1.0.0' },
+        });
+
+        setStatusText('Hoàn tất!');
+
+        // Navigate with server result
+        setTimeout(() => {
+          router.replace({
+            pathname: '/result',
+            params: {
+              answers,
+              serverResult: JSON.stringify(res.data.history),
+            },
+          });
+        }, 500);
+      } catch (error) {
+        console.warn('[Analystic] API submit failed, using local scoring:', error);
+        setStatusText('Đang tính toán...');
+
+        // Fallback to local scoring
+        setTimeout(() => {
+          router.replace({ pathname: '/result', params: { answers } });
+        }, 800);
+      }
+    };
+
+    submitQuiz();
   }, []);
 
   const spin = rotateAnim.interpolate({
@@ -77,7 +115,7 @@ export default function AnalysticScreen() {
         </Animated.View>
 
         <View style={styles.textGroup}>
-          <Text style={styles.title}>Đang phân tích...</Text>
+          <Text style={styles.title}>{statusText}</Text>
           <Text style={styles.subtitle}>Vui lòng đợi trong giây lát</Text>
         </View>
       </Animated.View>

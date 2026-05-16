@@ -3,6 +3,7 @@ import { Heading } from "@/components/ui/heading";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Text } from "@/components/ui/text";
 import { AppColorsType } from "@/constants/theme";
+import { useAuth } from "@/hooks/auth-context";
 import { useAppColors } from "@/hooks/use-app-theme";
 import { router } from "expo-router";
 import React from "react";
@@ -20,7 +21,9 @@ function getCurrentDateTime() {
 
 export default function HomeScreen() {
   const colors = useAppColors();
+  const { user } = useAuth();
   const styles = createStyles(colors);
+  const displayName = user?.displayName || user?.username || 'bạn';
   const cardStyle = {
     backgroundColor: colors.bgSurface1,
     borderRadius: 16,
@@ -53,7 +56,7 @@ export default function HomeScreen() {
         >
           <View>
             <Heading size="2xl" style={{ color: colors.textPrimary }}>
-              Chào Huy! 👋
+              Chào {displayName}! 👋
             </Heading>
             <Text size="sm" style={{ color: colors.textDisabled, marginTop: 4 }}>
               {getCurrentDateTime()}

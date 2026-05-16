@@ -122,11 +122,13 @@ export default function ResultScreen() {
     answers: answersJson,
     resultData: resultDataJson,
     surveyAnswers: surveyAnswersJson,
+    serverResult: serverResultJson,
     fromHistory,
   } = useLocalSearchParams<{
     answers?: string;
     resultData?: string;
     surveyAnswers?: string;
+    serverResult?: string;
     fromHistory?: string;
   }>();
 
@@ -152,7 +154,45 @@ export default function ResultScreen() {
       } catch {}
     }
 
-    // Survey mode: compute from raw answers
+    // Server result mode: use API response
+    if (serverResultJson) {
+      try {
+        const sr = JSON.parse(serverResultJson) as {
+          scores: { energy: number; work: number; psychology: number; environment: number; total: number };
+          state: string;
+          stateDetails: { name: string; emoji: string; description: string; recommendations: string[] };
+        };
+
+        // Map backend state names to frontend StateKey
+        const stateMap: Record<string, StateKey> = {
+          exhausted: 'exhausted',
+          tired: 'tired',
+          lazy_with_deadline: 'lazy',
+          ready: 'ready',
+          focused: 'focused',
+          unmotivated: 'unmotivated',
+        };
+        const mappedState = stateMap[sr.state] ?? 'tired';
+        const overall = (sr.scores.total / 100) * 5;
+        const categoryScores = [
+          (sr.scores.energy / 100) * 5,
+          ((sr.scores.energy + sr.scores.environment) / 200) * 5,
+          (sr.scores.psychology / 100) * 5,
+          (sr.scores.work / 100) * 5,
+        ];
+        const stateColor = getStateColorMap(resolvedTheme)[mappedState].text;
+
+        return {
+          overall,
+          categoryScores,
+          stateKey: mappedState,
+          stateColor,
+          reviewAnswersJson: answersJson ?? '{}',
+        };
+      } catch {}
+    }
+
+    // Fallback: Survey mode — compute from raw answers locally
     let parsed: Record<number, number> = {};
     try {
       parsed = JSON.parse(answersJson ?? '{}');
@@ -165,7 +205,7 @@ export default function ResultScreen() {
     const stateColor = getStateColorMap(resolvedTheme)[stateKey].text;
 
     return { overall, categoryScores, stateKey, stateColor, reviewAnswersJson: answersJson ?? '{}' };
-  }, [answersJson, resultDataJson, surveyAnswersJson, resolvedTheme]);
+  }, [answersJson, resultDataJson, surveyAnswersJson, serverResultJson, resolvedTheme]);
 
   const info = STATE_INFO[stateKey];
 
