@@ -29,7 +29,7 @@ export interface IAuthState {
 export interface IAuthApiResponse {
   user: IStoredUser;
   token: string;
-  refreshToken: string;
+  refreshToken?: string;
 }
 
 /**
@@ -37,7 +37,12 @@ export interface IAuthApiResponse {
  */
 export interface IAuthContextValue extends IAuthState {
   login: (email: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
+  register: (
+    username: string,
+    displayName: string | undefined,
+    email: string,
+    password: string,
+  ) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }

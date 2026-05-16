@@ -15,6 +15,14 @@ import type { IAuthApiResponse, IAuthContextValue, IAuthState, IStoredUser } fro
 
 const AuthContext = createContext<IAuthContextValue | null>(null);
 
+function requireAccessToken(payload: IAuthApiResponse): string {
+  if (typeof payload.token !== 'string' || payload.token.length === 0) {
+    throw new Error('Auth response is missing a valid access token');
+  }
+
+  return payload.token;
+}
+
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -106,7 +114,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       { email, password },
     );
 
-    const { user, token, refreshToken } = res.data;
+    const { user, refreshToken } = res.data;
+    const token = requireAccessToken(res.data);
     await saveTokens(token, refreshToken);
     await saveUser(user);
     apiClient.setAuthToken(token);
@@ -116,13 +125,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // ── Register ───────────────────────────────────────────────────────────────
   const register = useCallback(
-    async (username: string, email: string, password: string) => {
+    async (
+      username: string,
+      displayName: string | undefined,
+      email: string,
+      password: string,
+    ) => {
       const res = await apiClient.post<{ success: boolean; data: IAuthApiResponse }>(
         '/api/auth/register',
-        { username, email, password, displayName: username },
+        {
+          username,
+          email,
+          password,
+          ...(displayName ? { displayName } : {}),
+        },
       );
 
-      const { user, token, refreshToken } = res.data;
+      const { user, refreshToken } = res.data;
+      const token = requireAccessToken(res.data);
       await saveTokens(token, refreshToken);
       await saveUser(user);
       apiClient.setAuthToken(token);

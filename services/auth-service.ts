@@ -48,11 +48,19 @@ async function deleteItem(key: string): Promise<void> {
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 
-export async function saveTokens(accessToken: string, refreshToken: string): Promise<void> {
-  await Promise.all([
-    setItem(ACCESS_TOKEN_KEY, accessToken),
-    setItem(REFRESH_TOKEN_KEY, refreshToken),
-  ]);
+export async function saveTokens(
+  accessToken: string,
+  refreshToken?: string | null,
+): Promise<void> {
+  const tasks: Array<Promise<void>> = [setItem(ACCESS_TOKEN_KEY, accessToken)];
+
+  if (typeof refreshToken === 'string' && refreshToken.length > 0) {
+    tasks.push(setItem(REFRESH_TOKEN_KEY, refreshToken));
+  } else {
+    tasks.push(deleteItem(REFRESH_TOKEN_KEY));
+  }
+
+  await Promise.all(tasks);
 }
 
 export async function getAccessToken(): Promise<string | null> {
