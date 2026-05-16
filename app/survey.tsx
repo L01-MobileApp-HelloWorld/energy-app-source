@@ -14,31 +14,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ScreenBackTitle } from "@/components/ui/ScreenBackTitle";
 import {
-  SurveyOption,
   SurveyOptionCard,
 } from "@/components/ui/survey-option-card";
 import { AppColorsType, FontFamily } from "@/constants/theme";
 import { useAppColors, useAppTheme } from "@/hooks/use-app-theme";
+import type { IQuestion } from "@/typescript";
 
 const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 390) * size;
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type BackendGroup = 'energy' | 'work' | 'psychology' | 'environment';
-
-type Question = {
-  id: number;
-  category: string;
-  categoryEmoji: string;
-  question: string;
-  options: SurveyOption[];
-  group: BackendGroup;
-};
-
 // ─── Hard-coded data (sẽ thay bằng API sau) ──────────────────────────────────
 
-export const QUESTIONS: Question[] = [
+export const QUESTIONS: IQuestion[] = [
   {
     category: "Năng lượng và sức khỏe",
     categoryEmoji: "⚡",

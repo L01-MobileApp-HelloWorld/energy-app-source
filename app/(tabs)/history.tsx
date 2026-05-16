@@ -1,4 +1,4 @@
-import { EntryCard, HistoryEntry } from '@/components/ui/entry-card';
+import { EntryCard } from '@/components/ui/entry-card';
 import { ScreenBackTitle } from '@/components/ui/ScreenBackTitle';
 import { SortOption, SortSheet } from '@/components/ui/sort-sheet';
 import { AppColorsType, FontFamily, StateKey } from '@/constants/theme';
@@ -18,14 +18,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { IHistoryEntry, IHistorySection } from '@/typescript';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
-
-type HistorySection = {
-  label: string;
-  entries: HistoryEntry[];
-};
 
 // ─── Map API response to local format ─────────────────────────────────────────
 
@@ -38,8 +34,8 @@ const BACKEND_STATE_MAP: Record<string, StateKey> = {
   unmotivated: 'unmotivated',
 };
 
-function mapApiHistoryToSections(grouped: Record<string, unknown[]>): HistorySection[] {
-  const sections: HistorySection[] = [];
+function mapApiHistoryToSections(grouped: Record<string, unknown[]>): IHistorySection[] {
+  const sections: IHistorySection[] = [];
   const today = new Date().toDateString();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
 
@@ -61,7 +57,7 @@ function mapApiHistoryToSections(grouped: Record<string, unknown[]>): HistorySec
       }
     }
 
-    const entries: HistoryEntry[] = (items as Record<string, unknown>[]).map((item: Record<string, unknown>) => {
+    const entries: IHistoryEntry[] = (items as Record<string, unknown>[]).map((item: Record<string, unknown>) => {
       const scores = item.scores as { energy: number; work: number; psychology: number; environment: number; total: number } | undefined;
       const state = BACKEND_STATE_MAP[item.state as string] ?? 'tired';
       const overallScore = scores ? (scores.total / 100) * 5 : 3;
@@ -101,7 +97,7 @@ function mapApiHistoryToSections(grouped: Record<string, unknown[]>): HistorySec
 
 // ─── Sort logic ────────────────────────────────────────────────────────────────
 
-function sortSections(sections: HistorySection[], sort: SortOption): HistorySection[] {
+function sortSections(sections: IHistorySection[], sort: SortOption): IHistorySection[] {
   switch (sort) {
     case 'date-desc':
       return sections.map((s) => ({ ...s, entries: [...s.entries] }));
@@ -127,7 +123,7 @@ export default function HistoryScreen() {
   const styles = createStyles(colors);
   const [sortVisible, setSortVisible] = useState(false);
   const [sort, setSort] = useState<SortOption>('date-desc');
-  const [rawSections, setRawSections] = useState<HistorySection[]>([]);
+  const [rawSections, setRawSections] = useState<IHistorySection[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');

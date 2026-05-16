@@ -1,6 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
+import type { IStoredUser } from '@/typescript';
+
 const ACCESS_TOKEN_KEY = 'auth_access_token';
 const REFRESH_TOKEN_KEY = 'auth_refresh_token';
 const USER_DATA_KEY = 'auth_user_data';
@@ -45,17 +47,6 @@ async function deleteItem(key: string): Promise<void> {
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-export type StoredUser = {
-  _id: string;
-  username: string;
-  email: string;
-  displayName?: string;
-  stats?: {
-    totalQuizzes: number;
-    currentStreak: number;
-    longestStreak: number;
-  };
-};
 
 export async function saveTokens(accessToken: string, refreshToken: string): Promise<void> {
   await Promise.all([
@@ -72,15 +63,15 @@ export async function getRefreshToken(): Promise<string | null> {
   return getItem(REFRESH_TOKEN_KEY);
 }
 
-export async function saveUser(user: StoredUser): Promise<void> {
+export async function saveUser(user: IStoredUser): Promise<void> {
   await setItem(USER_DATA_KEY, JSON.stringify(user));
 }
 
-export async function getStoredUser(): Promise<StoredUser | null> {
+export async function getStoredUser(): Promise<IStoredUser | null> {
   const data = await getItem(USER_DATA_KEY);
   if (!data) return null;
   try {
-    return JSON.parse(data) as StoredUser;
+    return JSON.parse(data) as IStoredUser;
   } catch {
     return null;
   }

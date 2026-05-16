@@ -4,18 +4,15 @@ import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { RadioButton } from '@/components/ui/radio-button';
 import { AppColorsType, FontFamily } from '@/constants/theme';
 import { useAppColors } from '@/hooks/use-app-theme';
+import type { ISurveyOption } from '@/typescript';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
 
-export type SurveyOption = {
-  emoji: string;
-  label: string;
-  description: string;
-};
+export type SurveyOption = ISurveyOption;
 
 type SurveyOptionCardProps = {
-  option: SurveyOption;
+  option: ISurveyOption;
   selected: boolean;
   onPress: () => void;
 };

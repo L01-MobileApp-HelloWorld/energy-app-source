@@ -1,8 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-import { ApiError, apiClient } from '@/services/api-client';
+import { apiClient } from '@/services/api-client';
 import {
-  StoredUser,
   clearAuth,
   getAccessToken,
   getRefreshToken,
@@ -10,36 +9,16 @@ import {
   saveTokens,
   saveUser,
 } from '@/services/auth-service';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type AuthState = {
-  user: StoredUser | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-};
-
-type AuthContextValue = AuthState & {
-  login: (email: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
-};
-
-type AuthApiResponse = {
-  user: StoredUser;
-  token: string;
-  refreshToken: string;
-};
+import type { IAuthApiResponse, IAuthContextValue, IAuthState, IStoredUser } from '@/typescript';
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<IAuthContextValue | null>(null);
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>({
+  const [state, setState] = useState<IAuthState>({
     user: null,
     isAuthenticated: false,
     isLoading: true,
@@ -65,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Verify token is still valid by fetching profile
         try {
-          const res = await apiClient.get<{ success: boolean; data: { user: StoredUser } }>(
+          const res = await apiClient.get<{ success: boolean; data: { user: IStoredUser } }>(
             '/api/auth/profile',
           );
           const user = res.data.user;
@@ -89,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               // Fetch profile with new token
               const profileRes = await apiClient.get<{
                 success: boolean;
-                data: { user: StoredUser };
+                data: { user: IStoredUser };
               }>('/api/auth/profile');
               const user = profileRes.data.user;
               await saveUser(user);
@@ -122,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // ── Login ──────────────────────────────────────────────────────────────────
   const login = useCallback(async (email: string, password: string) => {
-    const res = await apiClient.post<{ success: boolean; data: AuthApiResponse }>(
+    const res = await apiClient.post<{ success: boolean; data: IAuthApiResponse }>(
       '/api/auth/login',
       { email, password },
     );
@@ -138,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Register ───────────────────────────────────────────────────────────────
   const register = useCallback(
     async (username: string, email: string, password: string) => {
-      const res = await apiClient.post<{ success: boolean; data: AuthApiResponse }>(
+      const res = await apiClient.post<{ success: boolean; data: IAuthApiResponse }>(
         '/api/auth/register',
         { username, email, password, displayName: username },
       );
@@ -172,7 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Refresh user profile ───────────────────────────────────────────────────
   const refreshUser = useCallback(async () => {
     try {
-      const res = await apiClient.get<{ success: boolean; data: { user: StoredUser } }>(
+      const res = await apiClient.get<{ success: boolean; data: { user: IStoredUser } }>(
         '/api/auth/profile',
       );
       const user = res.data.user;
@@ -183,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const value: AuthContextValue = {
+  const value: IAuthContextValue = {
     ...state,
     login,
     register,
@@ -196,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
-export function useAuth(): AuthContextValue {
+export function useAuth(): IAuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
     throw new Error('useAuth must be used within AuthProvider');
