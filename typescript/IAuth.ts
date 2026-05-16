@@ -32,6 +32,16 @@ export interface IAuthApiResponse {
   refreshToken?: string;
 }
 
+export interface IUpdateProfilePayload {
+  username: string;
+  displayName?: string;
+}
+
+export interface IChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
 /**
  * Interface for the auth context value provided to the app.
  */
@@ -45,4 +55,6 @@ export interface IAuthContextValue extends IAuthState {
   ) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  updateProfile: (payload: IUpdateProfilePayload) => Promise<void>;
+  changePassword: (payload: IChangePasswordPayload) => Promise<void>;
 }

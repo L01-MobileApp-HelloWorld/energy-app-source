@@ -9,7 +9,14 @@ import {
   saveTokens,
   saveUser,
 } from '@/services/auth-service';
-import type { IAuthApiResponse, IAuthContextValue, IAuthState, IStoredUser } from '@/typescript';
+import type {
+  IAuthApiResponse,
+  IChangePasswordPayload,
+  IAuthContextValue,
+  IAuthState,
+  IStoredUser,
+  IUpdateProfilePayload,
+} from '@/typescript';
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
@@ -182,12 +189,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const updateProfile = useCallback(async (payload: IUpdateProfilePayload) => {
+    const normalizedPayload = {
+      username: payload.username.trim(),
+      ...(payload.displayName?.trim()
+        ? { displayName: payload.displayName.trim() }
+        : { displayName: '' }),
+    };
+
+    const res = await apiClient.patch<{ success: boolean; data: { user: IStoredUser } }>(
+      '/api/auth/profile',
+      normalizedPayload,
+    );
+    const user = res.data.user;
+    await saveUser(user);
+    setState((prev) => ({ ...prev, user }));
+  }, []);
+
+  const changePassword = useCallback(async (payload: IChangePasswordPayload) => {
+    await apiClient.patch<{ success: boolean; message?: string }>(
+      '/api/auth/change-password',
+      {
+        currentPassword: payload.currentPassword,
+        newPassword: payload.newPassword,
+      },
+    );
+  }, []);
+
   const value: IAuthContextValue = {
     ...state,
     login,
     register,
     logout,
     refreshUser,
+    updateProfile,
+    changePassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

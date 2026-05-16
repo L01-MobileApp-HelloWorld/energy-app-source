@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  Pressable,
   ScrollView,
   StyleSheet,
   Switch,
@@ -67,7 +68,12 @@ export default function SettingsScreen() {
         {user && (
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>TÀI KHOẢN</Text>
-            <View style={styles.card}>
+            <Pressable
+              style={styles.card}
+              onPress={() => router.push("/profile-update")}
+              accessibilityRole="button"
+              accessibilityLabel="Mở trang cập nhật hồ sơ"
+            >
               <View style={styles.row}>
                 <View style={styles.rowLeft}>
                   <View
@@ -85,8 +91,13 @@ export default function SettingsScreen() {
                     <Text style={styles.itemSubtitle}>{user.email}</Text>
                   </View>
                 </View>
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={colors.textGhost}
+                />
               </View>
-            </View>
+            </Pressable>
           </View>
         )}
 
@@ -117,7 +128,7 @@ export default function SettingsScreen() {
               <Switch
                 value={isDarkModeEnabled}
                 onValueChange={(value) =>
-                  void setThemePreference(value ? "dark" : "light")
+                  setThemePreference(value ? "dark" : "light")
                 }
                 trackColor={{
                   false: colors.bgSurface3,
@@ -131,23 +142,30 @@ export default function SettingsScreen() {
         </View>
       </ScrollView>
 
-      {/* Account actions — pinned to bottom */}
       <View style={styles.footer}>
-        <Text style={styles.sectionLabel}>HÀNH ĐỘNG</Text>
         <View style={styles.card}>
-          <TouchableOpacity style={styles.accountRow} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.accountRow}
+            activeOpacity={0.7}
+            onPress={() => router.push("/change-password")}
+          >
             <Ionicons
-              name="trash-outline"
+              name="key-outline"
               size={20}
-              color={colors.stateTiredText}
+              color={colors.primaryMain}
             />
             <Text
-              style={[styles.accountRowText, { color: colors.stateTiredText }]}
+              style={[
+                styles.accountRowText,
+                { color: colors.textPrimary },
+              ]}
             >
-              Xóa tài khoản
+              Đổi mật khẩu
             </Text>
           </TouchableOpacity>
+
           <View style={styles.divider} />
+
           <TouchableOpacity
             style={styles.accountRow}
             activeOpacity={0.7}

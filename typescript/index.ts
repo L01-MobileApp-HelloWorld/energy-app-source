@@ -12,6 +12,8 @@ export type {
   IAuthState,
   IAuthApiResponse,
   IAuthContextValue,
+  IChangePasswordPayload,
+  IUpdateProfilePayload,
 } from './IAuth';
 export type {
   IQueryValue,

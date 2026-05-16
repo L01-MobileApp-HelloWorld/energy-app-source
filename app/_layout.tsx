@@ -91,6 +91,8 @@ function RootNavigator() {
           <Stack.Screen name="analystic" />
           <Stack.Screen name="result" />
           <Stack.Screen name="reminder" />
+          <Stack.Screen name="profile-update" />
+          <Stack.Screen name="change-password" />
           <Stack.Screen name="login" />
           <Stack.Screen name="register" />
           <Stack.Screen
