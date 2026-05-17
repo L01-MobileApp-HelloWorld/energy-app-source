@@ -1,6 +1,6 @@
 import { RatingPill } from '@/components/ui/rating-pill';
 import { StateBadge } from '@/components/ui/state-badge';
-import { AppColorsType, StateKey } from '@/constants/theme';
+import { AppColorsType } from '@/constants/theme';
 import { router } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -18,8 +18,7 @@ export function EntryCard({ entry, colors }: EntryCardProps) {
     router.push({
       pathname: '/result',
       params: {
-        resultData: JSON.stringify(entry.resultData),
-        surveyAnswers: JSON.stringify(entry.surveyAnswers),
+        historyId: entry.id,
         fromHistory: '1',
       },
     });

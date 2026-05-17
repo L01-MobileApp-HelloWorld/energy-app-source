@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Verify token is still valid by fetching profile
         try {
           const res = await apiClient.get<{ success: boolean; data: { user: IStoredUser } }>(
-            '/api/auth/profile',
+            '/auth/profile',
           );
           const user = res.data.user;
           await saveUser(user);
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               const refreshRes = await apiClient.post<{
                 success: boolean;
                 data: { token: string; refreshToken: string };
-              }>('/api/auth/refresh', { refreshToken });
+              }>('/auth/refresh', { refreshToken });
 
               const newToken = refreshRes.data.token;
               const newRefreshToken = refreshRes.data.refreshToken;
@@ -84,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               const profileRes = await apiClient.get<{
                 success: boolean;
                 data: { user: IStoredUser };
-              }>('/api/auth/profile');
+              }>('/auth/profile');
               const user = profileRes.data.user;
               await saveUser(user);
               if (mounted) setState({ user, isAuthenticated: true, isLoading: false });
@@ -117,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Login ──────────────────────────────────────────────────────────────────
   const login = useCallback(async (email: string, password: string) => {
     const res = await apiClient.post<{ success: boolean; data: IAuthApiResponse }>(
-      '/api/auth/login',
+      '/auth/login',
       { email, password },
     );
 
@@ -139,7 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password: string,
     ) => {
       const res = await apiClient.post<{ success: boolean; data: IAuthApiResponse }>(
-        '/api/auth/register',
+        '/auth/register',
         {
           username,
           email,
@@ -164,7 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const refreshToken = await getRefreshToken();
       if (refreshToken) {
-        await apiClient.post('/api/auth/logout', { refreshToken });
+        await apiClient.post('/auth/logout', { refreshToken });
       }
     } catch {
       // Ignore API errors on logout — clear locally anyway
@@ -179,7 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = useCallback(async () => {
     try {
       const res = await apiClient.get<{ success: boolean; data: { user: IStoredUser } }>(
-        '/api/auth/profile',
+        '/auth/profile',
       );
       const user = res.data.user;
       await saveUser(user);
@@ -195,7 +195,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const res = await apiClient.put<{ success: boolean; data: { user: IStoredUser } }>(
-      '/api/auth/profile',
+      '/auth/profile',
       normalizedPayload,
     );
     const user = res.data.user;
@@ -205,7 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const changePassword = useCallback(async (payload: IChangePasswordPayload) => {
     await apiClient.put<{ success: boolean; message?: string }>(
-      '/api/auth/change-password',
+      '/auth/change-password',
       {
         currentPassword: payload.currentPassword,
         newPassword: payload.newPassword,

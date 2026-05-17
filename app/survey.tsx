@@ -68,7 +68,7 @@ export default function SurveyScreen() {
       const res = await apiClient.get<{
         success: boolean;
         data: { questions: BackendQuestion[] };
-      }>("/api/questions");
+      }>("/questions");
 
       const fetchedQuestions = res.data.questions ?? [];
 

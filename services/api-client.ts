@@ -1,6 +1,8 @@
-type QueryValue = string | number | boolean | null | undefined;
+type QueryPrimitive = string | number | boolean | null | undefined;
+type QueryValue = QueryPrimitive | QueryPrimitive[];
 
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
+const API_PREFIX = '/api';
 
 export type QueryParams = Record<string, QueryValue>;
 
@@ -15,7 +17,7 @@ export type ApiResponse<T = unknown> = {
   success: boolean;
   data?: T;
   message?: string;
-  errors?: Array<{ field: string; message: string; value?: unknown }>;
+  errors?: { field: string; message: string; value?: unknown }[];
 };
 
 export class ApiError extends Error {
@@ -113,7 +115,10 @@ export class ApiClient {
   }
 
   private buildUrl(endpoint: string, query?: QueryParams) {
-    const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const path = normalizedEndpoint.startsWith(API_PREFIX)
+      ? normalizedEndpoint
+      : `${API_PREFIX}${normalizedEndpoint}`;
     const url = new URL(`${this.baseUrl}${path}`);
 
     if (!query) {
@@ -122,6 +127,20 @@ export class ApiClient {
 
     Object.entries(query).forEach(([key, value]) => {
       if (value === undefined || value === null) {
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        const normalized = value.filter(
+          (item): item is string | number | boolean =>
+            item !== undefined && item !== null,
+        );
+
+        if (normalized.length === 0) {
+          return;
+        }
+
+        url.searchParams.append(key, normalized.join(','));
         return;
       }
 

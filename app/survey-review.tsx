@@ -1,89 +1,244 @@
-import { QUESTIONS } from '@/app/survey';
 import { AppColorsType, FontFamily } from '@/constants/theme';
 import { useAppColors } from '@/hooks/use-app-theme';
+import { apiClient } from '@/services/api-client';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
 
+type BackendQuestionOption = {
+  label: string;
+  emoji: string;
+  subtext: string;
+  score: number;
+};
+
+type BackendQuestion = {
+  _id: string;
+  questionId: number;
+  group: 'energy' | 'work' | 'psychology' | 'environment';
+  question: string;
+  hint?: string;
+  options: BackendQuestionOption[];
+  order?: number;
+};
+
+const GROUP_META: Record<
+  BackendQuestion['group'],
+  { label: string; emoji: string }
+> = {
+  energy: { label: 'Năng lượng', emoji: '⚡' },
+  work: { label: 'Công việc', emoji: '💼' },
+  psychology: { label: 'Tâm lý', emoji: '🧠' },
+  environment: { label: 'Môi trường', emoji: '🌿' },
+};
+
+function normalizeSelectedOption(selectedOption: number, optionCount: number) {
+  if (selectedOption >= 0 && selectedOption < optionCount) {
+    return selectedOption;
+  }
+
+  if (selectedOption > 0 && selectedOption <= optionCount) {
+    return selectedOption - 1;
+  }
+
+  return -1;
+}
+
 export default function SurveyReviewScreen() {
   const colors = useAppColors();
   const styles = createStyles(colors);
-  const { answersJson } = useLocalSearchParams<{ answersJson: string }>();
+  const { answersJson, questionsJson } = useLocalSearchParams<{
+    answersJson?: string;
+    questionsJson?: string;
+  }>();
 
-  let answers: Record<number, number> = {};
-  try {
-    answers = JSON.parse(answersJson ?? '{}');
-  } catch {}
+  const answers = useMemo(() => {
+    try {
+      return JSON.parse(answersJson ?? '{}') as Record<number, number>;
+    } catch {
+      return {};
+    }
+  }, [answersJson]);
+
+  const [questions, setQuestions] = useState<BackendQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadQuestions() {
+      setLoading(true);
+      setError('');
+
+      try {
+        if (questionsJson) {
+          const parsed = JSON.parse(questionsJson) as BackendQuestion[];
+          if (active) {
+            setQuestions(
+              [...parsed].sort(
+                (a, b) => (a.order ?? a.questionId) - (b.order ?? b.questionId),
+              ),
+            );
+            setLoading(false);
+          }
+          return;
+        }
+
+        const questionIds = Object.keys(answers)
+          .map((key) => Number(key))
+          .filter((id) => Number.isFinite(id))
+          .sort((a, b) => a - b);
+
+        if (questionIds.length === 0) {
+          if (active) {
+            setQuestions([]);
+            setLoading(false);
+          }
+          return;
+        }
+
+        const res = await apiClient.get<{
+          success: boolean;
+          data: { questions: BackendQuestion[] };
+        }>('/questions', {
+          query: {
+            questionId: questionIds.join(','),
+          },
+        });
+
+        if (active) {
+          setQuestions(
+            [...(res.data.questions ?? [])].sort(
+              (a, b) => (a.order ?? a.questionId) - (b.order ?? b.questionId),
+            ),
+          );
+          setLoading(false);
+        }
+      } catch (fetchError) {
+        if (active) {
+          setError('Không thể tải câu hỏi khảo sát.');
+          setLoading(false);
+        }
+        console.warn('[SurveyReview] fetch questions failed:', fetchError);
+      }
+    }
+
+    loadQuestions();
+
+    return () => {
+      active = false;
+    };
+  }, [answers, questionsJson]);
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
-      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.headerBtn}
+          activeOpacity={0.7}
+        >
           <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Câu trả lời của bạn</Text>
         <View style={styles.headerBtn} />
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {QUESTIONS.map((q, qi) => {
-          const selected = answers[qi];
-          return (
-            <View key={qi} style={styles.questionCard}>
-              {/* Category badge */}
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>
-                  {q.categoryEmoji} {q.category}
+      {loading ? (
+        <View style={styles.centerState}>
+          <ActivityIndicator size="large" color={colors.primaryMain} />
+        </View>
+      ) : error ? (
+        <View style={styles.centerState}>
+          <Text style={styles.emptyTitle}>{error}</Text>
+        </View>
+      ) : questions.length === 0 ? (
+        <View style={styles.centerState}>
+          <Text style={styles.emptyTitle}>Không có câu trả lời để hiển thị</Text>
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {questions.map((q, index) => {
+            const rawSelected = answers[q.questionId];
+            const selected = normalizeSelectedOption(rawSelected, q.options.length);
+            const groupMeta = GROUP_META[q.group];
+
+            return (
+              <View key={q._id ?? q.questionId} style={styles.questionCard}>
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {groupMeta.emoji} {groupMeta.label}
+                  </Text>
+                </View>
+
+                <Text style={styles.questionText}>
+                  <Text style={styles.questionNumber}>{index + 1}. </Text>
+                  {q.question}
                 </Text>
-              </View>
 
-              {/* Question */}
-              <Text style={styles.questionText}>
-                <Text style={styles.questionNumber}>{qi + 1}. </Text>
-                {q.question}
-              </Text>
+                {q.hint ? <Text style={styles.hintText}>{q.hint}</Text> : null}
 
-              {/* Options */}
-              <View style={styles.optionsList}>
-                {q.options.map((opt, oi) => {
-                  const isSelected = selected === oi;
-                  return (
-                    <View
-                      key={oi}
-                      style={[
-                        styles.optionRow,
-                        isSelected && { backgroundColor: colors.primarySurface, borderColor: colors.primaryMain },
-                      ]}
-                    >
-                      <Text style={styles.optionEmoji}>{opt.emoji}</Text>
-                      <View style={styles.optionTexts}>
-                        <Text style={[styles.optionLabel, isSelected && { color: colors.primaryMain }]}>
-                          {opt.label}
-                        </Text>
-                        {'description' in opt && opt.description ? (
-                          <Text style={styles.optionDesc}>{opt.description}</Text>
+                <View style={styles.optionsList}>
+                  {q.options.map((opt, optionIndex) => {
+                    const isSelected = selected === optionIndex;
+                    return (
+                      <View
+                        key={`${q.questionId}-${optionIndex}`}
+                        style={[
+                          styles.optionRow,
+                          isSelected && {
+                            backgroundColor: colors.primarySurface,
+                            borderColor: colors.primaryMain,
+                          },
+                        ]}
+                      >
+                        <Text style={styles.optionEmoji}>{opt.emoji}</Text>
+                        <View style={styles.optionTexts}>
+                          <Text
+                            style={[
+                              styles.optionLabel,
+                              isSelected && { color: colors.primaryMain },
+                            ]}
+                          >
+                            {opt.label}
+                          </Text>
+                          {opt.subtext ? (
+                            <Text style={styles.optionDesc}>{opt.subtext}</Text>
+                          ) : null}
+                        </View>
+                        {isSelected ? (
+                          <Ionicons
+                            name="checkmark-circle"
+                            size={20}
+                            color={colors.primaryMain}
+                          />
                         ) : null}
                       </View>
-                      {isSelected && (
-                        <Ionicons name="checkmark-circle" size={20} color={colors.primaryMain} />
-                      )}
-                    </View>
-                  );
-                })}
+                    );
+                  })}
+                </View>
               </View>
-            </View>
-          );
-        })}
-      </ScrollView>
+            );
+          })}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
@@ -91,6 +246,18 @@ export default function SurveyReviewScreen() {
 const createStyles = (colors: AppColorsType) =>
   StyleSheet.create({
     screen: { flex: 1, backgroundColor: colors.bgApp },
+    centerState: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 32,
+    },
+    emptyTitle: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(16),
+      color: colors.textPrimary,
+      textAlign: 'center',
+    },
 
     header: {
       flexDirection: 'row',
@@ -151,6 +318,12 @@ const createStyles = (colors: AppColorsType) =>
       fontSize: scale(14),
       color: colors.textPrimary,
       lineHeight: scale(21),
+    },
+    hintText: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(12),
+      color: colors.textMuted,
+      lineHeight: scale(18),
     },
 
     optionsList: { gap: 8 },

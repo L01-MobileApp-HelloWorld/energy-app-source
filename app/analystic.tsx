@@ -1,16 +1,24 @@
-import Constants from 'expo-constants';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Platform, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle } from 'react-native-svg';
+import Constants from "expo-constants";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  Dimensions,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, { Circle } from "react-native-svg";
 
-import { AppColorsType, FontFamily } from '@/constants/theme';
-import { useAppColors } from '@/hooks/use-app-theme';
-import { apiClient } from '@/services/api-client';
-import type { IApiAnswer, IServerResult } from '@/typescript';
+import { AppColorsType, FontFamily } from "@/constants/theme";
+import { useAppColors } from "@/hooks/use-app-theme";
+import { apiClient } from "@/services/api-client";
+import type { IApiAnswer } from "@/typescript";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 390) * size;
 
 const SPINNER = 128;
@@ -21,14 +29,14 @@ const CIRC = 2 * Math.PI * R;
 export default function AnalysticScreen() {
   const colors = useAppColors();
   const styles = createStyles(colors);
-  const { answers, apiAnswers, startedAt } = useLocalSearchParams<{
-    answers: string;
+  const { apiAnswers, startedAt } = useLocalSearchParams<{
     apiAnswers: string;
     startedAt?: string;
   }>();
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const [statusText, setStatusText] = useState('Đang phân tích...');
+  const [statusText, setStatusText] = useState("Đang phân tích...");
+  const [error, setError] = useState("");
   const hasSubmitted = useRef(false);
 
   useEffect(() => {
@@ -43,7 +51,7 @@ export default function AnalysticScreen() {
         toValue: 1,
         duration: 1100,
         useNativeDriver: true,
-      })
+      }),
     ).start();
 
     // Submit to API
@@ -52,7 +60,7 @@ export default function AnalysticScreen() {
 
     const submitQuiz = async () => {
       try {
-        const parsedApiAnswers = JSON.parse(apiAnswers || '[]') as IApiAnswer[];
+        const parsedApiAnswers = JSON.parse(apiAnswers || "[]") as IApiAnswer[];
         const parsedStartedAt = Number(startedAt);
         const completionTime =
           Number.isFinite(parsedStartedAt) && parsedStartedAt > 0
@@ -61,107 +69,133 @@ export default function AnalysticScreen() {
 
         const res = await apiClient.post<{
           success: boolean;
-          data: { history: IServerResult };
-        }>('/api/histories/analyze', {
+          data: { history: { _id?: string } };
+        }>("/histories/analyze", {
           answers: parsedApiAnswers,
           meta: {
             completionTime,
             deviceInfo: Platform.OS,
-            appVersion: Constants.expoConfig?.version ?? '1.0.0',
+            appVersion: Constants.expoConfig?.version ?? "1.0.0",
           },
         });
 
-        setStatusText('Hoàn tất!');
+        const historyId = res.data.history._id;
+        if (!historyId) {
+          throw new Error("Không tìm thấy history id");
+        }
 
-        // Navigate with server result
+        setStatusText("Hoàn tất!");
+
         setTimeout(() => {
           router.replace({
-            pathname: '/result',
+            pathname: "/result",
             params: {
-              answers,
-              serverResult: JSON.stringify(res.data.history),
+              historyId,
             },
           });
         }, 500);
       } catch (error) {
-        console.warn('[Analystic] API submit failed, using local scoring:', error);
-        setStatusText('Đang tính toán...');
-
-        // Fallback to local scoring
-        setTimeout(() => {
-          router.replace({ pathname: '/result', params: { answers } });
-        }, 800);
+        console.warn("[Analystic] API submit failed:", error);
+        setError("Không thể phân tích từ backend. Vui lòng thử lại.");
+        setStatusText("Đã xảy ra lỗi");
       }
     };
 
     submitQuiz();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const spin = rotateAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: ["0deg", "360deg"],
   });
 
   return (
-    <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
-      <Animated.View style={[styles.center, { opacity: fadeAnim }]}>
-        <Animated.View style={{ transform: [{ rotate: spin }] }}>
-          <Svg width={SPINNER} height={SPINNER}>
-            <Circle
-              cx={SPINNER / 2}
-              cy={SPINNER / 2}
-              r={R}
-              stroke={colors.bgSurface3}
-              strokeWidth={STROKE}
-              fill="none"
-            />
-            <Circle
-              cx={SPINNER / 2}
-              cy={SPINNER / 2}
-              r={R}
-              stroke={colors.primaryMain}
-              strokeWidth={STROKE}
-              fill="none"
-              strokeDasharray={CIRC}
-              strokeDashoffset={CIRC * 0.28}
-              strokeLinecap="round"
-            />
-          </Svg>
-        </Animated.View>
-
-        <View style={styles.textGroup}>
+    <SafeAreaView style={styles.screen} edges={["top", "bottom"]}>
+      {error ? (
+        <View style={styles.center}>
           <Text style={styles.title}>{statusText}</Text>
-          <Text style={styles.subtitle}>Vui lòng đợi trong giây lát</Text>
+          <Text style={styles.subtitle}>{error}</Text>
+          <Pressable
+            style={styles.actionBtn}
+            onPress={() => router.replace("/survey")}
+          >
+            <Text style={styles.actionBtnText}>Quay lại khảo sát</Text>
+          </Pressable>
         </View>
-      </Animated.View>
+      ) : (
+        <Animated.View style={[styles.center, { opacity: fadeAnim }]}>
+          <Animated.View style={{ transform: [{ rotate: spin }] }}>
+            <Svg width={SPINNER} height={SPINNER}>
+              <Circle
+                cx={SPINNER / 2}
+                cy={SPINNER / 2}
+                r={R}
+                stroke={colors.bgSurface3}
+                strokeWidth={STROKE}
+                fill="none"
+              />
+              <Circle
+                cx={SPINNER / 2}
+                cy={SPINNER / 2}
+                r={R}
+                stroke={colors.primaryMain}
+                strokeWidth={STROKE}
+                fill="none"
+                strokeDasharray={CIRC}
+                strokeDashoffset={CIRC * 0.28}
+                strokeLinecap="round"
+              />
+            </Svg>
+          </Animated.View>
+
+          <View style={styles.textGroup}>
+            <Text style={styles.title}>{statusText}</Text>
+            <Text style={styles.subtitle}>Vui lòng đợi trong giây lát</Text>
+          </View>
+        </Animated.View>
+      )}
     </SafeAreaView>
   );
 }
 
 const createStyles = (colors: AppColorsType) =>
   StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.bgApp,
-  },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 36,
-  },
-  textGroup: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  title: {
-    fontFamily: FontFamily.sansBold,
-    fontSize: scale(22),
-    color: colors.textPrimary,
-  },
-  subtitle: {
-    fontFamily: FontFamily.sans,
-    fontSize: scale(14),
-    color: colors.textMuted,
-  },
-});
+    screen: {
+      flex: 1,
+      backgroundColor: colors.bgApp,
+    },
+    center: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 36,
+    },
+    textGroup: {
+      alignItems: "center",
+      gap: 8,
+    },
+    title: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(22),
+      color: colors.textPrimary,
+    },
+    subtitle: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(14),
+      color: colors.textMuted,
+    },
+    actionBtn: {
+      minWidth: 180,
+      height: 48,
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.primaryMain,
+    },
+    actionBtnText: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(14),
+      color: colors.textPrimary,
+    },
+  });

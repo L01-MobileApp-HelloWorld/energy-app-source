@@ -140,7 +140,7 @@ export default function HistoryScreen() {
           histories: Record<string, unknown[]>;
           pagination: { total: number; page: number; pages: number };
         };
-      }>('/api/histories');
+      }>('/histories');
 
       const sections = mapApiHistoryToSections(res.data.histories);
       setRawSections(sections);
