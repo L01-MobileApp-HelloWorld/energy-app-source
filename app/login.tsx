@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -71,10 +72,11 @@ export default function LoginScreen() {
         >
           {/* Branding */}
           <View style={styles.brandSection}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoEmoji}>⚡</Text>
-            </View>
-            <Text style={styles.appName}>Energy Check</Text>
+            <Image
+              source={require("@/assets/images/logo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
             <Text style={styles.tagline}>Hiểu rõ bản thân mỗi ngày</Text>
           </View>
 
@@ -218,19 +220,10 @@ const createStyles = (colors: AppColorsType) =>
       gap: 8,
       marginBottom: 4,
     },
-    logoBox: {
-      width: 72,
-      height: 72,
-      borderRadius: 20,
-      backgroundColor: colors.primarySurface,
-      borderWidth: 1,
-      borderColor: colors.primaryLight,
-      alignItems: "center",
-      justifyContent: "center",
+    logo: {
+      width: scale(80),
+      height: scale(80),
       marginBottom: 4,
-    },
-    logoEmoji: {
-      fontSize: scale(36),
     },
     appName: {
       fontFamily: FontFamily.sansExtraBold,

@@ -112,19 +112,12 @@ export default function RegisterScreen() {
           <ScreenBackTitle title="Đăng ký" onPress={() => router.back()} />
 
           <View style={styles.brandSection}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoEmoji}>⚡</Text>
-            </View>
-            <Text style={styles.appName}>Energy Check</Text>
             <Text style={styles.tagline}>
               Tạo tài khoản để bắt đầu hành trình theo dõi năng lượng
             </Text>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Đăng ký</Text>
-
-            {/* Error message */}
             {error ? (
               <View style={styles.errorBox}>
                 <Ionicons
@@ -332,19 +325,10 @@ const createStyles = (colors: AppColorsType) =>
       gap: 8,
       marginBottom: 4,
     },
-    logoBox: {
-      width: 72,
-      height: 72,
-      borderRadius: 20,
-      backgroundColor: colors.primarySurface,
-      borderWidth: 1,
-      borderColor: colors.primaryLight,
-      alignItems: "center",
-      justifyContent: "center",
+    logo: {
+      width: scale(80),
+      height: scale(80),
       marginBottom: 4,
-    },
-    logoEmoji: {
-      fontSize: scale(36),
     },
     appName: {
       fontFamily: FontFamily.sansExtraBold,
