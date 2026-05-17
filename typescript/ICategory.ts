@@ -9,4 +9,4 @@ export interface ICategory {
 /**
  * Sort options for history screen.
  */
-export type ISortOption = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc';
+export type ISortOption = 'createdAt:desc' | 'createdAt:asc';

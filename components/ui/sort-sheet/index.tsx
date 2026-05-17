@@ -8,13 +8,11 @@ import { useAppColors } from '@/hooks/use-app-theme';
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
 
-export type SortOption = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc';
+export type SortOption = 'createdAt:desc' | 'createdAt:asc';
 
 const SORT_OPTIONS: { value: SortOption; label: string; sub: string; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
-  { value: 'date-desc', label: 'Mới nhất trước', sub: 'Kết quả gần đây hiển thị đầu tiên', icon: 'arrow-down-outline' },
-  { value: 'date-asc',  label: 'Cũ nhất trước',  sub: 'Kết quả lâu nhất hiển thị đầu tiên', icon: 'arrow-up-outline' },
-  { value: 'name-asc',  label: 'Tên A → Z',       sub: 'Sắp xếp theo thứ tự bảng chữ cái',  icon: 'text-outline' },
-  { value: 'name-desc', label: 'Tên Z → A',       sub: 'Sắp xếp ngược thứ tự bảng chữ cái', icon: 'text-outline' },
+  { value: 'createdAt:desc', label: 'Mới nhất trước', sub: 'Kết quả gần đây hiển thị đầu tiên', icon: 'arrow-down-outline' },
+  { value: 'createdAt:asc', label: 'Cũ nhất trước', sub: 'Kết quả lâu nhất hiển thị đầu tiên', icon: 'arrow-up-outline' },
 ];
 
 type SortSheetProps = {

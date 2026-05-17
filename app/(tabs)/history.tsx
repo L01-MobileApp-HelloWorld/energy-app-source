@@ -4,26 +4,57 @@ import { SortOption, SortSheet } from '@/components/ui/sort-sheet';
 import { AppColorsType, FontFamily, StateKey } from '@/constants/theme';
 import { useAppColors } from '@/hooks/use-app-theme';
 import { apiClient } from '@/services/api-client';
+import type { IHistoryEntry } from '@/typescript';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
+  FlatList,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { IHistoryEntry, IHistorySection } from '@/typescript';
 
 const { width } = Dimensions.get('window');
 const scale = (size: number) => (width / 390) * size;
+const HISTORY_PAGE_LIMIT = 25;
 
-// ─── Map API response to local format ─────────────────────────────────────────
+type HistoryApiItem = {
+  _id: string;
+  userId: string;
+  state: string;
+  scores?: {
+    energy: number;
+    work: number;
+    psychology: number;
+    environment: number;
+    total: number;
+  };
+  stateDetails?: {
+    name?: string;
+    emoji?: string;
+    color?: string;
+    description?: string;
+    recommendations?: string[];
+  };
+  createdAt: string;
+};
+
+type HistoriesPagination = {
+  total: number;
+  page: number;
+  pages: number;
+};
+
+type HistoriesResponseData = {
+  histories: HistoryApiItem[];
+  pagination: HistoriesPagination;
+};
 
 const BACKEND_STATE_MAP: Record<string, StateKey> = {
   exhausted: 'exhausted',
@@ -34,132 +65,175 @@ const BACKEND_STATE_MAP: Record<string, StateKey> = {
   unmotivated: 'unmotivated',
 };
 
-function mapApiHistoryToSections(grouped: Record<string, unknown[]>): IHistorySection[] {
-  const sections: IHistorySection[] = [];
-  const today = new Date().toDateString();
-  const yesterday = new Date(Date.now() - 86400000).toDateString();
+function formatHistoryTimestamp(isoString: string): string {
+  const date = new Date(isoString);
+  const now = new Date();
+  const isSameDay =
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear();
+  const isSameYear = date.getFullYear() === now.getFullYear();
+  const weekdayLabelMap = ['CN', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7'];
+  const weekdayLabel = weekdayLabelMap[date.getDay()];
+  const timeLabel = date.toLocaleTimeString('vi-VN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 
-  for (const [dateStr, items] of Object.entries(grouped)) {
-    let label: string;
-    if (dateStr === today) {
-      label = 'HÔM NAY';
-    } else if (dateStr === yesterday) {
-      label = 'HÔM QUA';
-    } else {
-      const d = new Date(dateStr);
-      const diffDays = Math.floor((Date.now() - d.getTime()) / 86400000);
-      if (diffDays < 7) {
-        label = `${diffDays} NGÀY TRƯỚC`;
-      } else if (diffDays < 30) {
-        label = 'TUẦN TRƯỚC';
-      } else {
-        label = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-      }
-    }
-
-    const entries: IHistoryEntry[] = (items as Record<string, unknown>[]).map((item: Record<string, unknown>) => {
-      const scores = item.scores as { energy: number; work: number; psychology: number; environment: number; total: number } | undefined;
-      const state = BACKEND_STATE_MAP[item.state as string] ?? 'tired';
-      const overallScore = scores ? (scores.total / 100) * 5 : 3;
-      const createdAt = new Date(item.createdAt as string);
-      const time = createdAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
-
-      const stateDetails = item.stateDetails as { name?: string } | undefined;
-      const title = stateDetails?.name ?? state;
-
-      return {
-        id: (item._id as string) ?? String(Math.random()),
-        time,
-        title,
-        states: [state],
-        rating: Math.round(overallScore * 10) / 10,
-        resultData: {
-          stateKey: state,
-          overall: overallScore,
-          categoryScores: scores
-            ? [
-                (scores.energy / 100) * 5,
-                ((scores.energy + scores.environment) / 200) * 5,
-                (scores.psychology / 100) * 5,
-                (scores.work / 100) * 5,
-              ]
-            : [3, 3, 3, 3],
-        },
-        surveyAnswers: {},
-      };
-    });
-
-    sections.push({ label, entries });
+  if (isSameDay) {
+    return timeLabel;
   }
 
-  return sections;
-}
-
-// ─── Sort logic ────────────────────────────────────────────────────────────────
-
-function sortSections(sections: IHistorySection[], sort: SortOption): IHistorySection[] {
-  switch (sort) {
-    case 'date-desc':
-      return sections.map((s) => ({ ...s, entries: [...s.entries] }));
-    case 'date-asc':
-      return [...sections].reverse().map((s) => ({ ...s, entries: [...s.entries].reverse() }));
-    case 'name-asc':
-      return sections.map((s) => ({
-        ...s,
-        entries: [...s.entries].sort((a, b) => a.title.localeCompare(b.title, 'vi')),
-      }));
-    case 'name-desc':
-      return sections.map((s) => ({
-        ...s,
-        entries: [...s.entries].sort((a, b) => b.title.localeCompare(a.title, 'vi')),
-      }));
+  if (isSameYear) {
+    return `${weekdayLabel}, ${date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+    })}, ${timeLabel}`;
   }
+
+  return `${weekdayLabel}, ${date.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })}, ${timeLabel}`;
 }
 
-// ─── Screen ────────────────────────────────────────────────────────────────────
+function mapApiHistoryItem(item: HistoryApiItem): IHistoryEntry {
+  const scores = item.scores;
+  const state = BACKEND_STATE_MAP[item.state] ?? 'tired';
+  const overallScore = scores ? (scores.total / 100) * 5 : 3;
+  const title = item.stateDetails?.name ?? state;
+
+  return {
+    id: item._id,
+    createdAt: item.createdAt,
+    time: formatHistoryTimestamp(item.createdAt),
+    title,
+    states: [state],
+    rating: Math.round(overallScore * 10) / 10,
+    resultData: {
+      stateKey: state,
+      overall: overallScore,
+      categoryScores: scores
+        ? [
+            (scores.energy / 100) * 5,
+            ((scores.energy + scores.environment) / 200) * 5,
+            (scores.psychology / 100) * 5,
+            (scores.work / 100) * 5,
+          ]
+        : [3, 3, 3, 3],
+    },
+    surveyAnswers: {},
+  };
+}
 
 export default function HistoryScreen() {
   const colors = useAppColors();
   const styles = createStyles(colors);
   const [sortVisible, setSortVisible] = useState(false);
-  const [sort, setSort] = useState<SortOption>('date-desc');
-  const [rawSections, setRawSections] = useState<IHistorySection[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [sort, setSort] = useState<SortOption>('createdAt:desc');
+  const [items, setItems] = useState<IHistoryEntry[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
 
-  const fetchHistory = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
-    setError('');
+  const fetchHistory = useCallback(
+    async (targetPage: number, options?: { replace?: boolean; refresh?: boolean }) => {
+      const replace = options?.replace ?? false;
+      const refresh = options?.refresh ?? false;
 
-    try {
-      const res = await apiClient.get<{
-        success: boolean;
-        data: {
-          histories: Record<string, unknown[]>;
-          pagination: { total: number; page: number; pages: number };
-        };
-      }>('/histories');
+      if (refresh) {
+        setRefreshing(true);
+      } else if (targetPage === 1) {
+        setLoadingInitial(true);
+      } else {
+        setLoadingMore(true);
+      }
 
-      const sections = mapApiHistoryToSections(res.data.histories);
-      setRawSections(sections);
-    } catch (e) {
-      setError('Không thể tải lịch sử. Vui lòng thử lại.');
-      console.warn('[History] fetch failed:', e);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+      if (targetPage === 1) {
+        setError('');
+      }
+
+      try {
+        const res = await apiClient.get<{
+          success: boolean;
+          data: HistoriesResponseData;
+        }>('/histories', {
+          query: {
+            page: targetPage,
+            limit: HISTORY_PAGE_LIMIT,
+            sort,
+          },
+        });
+
+        const nextItems = res.data.histories.map(mapApiHistoryItem);
+        const pagination = res.data.pagination;
+
+        setItems((prevItems) =>
+          replace || targetPage === 1 ? nextItems : [...prevItems, ...nextItems],
+        );
+        setPage(pagination.page);
+        setHasNextPage(pagination.page < pagination.pages && nextItems.length > 0);
+      } catch (e) {
+        if (targetPage === 1) {
+          setError('Không thể tải lịch sử. Vui lòng thử lại.');
+        } else {
+          console.warn('[History] load more failed:', e);
+        }
+      } finally {
+        setLoadingInitial(false);
+        setLoadingMore(false);
+        setRefreshing(false);
+      }
+    },
+    [sort],
+  );
 
   useEffect(() => {
-    fetchHistory();
+    setItems([]);
+    setPage(1);
+    setHasNextPage(true);
+    setError('');
+    fetchHistory(1, { replace: true });
+  }, [fetchHistory, sort]);
+
+  const handleRefresh = useCallback(() => {
+    setHasNextPage(true);
+    fetchHistory(1, { replace: true, refresh: true });
   }, [fetchHistory]);
 
-  const sections = useMemo(() => sortSections(rawSections, sort), [rawSections, sort]);
+  const handleLoadMore = useCallback(() => {
+    if (loadingInitial || loadingMore || refreshing || !hasNextPage) {
+      return;
+    }
 
-  const isEmpty = !loading && sections.length === 0 && !error;
+    fetchHistory(page + 1);
+  }, [fetchHistory, hasNextPage, loadingInitial, loadingMore, page, refreshing]);
+
+  const handleRetry = useCallback(() => {
+    setItems([]);
+    setPage(1);
+    setHasNextPage(true);
+    fetchHistory(1, { replace: true });
+  }, [fetchHistory]);
+
+  const renderFooter = useCallback(() => {
+    if (!loadingMore) {
+      return <View style={styles.listFooterSpacer} />;
+    }
+
+    return (
+      <View style={styles.listFooter}>
+        <ActivityIndicator size="small" color={colors.primaryMain} />
+      </View>
+    );
+  }, [colors.primaryMain, loadingMore, styles.listFooter, styles.listFooterSpacer]);
+
+  const isEmpty = !loadingInitial && items.length === 0 && !error;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bgApp }}>
@@ -172,14 +246,14 @@ export default function HistoryScreen() {
               <Ionicons
                 name="filter-outline"
                 size={22}
-                color={sort !== 'date-desc' ? colors.primaryMain : colors.textPrimary}
+                color={sort !== 'createdAt:desc' ? colors.primaryMain : colors.textPrimary}
               />
             </TouchableOpacity>
           }
         />
       </View>
 
-      {loading ? (
+      {loadingInitial ? (
         <View style={styles.centerState}>
           <ActivityIndicator size="large" color={colors.primaryMain} />
         </View>
@@ -187,7 +261,7 @@ export default function HistoryScreen() {
         <View style={styles.centerState}>
           <Ionicons name="cloud-offline-outline" size={48} color={colors.textMuted} />
           <Text style={styles.emptyTitle}>{error}</Text>
-          <TouchableOpacity onPress={() => fetchHistory()} style={styles.retryBtn}>
+          <TouchableOpacity onPress={handleRetry} style={styles.retryBtn}>
             <Text style={styles.retryText}>Thử lại</Text>
           </TouchableOpacity>
         </View>
@@ -198,26 +272,23 @@ export default function HistoryScreen() {
           <Text style={styles.emptySubtitle}>Hãy thực hiện khảo sát đầu tiên của bạn!</Text>
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 100 }}
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <EntryCard entry={item} colors={colors} />}
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.4}
+          ListFooterComponent={renderFooter}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => fetchHistory(true)}
+              onRefresh={handleRefresh}
               tintColor={colors.primaryMain}
             />
           }
-        >
-          {sections.map((section) => (
-            <View key={section.label} style={{ marginBottom: 8 }}>
-              <Text style={styles.sectionLabel}>{section.label}</Text>
-              {section.entries.map((entry) => (
-                <EntryCard key={entry.id} entry={entry} colors={colors} />
-              ))}
-            </View>
-          ))}
-        </ScrollView>
+        />
       )}
 
       <SortSheet
@@ -236,14 +307,6 @@ const createStyles = (colors: AppColorsType) =>
       paddingHorizontal: 16,
       paddingVertical: 12,
     },
-    sectionLabel: {
-      fontFamily: FontFamily.sansSemiBold,
-      fontSize: 11,
-      letterSpacing: 1.2,
-      color: colors.textMuted,
-      marginBottom: 12,
-      marginTop: 4,
-    },
     centerState: {
       flex: 1,
       alignItems: 'center',
@@ -259,20 +322,34 @@ const createStyles = (colors: AppColorsType) =>
     },
     emptySubtitle: {
       fontFamily: FontFamily.sans,
-      fontSize: scale(14),
+      fontSize: scale(13),
       color: colors.textMuted,
       textAlign: 'center',
+      lineHeight: 20,
     },
     retryBtn: {
-      paddingHorizontal: 20,
-      paddingVertical: 10,
+      marginTop: 4,
       backgroundColor: colors.primaryMain,
-      borderRadius: 8,
-      marginTop: 8,
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      borderRadius: 12,
     },
     retryText: {
       fontFamily: FontFamily.sansSemiBold,
-      fontSize: scale(14),
       color: '#fff',
+      fontSize: scale(13),
+    },
+    listContent: {
+      paddingHorizontal: 20,
+      paddingTop: 8,
+      paddingBottom: 100,
+    },
+    listFooter: {
+      paddingVertical: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    listFooterSpacer: {
+      height: 12,
     },
   });
