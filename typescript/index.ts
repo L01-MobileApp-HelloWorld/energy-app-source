@@ -6,13 +6,15 @@
 export type { ISurveyOption } from './ISurveyOption';
 export type { IQuestion, BackendGroup } from './IQuestion';
 export type { IStateKey, IStateInfo } from './IStateInfo';
-export type { IHistoryEntry, IHistorySection } from './IHistoryEntry';
+export type { IHistoryEntry } from './IHistoryEntry';
 export type {
   IStoredUser,
   IAuthState,
   IAuthApiResponse,
   IAuthContextValue,
   IChangePasswordPayload,
+  IFcmTokenResponse,
+  INotificationPayload,
   IUpdateProfilePayload,
 } from './IAuth';
 export type {

@@ -32,7 +32,7 @@ export default function ProfileUpdateScreen() {
   const primaryForeground =
     resolvedTheme === "dark" ? colors.textPrimary : "#ffffff";
 
-  const [username, setUsername] = useState("");
+  // const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [displayNameFocused, setDisplayNameFocused] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export default function ProfileUpdateScreen() {
   useEffect(() => {
     if (!user) return;
 
-    setUsername(user.username ?? "");
+    // setUsername(user.username ?? "");
     setDisplayName(user.displayName ?? "");
   }, [user]);
 
@@ -146,7 +146,7 @@ export default function ProfileUpdateScreen() {
               </View>
             )}
 
-            <View style={styles.fieldGroup}>
+            {/* <View style={styles.fieldGroup}>
               <Text style={styles.label}>Tên người dùng</Text>
               <View style={[styles.input, styles.readOnlyInput]}>
                 <Text style={styles.readOnlyText}>{username}</Text>
@@ -154,7 +154,7 @@ export default function ProfileUpdateScreen() {
               <Text style={styles.helperText}>
                 Username hiện chỉ xem, chưa hỗ trợ chỉnh sửa.
               </Text>
-            </View>
+            </View> */}
 
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Tên hiển thị</Text>
@@ -201,7 +201,6 @@ export default function ProfileUpdateScreen() {
               </Text>
             )}
           </Pressable>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

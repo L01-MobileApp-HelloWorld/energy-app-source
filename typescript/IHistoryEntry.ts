@@ -6,6 +6,7 @@ import { IStateKey } from './IStateInfo';
  */
 export interface IHistoryEntry {
   id: string;
+  createdAt: string;
   time: string;
   title: string;
   states: IStateKey[];
@@ -16,12 +17,4 @@ export interface IHistoryEntry {
     categoryScores: number[];
   };
   surveyAnswers: Record<number, number>;
-}
-
-/**
- * Interface for a grouped history section (e.g., "HÔM NAY", "HÔM QUA").
- */
-export interface IHistorySection {
-  label: string;
-  entries: IHistoryEntry[];
 }

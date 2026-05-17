@@ -7,10 +7,19 @@ export interface IStoredUser {
   username: string;
   email: string;
   displayName?: string;
+  preferences?: {
+    darkMode?: boolean;
+    language?: string;
+    notificationsEnabled?: boolean;
+    reminderTime?: string;
+    reminderFrequency?: string;
+    customReminderDays?: number[];
+  };
   stats?: {
     totalQuizzes: number;
     currentStreak: number;
     longestStreak: number;
+    lastQuizDate?: string;
   };
 }
 
@@ -33,12 +42,37 @@ export interface IAuthApiResponse {
 }
 
 export interface IUpdateProfilePayload {
-  displayName: string;
+  displayName?: string;
+  preferences?: {
+    darkMode?: boolean;
+    notificationsEnabled?: boolean;
+    reminderTime?: string;
+    reminderFrequency?: string;
+    customReminderDays?: number[];
+  };
 }
 
 export interface IChangePasswordPayload {
   currentPassword: string;
   newPassword: string;
+}
+
+export interface IFcmTokenResponse {
+  success: boolean;
+  data: {
+    fcmTokens: string[];
+  };
+}
+
+export interface INotificationPayload {
+  title?: string;
+  body?: string;
+  deepLink?: string;
+  data?: {
+    type?: string;
+    reminderTime?: string;
+    reminderFrequency?: string;
+  };
 }
 
 /**

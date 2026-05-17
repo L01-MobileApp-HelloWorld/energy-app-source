@@ -1,7 +1,11 @@
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   Platform,
   Pressable,
@@ -22,76 +26,233 @@ import {
 } from "@/components/ui/actionsheet";
 import { ScreenBackTitle } from "@/components/ui/ScreenBackTitle";
 import { AppColorsType, AppTheme, FontFamily } from "@/constants/theme";
+import { useAuth } from "@/hooks/auth-context";
 import { useAppColors, useAppTheme } from "@/hooks/use-app-theme";
-import { Ionicons } from "@expo/vector-icons";
+import { ApiError } from "@/services/api-client";
 
 const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 390) * size;
 
-// 5 chips per row, 4 gaps of 8px, 40px Actionsheet padding
 const CHIP_GAP = 8;
 const CHIPS_PER_ROW = 5;
 const CHIP_SIZE = Math.floor(
   (width - 40 - (CHIPS_PER_ROW - 1) * CHIP_GAP) / CHIPS_PER_ROW,
 );
 
-const DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"];
+const DEFAULT_REMINDER_TIME = "22:00";
 
-type FrequencyKey = "daily" | "twice" | "custom";
+const DAYS = [
+  { value: 2, label: "T2" },
+  { value: 3, label: "T3" },
+  { value: 4, label: "T4" },
+  { value: 5, label: "T5" },
+  { value: 6, label: "T6" },
+  { value: 7, label: "T7" },
+  { value: 1, label: "CN" },
+];
+
+type FrequencyKey = "daily" | "custom";
+
 const FREQ_OPTIONS: { key: FrequencyKey; label: string }[] = [
   { key: "daily", label: "Hàng ngày" },
-  { key: "twice", label: "2 lần / Ngày" },
   { key: "custom", label: "Tùy chỉnh" },
 ];
+
+function parseReminderTime(value?: string) {
+  const [hourRaw = "22", minuteRaw = "00"] = (value ?? DEFAULT_REMINDER_TIME)
+    .split(":")
+    .slice(0, 2);
+  const hour = Number(hourRaw);
+  const minute = Number(minuteRaw);
+  const date = new Date();
+
+  date.setHours(Number.isFinite(hour) ? hour : 22);
+  date.setMinutes(Number.isFinite(minute) ? minute : 0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+
+  return date;
+}
+
+function formatReminderTime(date: Date) {
+  return `${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes(),
+  ).padStart(2, "0")}`;
+}
 
 export default function ReminderScreen() {
   const colors = useAppColors();
   const { resolvedTheme } = useAppTheme();
+  const { user, updateProfile } = useAuth();
   const styles = createStyles(colors, resolvedTheme);
   const primaryForeground =
     resolvedTheme === "dark" ? colors.textPrimary : "#ffffff";
-  const [isEnabled, setIsEnabled] = useState(true);
-  const [time, setTime] = useState(() => new Date());
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [time, setTime] = useState(() => parseReminderTime());
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [frequency, setFrequency] = useState<FrequencyKey>("daily");
-  const [customDays, setCustomDays] = useState<Set<number>>(new Set([2, 5, 6]));
+  const [customDays, setCustomDays] = useState<number[]>([]);
+  const [draftCustomDays, setDraftCustomDays] = useState<number[]>([]);
   const [showFreqSheet, setShowFreqSheet] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const hour = time.getHours();
-  const minute = time.getMinutes();
-  const timeLabel = `${String(hour).padStart(2, "0")} : ${String(minute).padStart(2, "0")}`;
+  useEffect(() => {
+    if (!user) return;
 
-  const handleTimeChange = (_: unknown, selected: Date) => {
-    if (selected) setTime(selected);
-    if (Platform.OS === "android") setShowTimePicker(false);
+    const prefs = user.preferences;
+    const nextFrequency =
+      prefs?.reminderFrequency === "daily" ||
+      prefs?.reminderFrequency === "custom"
+        ? prefs.reminderFrequency
+        : "daily";
+    const nextCustomDays = Array.isArray(prefs?.customReminderDays)
+      ? prefs.customReminderDays
+          .filter((day): day is number => Number.isInteger(day) && day >= 1 && day <= 7)
+          .sort((a, b) => a - b)
+      : [];
+
+    setIsEnabled(Boolean(prefs?.notificationsEnabled));
+    setTime(parseReminderTime(prefs?.reminderTime));
+    setFrequency(nextFrequency);
+    setCustomDays(nextCustomDays);
+    setDraftCustomDays(nextCustomDays);
+  }, [user]);
+
+  useEffect(() => {
+    return () => {
+      if (successTimerRef.current) {
+        clearTimeout(successTimerRef.current);
+      }
+    };
+  }, []);
+
+  const timeLabel = useMemo(() => formatReminderTime(time), [time]);
+  const isCustomFrequency = frequency === "custom";
+  const canSaveCustomFrequency = draftCustomDays.length > 0;
+  const canSubmit = !loading && (!isCustomFrequency || customDays.length > 0);
+
+  const clearMessages = () => {
+    if (error) setError("");
+    if (success) {
+      setSuccess("");
+    }
+    if (successTimerRef.current) {
+      clearTimeout(successTimerRef.current);
+      successTimerRef.current = null;
+    }
   };
 
-  const toggleDay = (idx: number) =>
-    setCustomDays((prev) => {
-      const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx);
-      else next.add(idx);
-      return next;
+  const toggleDraftDay = (dayValue: number) => {
+    clearMessages();
+    setDraftCustomDays((prev) => {
+      const exists = prev.includes(dayValue);
+      const next = exists
+        ? prev.filter((day) => day !== dayValue)
+        : [...prev, dayValue];
+
+      return next.sort((a, b) => a - b);
     });
+  };
+
+  const handleTimeChange = (event: DateTimePickerEvent, selected?: Date) => {
+    if (Platform.OS === "android") {
+      setShowTimePicker(false);
+    }
+
+    if (event.type === "dismissed" || !selected) {
+      return;
+    }
+
+    clearMessages();
+    setTime(selected);
+  };
 
   const handleFrequencyPress = (key: FrequencyKey) => {
-    if (key === "custom") setShowFreqSheet(true);
-    else setFrequency(key);
+    clearMessages();
+
+    if (key === "custom") {
+      setDraftCustomDays(customDays);
+      setShowFreqSheet(true);
+      return;
+    }
+
+    setFrequency(key);
+  };
+
+  const handleCloseFrequencySheet = () => {
+    setDraftCustomDays(customDays);
+    setShowFreqSheet(false);
   };
 
   const handleSaveCustom = () => {
+    if (!canSaveCustomFrequency) {
+      return;
+    }
+
+    clearMessages();
+    setCustomDays(draftCustomDays);
     setFrequency("custom");
     setShowFreqSheet(false);
   };
 
+  const handleSaveReminder = async () => {
+    if (!user || !canSubmit) {
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      await updateProfile({
+        preferences: {
+          notificationsEnabled: isEnabled,
+          reminderTime: formatReminderTime(time),
+          reminderFrequency: frequency,
+          customReminderDays: frequency === "custom" ? customDays : [],
+        },
+      });
+      setSuccess("Đã lưu cài đặt nhắc nhở");
+      successTimerRef.current = setTimeout(() => {
+        setSuccess("");
+        successTimerRef.current = null;
+      }, 2200);
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setError(e.message || "Lưu nhắc nhở thất bại");
+      } else {
+        setError("Không thể kết nối đến server. Vui lòng thử lại.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.screen} edges={["top", "bottom"]}>
+      {success ? (
+        <View pointerEvents="none" style={styles.flashWrap}>
+          <View style={styles.flashMessage}>
+            <Ionicons
+              name="checkmark-circle"
+              size={16}
+              color={colors.primaryMain}
+            />
+            <Text style={styles.flashMessageText}>{success}</Text>
+          </View>
+        </View>
+      ) : null}
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.header}>
           <ScreenBackTitle
             title="Nhắc nhở thông minh"
@@ -99,10 +260,32 @@ export default function ReminderScreen() {
           />
         </View>
 
-        {/* Toggle Card */}
+        {error ? (
+          <View
+            style={[
+              styles.messageBox,
+              styles.errorBox,
+            ]}
+          >
+            <Ionicons
+              name="alert-circle"
+              size={16}
+              color={colors.stateExhaustedText}
+            />
+            <Text
+              style={[
+                styles.messageText,
+                styles.errorText,
+              ]}
+            >
+              {error}
+            </Text>
+          </View>
+        ) : null}
+
         <View style={styles.card}>
           <View style={styles.toggleRow}>
-            <View style={{ flex: 1, marginRight: 12 }}>
+            <View style={styles.toggleContent}>
               <Text style={styles.cardLabel}>Bật nhắc nhở</Text>
               <Text style={styles.cardSub}>
                 Nhắc bạn kiểm tra trạng thái mỗi tối trước khi ngủ
@@ -110,7 +293,10 @@ export default function ReminderScreen() {
             </View>
             <Switch
               value={isEnabled}
-              onValueChange={setIsEnabled}
+              onValueChange={(value) => {
+                clearMessages();
+                setIsEnabled(value);
+              }}
               trackColor={{
                 false: colors.bgSurface3,
                 true: colors.primaryMain,
@@ -121,7 +307,6 @@ export default function ReminderScreen() {
           </View>
         </View>
 
-        {/* Time Card */}
         <View style={styles.card}>
           <Text style={styles.cardLabel}>Giờ nhắc nhở</Text>
           <Pressable
@@ -132,12 +317,12 @@ export default function ReminderScreen() {
           </Pressable>
         </View>
 
-        {/* Frequency Card */}
         <View style={styles.card}>
           <Text style={styles.cardLabel}>Tần suất</Text>
           <View style={styles.freqRow}>
             {FREQ_OPTIONS.map(({ key, label }) => {
               const active = frequency === key;
+
               return (
                 <Pressable
                   key={key}
@@ -156,32 +341,50 @@ export default function ReminderScreen() {
               );
             })}
           </View>
+
+          {isCustomFrequency && (
+            <Text style={styles.helperText}>
+              {customDays.length > 0
+                ? `Ngày đã chọn: ${DAYS.filter((day) =>
+                    customDays.includes(day.value),
+                  )
+                    .map((day) => day.label)
+                    .join(", ")}`
+                : "Chọn ít nhất 1 ngày để lưu tần suất tùy chỉnh."}
+            </Text>
+          )}
         </View>
       </ScrollView>
 
-      {/* Footer */}
       <View style={styles.footer}>
-        <Pressable style={styles.saveBtn} onPress={() => router.back()}>
-          <Text style={[styles.saveBtnText, { color: primaryForeground }]}>
-            Lưu nhắc nhở
-          </Text>
-          <Ionicons name="checkmark" size={18} color={primaryForeground} />
+        <Pressable
+          style={[styles.saveBtn, !canSubmit && styles.saveBtnDisabled]}
+          onPress={handleSaveReminder}
+          disabled={!canSubmit}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color={primaryForeground} />
+          ) : (
+            <>
+              <Text style={[styles.saveBtnText, { color: primaryForeground }]}>
+                Lưu nhắc nhở
+              </Text>
+              <Ionicons name="checkmark" size={18} color={primaryForeground} />
+            </>
+          )}
         </Pressable>
       </View>
 
-      {/* Time Picker — Android native dialog */}
       {Platform.OS === "android" && showTimePicker && (
         <DateTimePicker
           value={time}
           mode="time"
           display="default"
-          onValueChange={handleTimeChange}
-          onDismiss={() => setShowTimePicker(false)}
+          onChange={handleTimeChange}
           is24Hour
         />
       )}
 
-      {/* Time Picker — iOS bottom sheet */}
       {Platform.OS === "ios" && (
         <Actionsheet
           isOpen={showTimePicker}
@@ -198,8 +401,7 @@ export default function ReminderScreen() {
                 value={time}
                 mode="time"
                 display="spinner"
-                onValueChange={handleTimeChange}
-                onDismiss={() => setShowTimePicker(false)}
+                onChange={handleTimeChange}
                 is24Hour
                 style={{ width: "100%" }}
                 textColor={colors.textPrimary}
@@ -219,26 +421,26 @@ export default function ReminderScreen() {
         </Actionsheet>
       )}
 
-      {/* Custom Frequency Bottom Sheet */}
       <Actionsheet
         isOpen={showFreqSheet}
-        onClose={() => setShowFreqSheet(false)}
+        onClose={handleCloseFrequencySheet}
       >
-        <ActionsheetBackdrop onPress={() => setShowFreqSheet(false)} />
+        <ActionsheetBackdrop onPress={handleCloseFrequencySheet} />
         <ActionsheetContent style={{ backgroundColor: colors.bgSurface1 }}>
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
           <View style={styles.sheetInner}>
-            <Text style={styles.sheetTitle}>Tùy chỉnh tần suất nhắc nhở</Text>
+            <Text style={styles.sheetTitle}>Chọn ngày nhắc nhở</Text>
             <View style={styles.daysGrid}>
-              {DAYS.map((day, idx) => {
-                const selected = customDays.has(idx);
+              {DAYS.map((day) => {
+                const selected = draftCustomDays.includes(day.value);
+
                 return (
                   <Pressable
-                    key={day}
+                    key={day.value}
                     style={[styles.dayChip, selected && styles.dayChipActive]}
-                    onPress={() => toggleDay(idx)}
+                    onPress={() => toggleDraftDay(day.value)}
                   >
                     <Text
                       style={[
@@ -246,13 +448,23 @@ export default function ReminderScreen() {
                         selected && styles.dayChipTextActive,
                       ]}
                     >
-                      {day}
+                      {day.label}
                     </Text>
                   </Pressable>
                 );
               })}
             </View>
-            <Pressable style={styles.saveBtn} onPress={handleSaveCustom}>
+            <Text style={styles.sheetHelperText}>
+              Cần chọn ít nhất 1 ngày để lưu tần suất tùy chỉnh.
+            </Text>
+            <Pressable
+              style={[
+                styles.saveBtn,
+                !canSaveCustomFrequency && styles.saveBtnDisabled,
+              ]}
+              onPress={handleSaveCustom}
+              disabled={!canSaveCustomFrequency}
+            >
               <Text style={[styles.saveBtnText, { color: primaryForeground }]}>
                 Lưu tần suất
               </Text>
@@ -269,12 +481,63 @@ const createStyles = (colors: AppColorsType, theme: AppTheme) =>
   StyleSheet.create({
     screen: { flex: 1, backgroundColor: colors.bgApp },
     scroll: { flex: 1 },
-    scrollContent: { padding: 20, gap: 16 },
+    scrollContent: { padding: 20, gap: 16, paddingBottom: 24 },
 
     header: {
       marginBottom: 4,
     },
 
+    flashWrap: {
+      position: "absolute",
+      top: 12,
+      left: 20,
+      right: 20,
+      zIndex: 20,
+    },
+    flashMessage: {
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.primaryLight,
+      backgroundColor: colors.primarySurface,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      shadowColor: colors.black,
+      shadowOpacity: theme === "dark" ? 0.28 : 0.08,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 5,
+    },
+    flashMessageText: {
+      flex: 1,
+      fontFamily: FontFamily.sansMedium,
+      fontSize: scale(13),
+      color: colors.primaryMain,
+    },
+
+    messageBox: {
+      borderRadius: 12,
+      borderWidth: 1,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    errorBox: {
+      backgroundColor: colors.stateExhaustedText + "14",
+      borderColor: colors.stateExhaustedText + "33",
+    },
+    messageText: {
+      flex: 1,
+      fontFamily: FontFamily.sans,
+      fontSize: scale(13),
+    },
+    errorText: {
+      color: colors.stateExhaustedText,
+    },
     card: {
       backgroundColor: colors.bgSurface1,
       borderRadius: 12,
@@ -294,10 +557,20 @@ const createStyles = (colors: AppColorsType, theme: AppTheme) =>
       color: colors.textMuted,
       lineHeight: scale(18),
     },
+    helperText: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(12),
+      color: colors.textMuted,
+      lineHeight: scale(17),
+    },
 
     toggleRow: {
       flexDirection: "row",
       alignItems: "center",
+    },
+    toggleContent: {
+      flex: 1,
+      marginRight: 12,
     },
 
     timeRow: {
@@ -332,7 +605,7 @@ const createStyles = (colors: AppColorsType, theme: AppTheme) =>
       borderColor: colors.primaryMain,
     },
     freqChipText: {
-      // fontFamily: FontFamily.sansSemiBold,
+      fontFamily: FontFamily.sansSemiBold,
       fontSize: scale(13),
       color: colors.textSecondary,
     },
@@ -354,6 +627,9 @@ const createStyles = (colors: AppColorsType, theme: AppTheme) =>
       justifyContent: "center",
       gap: 8,
     },
+    saveBtnDisabled: {
+      opacity: 0.5,
+    },
     saveBtnText: {
       fontFamily: FontFamily.sansBold,
       fontSize: scale(15),
@@ -369,6 +645,12 @@ const createStyles = (colors: AppColorsType, theme: AppTheme) =>
       fontFamily: FontFamily.sansBold,
       fontSize: scale(16),
       color: colors.textPrimary,
+    },
+    sheetHelperText: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(12),
+      color: colors.textMuted,
+      lineHeight: scale(17),
     },
     daysGrid: {
       flexDirection: "row",

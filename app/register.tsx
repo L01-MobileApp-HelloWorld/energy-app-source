@@ -32,7 +32,7 @@ export default function RegisterScreen() {
   const primaryForeground =
     resolvedTheme === "dark" ? colors.textPrimary : "#ffffff";
 
-  const [username, setUsername] = useState("");
+  // const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,7 +40,7 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
-  const [usernameFocused, setUsernameFocused] = useState(false);
+  // const [usernameFocused, setUsernameFocused] = useState(false);
   const [displayNameFocused, setDisplayNameFocused] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
@@ -50,7 +50,7 @@ export default function RegisterScreen() {
   const [error, setError] = useState("");
 
   const canSubmit =
-    username.trim().length >= 3 &&
+    // username.trim().length >= 3 &&
     email.trim().length > 0 &&
     password.length >= 6 &&
     passwordConfirmation.length > 0;
@@ -76,7 +76,8 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await register(
-        username.trim(),
+        // username.trim(),
+        "",
         displayName.trim() || undefined,
         email.trim(),
         password,
@@ -130,7 +131,7 @@ export default function RegisterScreen() {
             ) : null}
 
             {/* Username */}
-            <View style={styles.fieldGroup}>
+            {/* <View style={styles.fieldGroup}>
               <Text style={styles.label}>Tên người dùng</Text>
               <TextInput
                 style={[styles.input, usernameFocused && styles.inputFocused]}
@@ -147,7 +148,7 @@ export default function RegisterScreen() {
                 autoCorrect={false}
                 editable={!loading}
               />
-            </View>
+            </View> */}
 
             {/* Display Name */}
             <View style={styles.fieldGroup}>

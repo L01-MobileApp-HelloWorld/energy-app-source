@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AppColorsType, AppTheme, getAppColors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -54,6 +54,10 @@ async function writeStoredPreference(key: string, value: string) {
   }
 }
 
+export async function persistThemePreference(preference: ThemePreference) {
+  await writeStoredPreference(THEME_PREFERENCE_KEY, preference);
+}
+
 function resolveTheme(
   preference: ThemePreference,
   systemTheme: ReturnType<typeof useColorScheme>
@@ -69,6 +73,11 @@ export function ThemePreferencesProvider({ children }: { children: React.ReactNo
   const systemTheme = useColorScheme();
   const [themePreference, setThemePreferenceState] = useState<ThemePreference>('system');
   const [isHydrated, setIsHydrated] = useState(false);
+  const themePreferenceRef = useRef<ThemePreference>('system');
+
+  useEffect(() => {
+    themePreferenceRef.current = themePreference;
+  }, [themePreference]);
 
   useEffect(() => {
     let isMounted = true;
@@ -98,17 +107,24 @@ export function ThemePreferencesProvider({ children }: { children: React.ReactNo
     };
   }, []);
 
-  const setThemePreference = async (preference: ThemePreference) => {
-    setThemePreferenceState(preference);
-    await writeStoredPreference(THEME_PREFERENCE_KEY, preference);
-  };
+  const setThemePreference = useCallback(async (preference: ThemePreference) => {
+    if (themePreferenceRef.current === preference) {
+      return;
+    }
 
-  const value: AppThemeContextValue = {
+    themePreferenceRef.current = preference;
+    setThemePreferenceState(preference);
+    await persistThemePreference(preference);
+  }, []);
+
+  const resolvedTheme = resolveTheme(themePreference, systemTheme);
+
+  const value: AppThemeContextValue = useMemo(() => ({
     themePreference,
-    resolvedTheme: resolveTheme(themePreference, systemTheme),
+    resolvedTheme,
     setThemePreference,
     isHydrated,
-  };
+  }), [isHydrated, resolvedTheme, setThemePreference, themePreference]);
 
   return <AppThemeContext.Provider value={value}>{children}</AppThemeContext.Provider>;
 }
