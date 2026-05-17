@@ -76,6 +76,20 @@ npx jest __tests__/HomeScreen.test.tsx --runInBand
 npx jest __tests__/OnboardingScreen.test.tsx --runInBand
 ```
 
+## Regenerate Native Android Project
+
+Khi thay đổi icon app, splash screen, hoặc cấu hình trong `app.json`, cần regenerate lại native project:
+
+```bash
+npx expo prebuild -p android
+```
+
+Sau đó build lại:
+
+```bash
+npx expo run:android
+```
+
 ## Update Expo Go
 
 Khi muốn đẩy bản cập nhật mới để test nhanh qua Expo/EAS update trên kênh `preview`, chạy:

@@ -1,7 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
   type DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -111,7 +111,10 @@ export default function ReminderScreen() {
         : "daily";
     const nextCustomDays = Array.isArray(prefs?.customReminderDays)
       ? prefs.customReminderDays
-          .filter((day): day is number => Number.isInteger(day) && day >= 1 && day <= 7)
+          .filter(
+            (day): day is number =>
+              Number.isInteger(day) && day >= 1 && day <= 7,
+          )
           .sort((a, b) => a - b)
       : [];
 
@@ -235,19 +238,6 @@ export default function ReminderScreen() {
 
   return (
     <SafeAreaView style={styles.screen} edges={["top", "bottom"]}>
-      {success ? (
-        <View pointerEvents="none" style={styles.flashWrap}>
-          <View style={styles.flashMessage}>
-            <Ionicons
-              name="checkmark-circle"
-              size={16}
-              color={colors.primaryMain}
-            />
-            <Text style={styles.flashMessageText}>{success}</Text>
-          </View>
-        </View>
-      ) : null}
-
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -258,28 +248,29 @@ export default function ReminderScreen() {
             title="Nhắc nhở thông minh"
             onPress={() => router.back()}
           />
+
+          {success ? (
+            <View pointerEvents="none" style={styles.flashWrap}>
+              <View style={styles.flashMessage}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={16}
+                  color={colors.primaryMain}
+                />
+                <Text style={styles.flashMessageText}>{success}</Text>
+              </View>
+            </View>
+          ) : null}
         </View>
 
         {error ? (
-          <View
-            style={[
-              styles.messageBox,
-              styles.errorBox,
-            ]}
-          >
+          <View style={[styles.messageBox, styles.errorBox]}>
             <Ionicons
               name="alert-circle"
               size={16}
               color={colors.stateExhaustedText}
             />
-            <Text
-              style={[
-                styles.messageText,
-                styles.errorText,
-              ]}
-            >
-              {error}
-            </Text>
+            <Text style={[styles.messageText, styles.errorText]}>{error}</Text>
           </View>
         ) : null}
 
@@ -421,10 +412,7 @@ export default function ReminderScreen() {
         </Actionsheet>
       )}
 
-      <Actionsheet
-        isOpen={showFreqSheet}
-        onClose={handleCloseFrequencySheet}
-      >
+      <Actionsheet isOpen={showFreqSheet} onClose={handleCloseFrequencySheet}>
         <ActionsheetBackdrop onPress={handleCloseFrequencySheet} />
         <ActionsheetContent style={{ backgroundColor: colors.bgSurface1 }}>
           <ActionsheetDragIndicatorWrapper>

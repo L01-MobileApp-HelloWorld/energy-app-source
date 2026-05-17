@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "energy-app-source",
+    "name": "Boot Energy",
     "slug": "energy-app-source",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -42,7 +42,9 @@
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging"
     ],
     "experiments": {
       "typedRoutes": true,
