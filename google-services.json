@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "105034882285",
+    "project_id": "timesheet-8298b",
+    "storage_bucket": "timesheet-8298b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105034882285:android:b3657bc5b58b29c67c00e4",
+        "android_client_info": {
+          "package_name": "com.hcmut.energyapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoEfqKelvqUqI8c2aHA-yplUqt1w0kc8o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

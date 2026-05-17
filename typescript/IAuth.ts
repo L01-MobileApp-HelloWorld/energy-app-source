@@ -13,6 +13,7 @@ export interface IStoredUser {
     notificationsEnabled?: boolean;
     reminderTime?: string;
     reminderFrequency?: string;
+    customReminderDays?: number[];
   };
   stats?: {
     totalQuizzes: number;
@@ -44,6 +45,10 @@ export interface IUpdateProfilePayload {
   displayName?: string;
   preferences?: {
     darkMode?: boolean;
+    notificationsEnabled?: boolean;
+    reminderTime?: string;
+    reminderFrequency?: string;
+    customReminderDays?: number[];
   };
 }
 
