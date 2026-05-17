@@ -6,6 +6,7 @@ import type { IStoredUser } from '@/typescript';
 const ACCESS_TOKEN_KEY = 'auth_access_token';
 const REFRESH_TOKEN_KEY = 'auth_refresh_token';
 const USER_DATA_KEY = 'auth_user_data';
+const FCM_TOKEN_KEY = 'auth_fcm_token';
 
 // Fallback for web (SecureStore is native-only)
 const memoryStore = new Map<string, string>();
@@ -91,4 +92,16 @@ export async function clearAuth(): Promise<void> {
     deleteItem(REFRESH_TOKEN_KEY),
     deleteItem(USER_DATA_KEY),
   ]);
+}
+
+export async function saveFcmToken(token: string): Promise<void> {
+  await setItem(FCM_TOKEN_KEY, token);
+}
+
+export async function getStoredFcmToken(): Promise<string | null> {
+  return getItem(FCM_TOKEN_KEY);
+}
+
+export async function clearStoredFcmToken(): Promise<void> {
+  await deleteItem(FCM_TOKEN_KEY);
 }

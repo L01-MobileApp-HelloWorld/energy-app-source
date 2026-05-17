@@ -13,6 +13,8 @@ export type {
   IAuthApiResponse,
   IAuthContextValue,
   IChangePasswordPayload,
+  IFcmTokenResponse,
+  INotificationPayload,
   IUpdateProfilePayload,
 } from './IAuth';
 export type {

@@ -1,12 +1,29 @@
 import "@testing-library/jest-native/extend-expect";
+import { PermissionsAndroid, Platform } from "react-native";
 
 const asyncStorageState = {};
+const secureStoreState = {};
+
+const mockRouter = {
+  push: jest.fn(),
+  replace: jest.fn(),
+  back: jest.fn(),
+};
+
+const mockMessagingInstance = {
+  registerDeviceForRemoteMessages: jest.fn(() => Promise.resolve()),
+  getToken: jest.fn(() => Promise.resolve("mock-fcm-token")),
+  getInitialNotification: jest.fn(() => Promise.resolve(null)),
+  onNotificationOpenedApp: jest.fn(() => jest.fn()),
+  onTokenRefresh: jest.fn(() => jest.fn()),
+};
 
 // mock expo router
 jest.mock("expo-router", () => ({
   Link: "Link",
   Stack: "Stack",
-  useRouter: () => ({ push: jest.fn() }),
+  router: mockRouter,
+  useRouter: () => mockRouter,
 }));
 
 jest.mock("@/hooks/use-color-scheme", () => ({
@@ -32,6 +49,20 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   },
 }));
 
+jest.mock("expo-secure-store", () => ({
+  setItemAsync: jest.fn((key, value) => {
+    secureStoreState[key] = value;
+    return Promise.resolve();
+  }),
+  getItemAsync: jest.fn((key) =>
+    Promise.resolve(key in secureStoreState ? secureStoreState[key] : null)
+  ),
+  deleteItemAsync: jest.fn((key) => {
+    delete secureStoreState[key];
+    return Promise.resolve();
+  }),
+}));
+
 // mock expo modules
 jest.mock("expo-status-bar", () => ({
   StatusBar: () => null,
@@ -52,6 +83,34 @@ jest.mock("@expo/vector-icons", () => {
     MaterialIcons: Icon,
     FontAwesome: Icon,
   };
+});
+
+jest.mock("@react-native-firebase/messaging", () => {
+  const messaging = () => mockMessagingInstance;
+  messaging.AuthorizationStatus = {
+    AUTHORIZED: 1,
+    PROVISIONAL: 2,
+    DENIED: 0,
+  };
+
+  return {
+    __esModule: true,
+    default: messaging,
+  };
+});
+
+PermissionsAndroid.request = jest.fn(() =>
+  Promise.resolve(PermissionsAndroid.RESULTS.GRANTED)
+);
+
+Object.defineProperty(Platform, "OS", {
+  configurable: true,
+  get: () => "android",
+});
+
+Object.defineProperty(Platform, "Version", {
+  configurable: true,
+  get: () => 34,
 });
 
 // import "@testing-library/jest-native/extend-expect";

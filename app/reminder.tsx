@@ -51,11 +51,10 @@ const DAYS = [
   { value: 1, label: "CN" },
 ];
 
-type FrequencyKey = "daily" | "twice" | "custom";
+type FrequencyKey = "daily" | "custom";
 
 const FREQ_OPTIONS: { key: FrequencyKey; label: string }[] = [
   { key: "daily", label: "Hàng ngày" },
-  { key: "twice", label: "2 lần / ngày" },
   { key: "custom", label: "Tùy chỉnh" },
 ];
 
@@ -107,7 +106,6 @@ export default function ReminderScreen() {
     const prefs = user.preferences;
     const nextFrequency =
       prefs?.reminderFrequency === "daily" ||
-      prefs?.reminderFrequency === "twice" ||
       prefs?.reminderFrequency === "custom"
         ? prefs.reminderFrequency
         : "daily";

@@ -5,11 +5,19 @@ import { useAppTheme } from '@/hooks/use-app-theme';
 import {
   clearAuth,
   getAccessToken,
+  getStoredFcmToken,
   getRefreshToken,
   getStoredUser,
   saveTokens,
   saveUser,
 } from '@/services/auth-service';
+import {
+  handleInitialNotification,
+  registerFcmToken,
+  subscribeToFcmTokenRefresh,
+  subscribeToNotificationOpens,
+  unregisterFcmToken,
+} from '@/services/notification-service';
 import type {
   IAuthApiResponse,
   IChangePasswordPayload,
@@ -137,6 +145,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [syncThemePreferenceFromUser]);
 
+  useEffect(() => {
+    if (!state.isAuthenticated) {
+      return;
+    }
+
+    let active = true;
+
+    void handleInitialNotification();
+
+    const unsubscribeTokenRefresh = subscribeToFcmTokenRefresh();
+    const unsubscribeNotificationOpens = subscribeToNotificationOpens();
+
+    void (async () => {
+      try {
+        await registerFcmToken();
+      } catch {
+        if (!active) {
+          return;
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+      unsubscribeTokenRefresh();
+      unsubscribeNotificationOpens();
+    };
+  }, [state.isAuthenticated]);
+
   // ── Login ──────────────────────────────────────────────────────────────────
   const login = useCallback(async (email: string, password: string) => {
     const res = await apiClient.post<{ success: boolean; data: IAuthApiResponse }>(
@@ -187,6 +224,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Logout ─────────────────────────────────────────────────────────────────
   const logout = useCallback(async () => {
     try {
+      const fcmToken = await getStoredFcmToken();
+      if (fcmToken) {
+        await unregisterFcmToken(fcmToken);
+      }
+
       const refreshToken = await getRefreshToken();
       if (refreshToken) {
         await apiClient.post('/auth/logout', { refreshToken });

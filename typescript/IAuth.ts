@@ -57,6 +57,24 @@ export interface IChangePasswordPayload {
   newPassword: string;
 }
 
+export interface IFcmTokenResponse {
+  success: boolean;
+  data: {
+    fcmTokens: string[];
+  };
+}
+
+export interface INotificationPayload {
+  title?: string;
+  body?: string;
+  deepLink?: string;
+  data?: {
+    type?: string;
+    reminderTime?: string;
+    reminderFrequency?: string;
+  };
+}
+
 /**
  * Interface for the auth context value provided to the app.
  */
