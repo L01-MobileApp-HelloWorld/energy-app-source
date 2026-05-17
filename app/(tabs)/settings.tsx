@@ -27,9 +27,21 @@ export default function SettingsScreen() {
   const colors = useAppColors();
   const styles = createStyles(colors);
   const { resolvedTheme, setThemePreference } = useAppTheme();
-  const { user, logout } = useAuth();
-  const isDarkModeEnabled = resolvedTheme === "dark";
+  const { user, logout, updateProfile } = useAuth();
+  const isDarkModeEnabled =
+    typeof user?.preferences?.darkMode === "boolean"
+      ? user.preferences.darkMode
+      : resolvedTheme === "dark";
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleDarkModeChange = (value: boolean) => {
+    void setThemePreference(value ? "dark" : "light");
+    void updateProfile({
+      preferences: {
+        darkMode: value,
+      },
+    });
+  };
 
   const handleLogout = () => {
     Alert.alert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", [
@@ -127,9 +139,7 @@ export default function SettingsScreen() {
 
               <Switch
                 value={isDarkModeEnabled}
-                onValueChange={(value) =>
-                  setThemePreference(value ? "dark" : "light")
-                }
+                onValueChange={handleDarkModeChange}
                 trackColor={{
                   false: colors.bgSurface3,
                   true: colors.primaryLight,

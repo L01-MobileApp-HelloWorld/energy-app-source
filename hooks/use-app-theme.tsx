@@ -54,6 +54,10 @@ async function writeStoredPreference(key: string, value: string) {
   }
 }
 
+export async function persistThemePreference(preference: ThemePreference) {
+  await writeStoredPreference(THEME_PREFERENCE_KEY, preference);
+}
+
 function resolveTheme(
   preference: ThemePreference,
   systemTheme: ReturnType<typeof useColorScheme>
@@ -100,7 +104,7 @@ export function ThemePreferencesProvider({ children }: { children: React.ReactNo
 
   const setThemePreference = async (preference: ThemePreference) => {
     setThemePreferenceState(preference);
-    await writeStoredPreference(THEME_PREFERENCE_KEY, preference);
+    await persistThemePreference(preference);
   };
 
   const value: AppThemeContextValue = {

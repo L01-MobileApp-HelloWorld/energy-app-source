@@ -156,9 +156,9 @@ export default function LoginScreen() {
             </View>
 
             {/* Forgot password */}
-            <Pressable style={styles.forgotRow} hitSlop={8}>
+            {/* <Pressable style={styles.forgotRow} hitSlop={8}>
               <Text style={styles.forgotText}>Quên mật khẩu?</Text>
-            </Pressable>
+            </Pressable> */}
           </View>
 
           {/* Primary CTA */}

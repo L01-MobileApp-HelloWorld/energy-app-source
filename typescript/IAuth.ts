@@ -7,10 +7,18 @@ export interface IStoredUser {
   username: string;
   email: string;
   displayName?: string;
+  preferences?: {
+    darkMode?: boolean;
+    language?: string;
+    notificationsEnabled?: boolean;
+    reminderTime?: string;
+    reminderFrequency?: string;
+  };
   stats?: {
     totalQuizzes: number;
     currentStreak: number;
     longestStreak: number;
+    lastQuizDate?: string;
   };
 }
 
@@ -33,7 +41,10 @@ export interface IAuthApiResponse {
 }
 
 export interface IUpdateProfilePayload {
-  displayName: string;
+  displayName?: string;
+  preferences?: {
+    darkMode?: boolean;
+  };
 }
 
 export interface IChangePasswordPayload {

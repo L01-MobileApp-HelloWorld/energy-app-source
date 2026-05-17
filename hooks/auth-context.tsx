@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 import { apiClient } from '@/services/api-client';
+import { persistThemePreference } from '@/hooks/use-app-theme';
 import {
   clearAuth,
   getAccessToken,
@@ -21,6 +22,14 @@ import type {
 // ─── Context ──────────────────────────────────────────────────────────────────
 
 const AuthContext = createContext<IAuthContextValue | null>(null);
+
+async function syncThemePreferenceFromUser(user: IStoredUser) {
+  if (typeof user.preferences?.darkMode !== 'boolean') {
+    return;
+  }
+
+  await persistThemePreference(user.preferences.darkMode ? 'dark' : 'light');
+}
 
 function requireAccessToken(payload: IAuthApiResponse): string {
   if (typeof payload.token !== 'string' || payload.token.length === 0) {
@@ -64,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           );
           const user = res.data.user;
           await saveUser(user);
+          await syncThemePreferenceFromUser(user);
           if (mounted) setState({ user, isAuthenticated: true, isLoading: false });
         } catch {
           // Token might be expired — try refresh
@@ -87,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }>('/auth/profile');
               const user = profileRes.data.user;
               await saveUser(user);
+              await syncThemePreferenceFromUser(user);
               if (mounted) setState({ user, isAuthenticated: true, isLoading: false });
             } catch {
               // Refresh also failed — clear session
@@ -125,6 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = requireAccessToken(res.data);
     await saveTokens(token, refreshToken);
     await saveUser(user);
+    await syncThemePreferenceFromUser(user);
     apiClient.setAuthToken(token);
 
     setState({ user, isAuthenticated: true, isLoading: false });
@@ -152,6 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const token = requireAccessToken(res.data);
       await saveTokens(token, refreshToken);
       await saveUser(user);
+      await syncThemePreferenceFromUser(user);
       apiClient.setAuthToken(token);
 
       setState({ user, isAuthenticated: true, isLoading: false });
@@ -171,6 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     await clearAuth();
+    await persistThemePreference('system');
     apiClient.clearAuthToken();
     setState({ user: null, isAuthenticated: false, isLoading: false });
   }, []);
@@ -183,6 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       );
       const user = res.data.user;
       await saveUser(user);
+      await syncThemePreferenceFromUser(user);
       setState((prev) => ({ ...prev, user }));
     } catch {
       // silently fail
@@ -190,9 +205,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const updateProfile = useCallback(async (payload: IUpdateProfilePayload) => {
-    const normalizedPayload = {
-      displayName: payload.displayName.trim(),
-    };
+    const normalizedPayload: IUpdateProfilePayload = {};
+
+    if (typeof payload.displayName === 'string') {
+      normalizedPayload.displayName = payload.displayName.trim();
+    }
+
+    if (typeof payload.preferences?.darkMode === 'boolean') {
+      normalizedPayload.preferences = {
+        darkMode: payload.preferences.darkMode,
+      };
+    }
+
+    if (typeof normalizedPayload.preferences?.darkMode === 'boolean') {
+      setState((prev) => {
+        if (!prev.user) {
+          return prev;
+        }
+
+        const nextUser: IStoredUser = {
+          ...prev.user,
+          preferences: {
+            ...prev.user.preferences,
+            darkMode: normalizedPayload.preferences?.darkMode,
+          },
+        };
+
+        void saveUser(nextUser);
+        return { ...prev, user: nextUser };
+      });
+    }
 
     const res = await apiClient.put<{ success: boolean; data: { user: IStoredUser } }>(
       '/auth/profile',
@@ -200,6 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
     const user = res.data.user;
     await saveUser(user);
+    await syncThemePreferenceFromUser(user);
     setState((prev) => ({ ...prev, user }));
   }, []);
 
