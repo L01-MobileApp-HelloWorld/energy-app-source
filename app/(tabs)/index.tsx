@@ -3,6 +3,7 @@ import { Heading } from "@/components/ui/heading";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Text } from "@/components/ui/text";
 import { AppColorsType } from "@/constants/theme";
+import { useAuth } from "@/hooks/auth-context";
 import { useAppColors } from "@/hooks/use-app-theme";
 import { router } from "expo-router";
 import React from "react";
@@ -20,7 +21,9 @@ function getCurrentDateTime() {
 
 export default function HomeScreen() {
   const colors = useAppColors();
+  const { user } = useAuth();
   const styles = createStyles(colors);
+  const displayName = user?.displayName || user?.username || "bạn";
   const cardStyle = {
     backgroundColor: colors.bgSurface1,
     borderRadius: 16,
@@ -53,24 +56,14 @@ export default function HomeScreen() {
         >
           <View>
             <Heading size="2xl" style={{ color: colors.textPrimary }}>
-              Chào Huy! 👋
+              Chào {displayName}! 👋
             </Heading>
-            <Text size="sm" style={{ color: colors.textDisabled, marginTop: 4 }}>
+            <Text
+              size="sm"
+              style={{ color: colors.textDisabled, marginTop: 4 }}
+            >
               {getCurrentDateTime()}
             </Text>
-          </View>
-          <View
-            style={{
-              width: 46,
-              height: 46,
-              borderRadius: 23,
-              backgroundColor: colors.bgSurface3,
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-            }}
-          >
-            <Text size="xl">🧑</Text>
           </View>
         </View>
 
@@ -91,17 +84,29 @@ export default function HomeScreen() {
           </View>
           <Heading
             size="lg"
-            style={{ color: colors.textPrimary, textAlign: "center", marginBottom: 8 }}
+            style={{
+              color: colors.textPrimary,
+              textAlign: "center",
+              marginBottom: 8,
+            }}
           >
             Hôm nay bạn cảm thấy thế nào?
           </Heading>
           <Text
             size="sm"
-            style={{ color: colors.textDisabled, textAlign: "center", marginBottom: 20 }}
+            style={{
+              color: colors.textDisabled,
+              textAlign: "center",
+              marginBottom: 20,
+            }}
           >
             Dành 1 phút để thấu hiểm cảm xúc của mình
           </Text>
-          <Button size="lg" className="w-full" onPress={() => router.push('/survey')}>
+          <Button
+            size="lg"
+            className="w-full"
+            onPress={() => router.push("/survey")}
+          >
             <ButtonText>Bắt đầu kiểm tra</ButtonText>
           </Button>
         </View>
@@ -139,10 +144,17 @@ export default function HomeScreen() {
             <Text size="xs" style={{ color: colors.textDisabled }}>
               Lần trước,
             </Text>
-            <Text size="lg" bold style={{ color: colors.primaryMain, marginTop: 2 }}>
+            <Text
+              size="lg"
+              bold
+              style={{ color: colors.primaryMain, marginTop: 2 }}
+            >
               Tỉnh táo, sẵn sàng
             </Text>
-            <Text size="xs" style={{ color: colors.textDisabled, marginTop: 2 }}>
+            <Text
+              size="xs"
+              style={{ color: colors.textDisabled, marginTop: 2 }}
+            >
               Hôm nay, 12:00
             </Text>
           </View>
@@ -152,7 +164,7 @@ export default function HomeScreen() {
         <TouchableOpacity
           activeOpacity={0.7}
           style={styles.menuCard}
-          onPress={() => router.push('/(tabs)/history')}
+          onPress={() => router.push("/(tabs)/history")}
         >
           <View style={styles.menuIconBox}>
             <IconSymbol
@@ -172,8 +184,8 @@ export default function HomeScreen() {
           activeOpacity={0.7}
           style={[styles.menuCard, { marginBottom: 0 }]}
           onPress={() => {
-            console.log('[Dashboard] navigate to reminder');
-            router.push('/reminder');
+            console.log("[Dashboard] navigate to reminder");
+            router.push("/reminder");
           }}
         >
           <View style={styles.menuIconBox}>

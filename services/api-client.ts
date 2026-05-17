@@ -1,6 +1,8 @@
-type QueryValue = string | number | boolean | null | undefined;
+type QueryPrimitive = string | number | boolean | null | undefined;
+type QueryValue = QueryPrimitive | QueryPrimitive[];
 
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
+const API_PREFIX = '/api';
 
 export type QueryParams = Record<string, QueryValue>;
 
@@ -8,6 +10,14 @@ export type RequestOptions = Omit<RequestInit, 'body' | 'method'> & {
   body?: unknown;
   headers?: HeadersInit;
   query?: QueryParams;
+};
+
+/** Standard API response shape from the backend */
+export type ApiResponse<T = unknown> = {
+  success: boolean;
+  data?: T;
+  message?: string;
+  errors?: { field: string; message: string; value?: unknown }[];
 };
 
 export class ApiError extends Error {
@@ -24,9 +34,18 @@ export class ApiError extends Error {
 
 export class ApiClient {
   private readonly baseUrl: string;
+  private authToken: string | null = null;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl.replace(/\/+$/, '');
+  }
+
+  setAuthToken(token: string) {
+    this.authToken = token;
+  }
+
+  clearAuthToken() {
+    this.authToken = null;
   }
 
   get<T>(endpoint: string, options?: RequestOptions) {
@@ -67,6 +86,10 @@ export class ApiClient {
       normalizedHeaders.set('Accept', 'application/json');
     }
 
+    if (this.authToken && !normalizedHeaders.has('Authorization')) {
+      normalizedHeaders.set('Authorization', `Bearer ${this.authToken}`);
+    }
+
     const response = await fetch(url, {
       ...restOptions,
       method,
@@ -92,7 +115,10 @@ export class ApiClient {
   }
 
   private buildUrl(endpoint: string, query?: QueryParams) {
-    const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const path = normalizedEndpoint.startsWith(API_PREFIX)
+      ? normalizedEndpoint
+      : `${API_PREFIX}${normalizedEndpoint}`;
     const url = new URL(`${this.baseUrl}${path}`);
 
     if (!query) {
@@ -101,6 +127,20 @@ export class ApiClient {
 
     Object.entries(query).forEach(([key, value]) => {
       if (value === undefined || value === null) {
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        const normalized = value.filter(
+          (item): item is string | number | boolean =>
+            item !== undefined && item !== null,
+        );
+
+        if (normalized.length === 0) {
+          return;
+        }
+
+        url.searchParams.append(key, normalized.join(','));
         return;
       }
 

@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   KeyboardAvoidingView,
   Platform,
@@ -15,8 +16,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppColorsType, FontFamily } from "@/constants/theme";
+import { useAuth } from "@/hooks/auth-context";
 import { useAppColors, useAppTheme } from "@/hooks/use-app-theme";
-import { apiClient } from "@/services/api-client";
+import { ApiError } from "@/services/api-client";
 
 const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 390) * size;
@@ -24,6 +26,7 @@ const scale = (size: number) => (width / 390) * size;
 export default function LoginScreen() {
   const colors = useAppColors();
   const { resolvedTheme } = useAppTheme();
+  const { login } = useAuth();
   const styles = createStyles(colors);
   const primaryForeground =
     resolvedTheme === "dark" ? colors.textPrimary : "#ffffff";
@@ -32,13 +35,27 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    apiClient.get("/");
-  }, []);
+  const canSubmit = email.trim().length > 0 && password.length > 0;
 
-  const handleLogin = () => {
-    router.replace("/(tabs)");
+  const handleLogin = async () => {
+    if (!canSubmit || loading) return;
+    setError("");
+    setLoading(true);
+    try {
+      await login(email.trim(), password);
+      router.replace("/(tabs)");
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setError(e.message || "Email hoặc mật khẩu không đúng");
+      } else {
+        setError("Không thể kết nối đến server. Vui lòng thử lại.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -65,13 +82,28 @@ export default function LoginScreen() {
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Đăng nhập</Text>
 
+            {/* Error message */}
+            {error ? (
+              <View style={styles.errorBox}>
+                <Ionicons
+                  name="alert-circle"
+                  size={16}
+                  color={colors.stateExhaustedText}
+                />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            ) : null}
+
             {/* Email */}
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Email</Text>
               <TextInput
                 style={[styles.input, emailFocused && styles.inputFocused]}
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(v) => {
+                  setEmail(v);
+                  setError("");
+                }}
                 onFocus={() => setEmailFocused(true)}
                 onBlur={() => setEmailFocused(false)}
                 placeholder="you@example.com"
@@ -79,6 +111,7 @@ export default function LoginScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
+                editable={!loading}
               />
             </View>
 
@@ -95,7 +128,10 @@ export default function LoginScreen() {
                 <TextInput
                   style={styles.passwordInput}
                   value={password}
-                  onChangeText={setPassword}
+                  onChangeText={(v) => {
+                    setPassword(v);
+                    setError("");
+                  }}
                   onFocus={() => setPasswordFocused(true)}
                   onBlur={() => setPasswordFocused(false)}
                   placeholder="••••••••"
@@ -103,6 +139,7 @@ export default function LoginScreen() {
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
+                  editable={!loading}
                 />
                 <Pressable
                   onPress={() => setShowPassword((v) => !v)}
@@ -125,10 +162,21 @@ export default function LoginScreen() {
           </View>
 
           {/* Primary CTA */}
-          <Pressable style={styles.loginBtn} onPress={handleLogin}>
-            <Text style={[styles.loginBtnText, { color: primaryForeground }]}>
-              Đăng nhập
-            </Text>
+          <Pressable
+            style={[
+              styles.loginBtn,
+              (!canSubmit || loading) && styles.loginBtnDisabled,
+            ]}
+            onPress={handleLogin}
+            disabled={!canSubmit || loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color={primaryForeground} />
+            ) : (
+              <Text style={[styles.loginBtnText, { color: primaryForeground }]}>
+                Đăng nhập
+              </Text>
+            )}
           </Pressable>
 
           {/* Divider */}
@@ -137,12 +185,6 @@ export default function LoginScreen() {
             <Text style={styles.dividerText}>hoặc</Text>
             <View style={styles.dividerLine} />
           </View>
-
-          {/* Google button */}
-          <Pressable style={styles.googleBtn}>
-            <Text style={styles.googleIcon}>G</Text>
-            <Text style={styles.googleBtnText}>Tiếp tục với Google</Text>
-          </Pressable>
 
           {/* Sign up */}
           <View style={styles.signupRow}>
@@ -216,6 +258,25 @@ const createStyles = (colors: AppColorsType) =>
       fontSize: scale(18),
       color: colors.textPrimary,
       marginBottom: 4,
+    },
+
+    // Error
+    errorBox: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      backgroundColor: colors.bgSurface2,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      borderWidth: 1,
+      borderColor: colors.stateExhaustedText + "33",
+    },
+    errorText: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(13),
+      color: colors.stateExhaustedText,
+      flex: 1,
     },
 
     // Fields

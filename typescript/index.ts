@@ -1,0 +1,26 @@
+/**
+ * Central barrel export for all TypeScript interfaces.
+ * Import from '@/typescript' instead of individual files.
+ */
+
+export type { ISurveyOption } from './ISurveyOption';
+export type { IQuestion, BackendGroup } from './IQuestion';
+export type { IStateKey, IStateInfo } from './IStateInfo';
+export type { IHistoryEntry, IHistorySection } from './IHistoryEntry';
+export type {
+  IStoredUser,
+  IAuthState,
+  IAuthApiResponse,
+  IAuthContextValue,
+  IChangePasswordPayload,
+  IUpdateProfilePayload,
+} from './IAuth';
+export type {
+  IQueryValue,
+  IQueryParams,
+  IRequestOptions,
+  IApiResponse,
+  IApiAnswer,
+  IServerResult,
+} from './IApi';
+export type { ICategory, ISortOption } from './ICategory';

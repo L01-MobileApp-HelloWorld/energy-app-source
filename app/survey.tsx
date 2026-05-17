@@ -1,309 +1,50 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Dimensions,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ScreenBackTitle } from "@/components/ui/ScreenBackTitle";
-import {
-  SurveyOption,
-  SurveyOptionCard,
-} from "@/components/ui/survey-option-card";
+import { SurveyOptionCard } from "@/components/ui/survey-option-card";
 import { AppColorsType, FontFamily } from "@/constants/theme";
 import { useAppColors, useAppTheme } from "@/hooks/use-app-theme";
+import { apiClient } from "@/services/api-client";
+import type { BackendGroup, ISurveyOption } from "@/typescript";
 
 const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 390) * size;
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type Question = {
-  id: number;
-  category: string;
-  categoryEmoji: string;
-  question: string;
-  options: SurveyOption[];
+type BackendQuestionOption = {
+  _id: string;
+  label: string;
+  emoji: string;
+  subtext: string;
+  score: number;
 };
 
-// ─── Hard-coded data (sẽ thay bằng API sau) ──────────────────────────────────
+type BackendQuestion = {
+  _id: string;
+  questionId: number;
+  group: BackendGroup;
+  question: string;
+  hint?: string;
+  options: BackendQuestionOption[];
+};
 
-export const QUESTIONS: Question[] = [
-  {
-    category: "Năng lượng và sức khỏe",
-    categoryEmoji: "⚡",
-    question: "Mức năng lượng của bạn lúc này như thế nào?",
-    id: 1,
-    options: [
-      {
-        emoji: "😤",
-        label: "Kiệt sức hoàn toàn",
-        description: "Không muốn làm gì cả",
-      },
-      { emoji: "😢", label: "Khá mệt", description: "Cần nghỉ ngơi thêm" },
-      {
-        emoji: "😐",
-        label: "Bình thường",
-        description: "Không mệt, không khỏe lắm",
-      },
-      { emoji: "😊", label: "Khá tốt", description: "Sẵn sàng làm việc nhẹ" },
-      {
-        emoji: "🔥",
-        label: "Tràn đầy năng lượng",
-        description: "Sẵn sàng chiến hết mình",
-      },
-    ],
-  },
-  {
-    category: "Giấc ngủ",
-    categoryEmoji: "🌙",
-    question: "Bạn ngủ được khoảng mấy tiếng tối qua?",
-    id: 2,
-    options: [
-      {
-        emoji: "😵",
-        label: "Dưới 4 tiếng",
-        description: "Gần như không ngủ được",
-      },
-      {
-        emoji: "😴",
-        label: "4 – 6 tiếng",
-        description: "Thiếu ngủ, còn buồn ngủ",
-      },
-      { emoji: "🙂", label: "6 – 8 tiếng", description: "Ngủ tạm ổn" },
-      {
-        emoji: "😎",
-        label: "Trên 8 tiếng",
-        description: "Ngủ đủ giấc, cảm thấy sảng khoái",
-      },
-    ],
-  },
-  {
-    category: "Cơ thể",
-    categoryEmoji: "💪",
-    question: "Cơ thể bạn đang cảm thấy thế nào?",
-    id: 3,
-    options: [
-      {
-        emoji: "🤕",
-        label: "Đau nhức, khó chịu",
-        description: "Cơ thể không ổn chút nào",
-      },
-      {
-        emoji: "😓",
-        label: "Nặng nề, uể oải",
-        description: "Muốn nằm xuống nghỉ",
-      },
-      {
-        emoji: "😐",
-        label: "Bình thường",
-        description: "Không đau nhưng cũng không khỏe",
-      },
-      {
-        emoji: "💪",
-        label: "Khỏe khoắn",
-        description: "Cơ thể nhẹ nhàng, thoải mái",
-      },
-    ],
-  },
-  {
-    category: "Tâm trạng",
-    categoryEmoji: "🧠",
-    question: "Tâm trạng chung của bạn lúc này?",
-    id: 4,
-    options: [
-      {
-        emoji: "😞",
-        label: "Chán nản, tiêu cực",
-        description: "Không muốn làm gì",
-      },
-      {
-        emoji: "😕",
-        label: "Hơi buồn bực",
-        description: "Khó chịu, không vui lắm",
-      },
-      { emoji: "😐", label: "Trung lập", description: "Không vui không buồn" },
-      { emoji: "😊", label: "Ổn, tích cực", description: "Cảm thấy thoải mái" },
-    ],
-  },
-  {
-    category: "Công việc & học tập",
-    categoryEmoji: "📚",
-    question: "Khi nghĩ đến công việc / bài vở hôm nay, bạn cảm thấy?",
-    id: 5,
-    options: [
-      {
-        emoji: "😰",
-        label: "Sợ hãi, né tránh",
-        description: "Không dám nghĩ đến",
-      },
-      {
-        emoji: "😒",
-        label: "Chán, không muốn làm",
-        description: "Biết phải làm nhưng lười",
-      },
-      {
-        emoji: "😑",
-        label: "Bình thường",
-        description: "Làm được nhưng không hứng",
-      },
-      {
-        emoji: "💡",
-        label: "Có hứng thú",
-        description: "Muốn bắt tay vào làm ngay",
-      },
-    ],
-  },
-  {
-    category: "Ăn uống",
-    categoryEmoji: "🍱",
-    question: "Bạn đã ăn uống đầy đủ chưa?",
-    id: 6,
-    options: [
-      {
-        emoji: "😵",
-        label: "Chưa ăn gì cả",
-        description: "Bỏ bữa hoặc quên ăn",
-      },
-      {
-        emoji: "🥱",
-        label: "Ăn ít, không đủ",
-        description: "Ăn qua loa cho có",
-      },
-      {
-        emoji: "🙂",
-        label: "Ăn bình thường",
-        description: "Đủ bữa, không ngon lắm",
-      },
-      {
-        emoji: "😋",
-        label: "Ăn đầy đủ, ngon miệng",
-        description: "No và có năng lượng",
-      },
-    ],
-  },
-  {
-    category: "Tập trung",
-    categoryEmoji: "🎯",
-    question: "Gần đây bạn có thể tập trung vào 1 việc trong bao lâu?",
-    id: 7,
-    options: [
-      {
-        emoji: "😵‍💫",
-        label: "Dưới 5 phút",
-        description: "Đầu óc liên tục phân tâm",
-      },
-      {
-        emoji: "😓",
-        label: "5 – 15 phút",
-        description: "Khó giữ tập trung lâu",
-      },
-      {
-        emoji: "🙂",
-        label: "15 – 30 phút",
-        description: "Tạm ổn, hay bị gián đoạn",
-      },
-      {
-        emoji: "🧘",
-        label: "Trên 30 phút",
-        description: "Tập trung tốt, ít bị phân tán",
-      },
-    ],
-  },
-  {
-    category: "Deadline",
-    categoryEmoji: "⏰",
-    question: "Deadline của bạn đang như thế nào?",
-    id: 8,
-    options: [
-      {
-        emoji: "🔥",
-        label: "Rất gấp, sắp hết giờ",
-        description: "Stress cao, áp lực lớn",
-      },
-      {
-        emoji: "😬",
-        label: "Sắp tới, còn ít thời gian",
-        description: "Cần tăng tốc",
-      },
-      {
-        emoji: "🙂",
-        label: "Còn vài ngày",
-        description: "Chưa gấp, có thể lên kế hoạch",
-      },
-      {
-        emoji: "😌",
-        label: "Còn nhiều thời gian",
-        description: "Chưa có deadline gấp",
-      },
-    ],
-  },
-  {
-    category: "Cảm xúc với bản thân",
-    categoryEmoji: "🪞",
-    question: "Bạn nghĩ lý do bạn chưa làm việc là vì?",
-    id: 9,
-    options: [
-      {
-        emoji: "😮‍💨",
-        label: "Thực sự kiệt sức",
-        description: "Cơ thể và tinh thần đều cạn",
-      },
-      {
-        emoji: "🥱",
-        label: "Lười, không có hứng",
-        description: "Không mệt nhưng không muốn làm",
-      },
-      {
-        emoji: "😵",
-        label: "Quá nhiều việc, không biết bắt đầu từ đâu",
-        description: "Bị overwhelmed",
-      },
-      {
-        emoji: "🤔",
-        label: "Chưa rõ lý do",
-        description: "Không chắc mình đang thế nào",
-      },
-    ],
-  },
-  {
-    category: "Năng lượng và sức khỏe",
-    categoryEmoji: "⚡",
-    question: "Mức độ tập trung của bạn hôm nay như thế nào?",
-    id: 10,
-    options: [
-      {
-        emoji: "😤",
-        label: "Rất khó tập trung",
-        description: "Dễ bị sao nhãng",
-      },
-      {
-        emoji: "😢",
-        label: "Tập trung kém",
-        description: "Cần nghỉ ngơi thêm",
-      },
-      {
-        emoji: "😐",
-        label: "Tập trung ổn",
-        description: "Làm việc bình thường",
-      },
-      {
-        emoji: "😊",
-        label: "Tập trung cao",
-        description: "Làm việc trôi chảy",
-      },
-    ],
-  },
-];
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
+type SelectedAnswer = {
+  selectedOption: number;
+  score: number;
+};
 
 export default function SurveyScreen() {
   const colors = useAppColors();
@@ -311,33 +52,120 @@ export default function SurveyScreen() {
   const styles = createStyles(colors);
   const primaryForeground =
     resolvedTheme === "dark" ? colors.textPrimary : "#ffffff";
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, number>>({});
 
-  const question = QUESTIONS[currentIndex];
-  const selectedAnswer = answers[currentIndex];
-  const progress = Math.round(((currentIndex + 1) / QUESTIONS.length) * 100);
-  const isLastQuestion = currentIndex === QUESTIONS.length - 1;
+  const [questions, setQuestions] = useState<BackendQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, SelectedAnswer>>({});
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+
+  const fetchQuestions = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await apiClient.get<{
+        success: boolean;
+        data: { questions: BackendQuestion[] };
+      }>("/questions");
+
+      const fetchedQuestions = res.data.questions ?? [];
+
+      if (fetchedQuestions.length === 0) {
+        setQuestions([]);
+        setError("Không có câu hỏi để hiển thị. Vui lòng thử lại.");
+        return;
+      }
+
+      setQuestions(fetchedQuestions);
+      setCurrentIndex(0);
+      setAnswers({});
+      setStartedAt(Date.now());
+    } catch (e) {
+      setError("Không thể tải câu hỏi. Vui lòng thử lại.");
+      console.warn("[Survey] fetch questions failed:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchQuestions();
+  }, [fetchQuestions]);
+
+  const question = questions[currentIndex];
+  const selectedAnswer = question ? answers[question.questionId] : undefined;
+  const progress = questions.length
+    ? Math.round(((currentIndex + 1) / questions.length) * 100)
+    : 0;
+  const isLastQuestion =
+    questions.length > 0 && currentIndex === questions.length - 1;
   const hasAnswer = selectedAnswer !== undefined;
+  const isEmpty = !loading && !error && questions.length === 0;
+
+  const mappedOptions = useMemo<ISurveyOption[]>(() => {
+    if (!question) return [];
+
+    return question.options.map((option) => ({
+      emoji: option.emoji,
+      label: option.label,
+      description: option.subtext,
+    }));
+  }, [question]);
 
   const handleSelect = (optionIndex: number) => {
-    setAnswers((prev) => ({ ...prev, [currentIndex]: optionIndex }));
+    if (!question) return;
+
+    const selectedOption = question.options[optionIndex];
+    setAnswers((prev) => ({
+      ...prev,
+      [question.questionId]: {
+        selectedOption: optionIndex,
+        score: selectedOption.score,
+      },
+    }));
   };
 
   const handleNext = () => {
+    if (!question) return;
+
     if (isLastQuestion) {
       try {
-        console.log("[Survey] navigating to analystic, answers:", answers);
+        const apiAnswers = questions.map((item) => {
+          const selected = answers[item.questionId];
+
+          return {
+            questionId: item.questionId,
+            group: item.group,
+            selectedOption: selected?.selectedOption ?? 0,
+            score: selected?.score ?? item.options[0]?.score ?? 0,
+          };
+        });
+
+        const answersForResult = Object.fromEntries(
+          questions.map((item) => [
+            item.questionId,
+            answers[item.questionId]?.selectedOption ?? 0,
+          ]),
+        );
+
         router.push({
           pathname: "/analystic",
-          params: { answers: JSON.stringify(answers) },
+          params: {
+            answers: JSON.stringify(answersForResult),
+            apiAnswers: JSON.stringify(apiAnswers),
+            startedAt: String(startedAt ?? Date.now()),
+          },
         });
       } catch (e) {
         Alert.alert("Navigation error", String(e));
       }
-    } else {
-      setCurrentIndex((i) => i + 1);
+
+      return;
     }
+
+    setCurrentIndex((i) => i + 1);
   };
 
   const handleBack = () => {
@@ -348,21 +176,73 @@ export default function SurveyScreen() {
     }
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.screen} edges={["top", "bottom"]}>
+        <View style={styles.centerState}>
+          <ActivityIndicator size="large" color={colors.primaryMain} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.screen} edges={["top", "bottom"]}>
+        <View style={styles.topBar}>
+          <ScreenBackTitle
+            title="Khảo sát nhanh"
+            onPress={() => router.back()}
+          />
+        </View>
+        <View style={styles.centerState}>
+          <Ionicons
+            name="cloud-offline-outline"
+            size={48}
+            color={colors.textMuted}
+          />
+          <Text style={styles.emptyTitle}>{error}</Text>
+          <TouchableOpacity
+            onPress={() => fetchQuestions()}
+            style={styles.retryBtn}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.retryText}>Thử lại</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isEmpty || !question) {
+    return (
+      <SafeAreaView style={styles.screen} edges={["top", "bottom"]}>
+        <View style={styles.topBar}>
+          <ScreenBackTitle
+            title="Khảo sát nhanh"
+            onPress={() => router.back()}
+          />
+        </View>
+        <View style={styles.centerState}>
+          <Text style={styles.emptyTitle}>Không có câu hỏi để hiển thị</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.screen} edges={["top", "bottom"]}>
       <View style={styles.topBar}>
         <ScreenBackTitle title="Khảo sát nhanh" onPress={() => router.back()} />
       </View>
 
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerCounter}>
-          Câu hỏi {currentIndex + 1} / {QUESTIONS.length}
+          Câu hỏi {currentIndex + 1} / {questions.length}
         </Text>
         <Text style={styles.headerPercent}>{progress}%</Text>
       </View>
 
-      {/* Progress bar */}
       <View style={styles.progressTrack}>
         <View style={[styles.progressFill, { width: `${progress}%` }]} />
       </View>
@@ -372,30 +252,24 @@ export default function SurveyScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Category badge */}
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>
-            {question.categoryEmoji} {question.category}
-          </Text>
-        </View>
-
-        {/* Question */}
         <Text style={styles.question}>{question.question}</Text>
 
-        {/* Options */}
+        {question.hint ? (
+          <Text style={styles.hint}>{question.hint}</Text>
+        ) : null}
+
         <View style={styles.options}>
-          {question.options.map((option, index) => (
+          {mappedOptions.map((option, index) => (
             <SurveyOptionCard
-              key={index}
+              key={question.options[index]._id}
               option={option}
-              selected={selectedAnswer === index}
+              selected={selectedAnswer?.selectedOption === index}
               onPress={() => handleSelect(index)}
             />
           ))}
         </View>
       </ScrollView>
 
-      {/* Bottom actions */}
       <View style={currentIndex > 0 ? styles.footer : styles.footerSingle}>
         {currentIndex > 0 ? (
           <Pressable style={styles.backBtn} onPress={handleBack}>
@@ -428,21 +302,16 @@ export default function SurveyScreen() {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
 const createStyles = (colors: AppColorsType) =>
   StyleSheet.create({
     screen: {
       flex: 1,
       backgroundColor: colors.bgApp,
     },
-
     topBar: {
       paddingHorizontal: 20,
       paddingTop: 12,
     },
-
-    // Header
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
@@ -461,8 +330,6 @@ const createStyles = (colors: AppColorsType) =>
       fontSize: scale(16),
       color: colors.primaryMain,
     },
-
-    // Progress
     progressTrack: {
       height: 4,
       marginHorizontal: 20,
@@ -475,44 +342,27 @@ const createStyles = (colors: AppColorsType) =>
       backgroundColor: colors.primaryMain,
       borderRadius: 2,
     },
-
-    // Scroll
     scroll: { flex: 1 },
     scrollContent: {
       paddingHorizontal: 20,
       paddingTop: 20,
       paddingBottom: 12,
     },
-
-    // Category badge
-    badge: {
-      alignSelf: "flex-start",
-      borderWidth: 1,
-      borderColor: colors.stateTiredText,
-      borderRadius: 999,
-      paddingVertical: 4,
-      paddingHorizontal: 12,
-      marginBottom: 16,
-    },
-    badgeText: {
-      fontFamily: FontFamily.sansSemiBold,
-      fontSize: scale(12),
-      color: colors.stateTiredText,
-    },
-
-    // Question
     question: {
       fontFamily: FontFamily.sansBold,
       fontSize: scale(20),
       color: colors.textPrimary,
       lineHeight: scale(28),
+      marginBottom: 12,
+    },
+    hint: {
+      fontFamily: FontFamily.sans,
+      fontSize: scale(14),
+      color: colors.textMuted,
+      lineHeight: scale(20),
       marginBottom: 24,
     },
-
-    // Options
     options: { gap: 10 },
-
-    // Footer
     footer: {
       flexDirection: "row",
       paddingHorizontal: 20,
@@ -561,5 +411,31 @@ const createStyles = (colors: AppColorsType) =>
     nextBtnText: {
       fontFamily: FontFamily.sansBold,
       fontSize: scale(14),
+    },
+    centerState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 12,
+      paddingHorizontal: 40,
+    },
+    emptyTitle: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(16),
+      color: colors.textPrimary,
+      textAlign: "center",
+    },
+    retryBtn: {
+      minHeight: 46,
+      paddingHorizontal: 18,
+      borderRadius: 8,
+      backgroundColor: colors.primaryMain,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    retryText: {
+      fontFamily: FontFamily.sansBold,
+      fontSize: scale(14),
+      color: "#ffffff",
     },
   });
