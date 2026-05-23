@@ -8,7 +8,16 @@
       "Bash(node -e \"const pkg = require\\('/Users/huynhat/HCMUT/energy-app-source/node_modules/@react-native-community/datetimepicker/package.json'\\); console.log\\(pkg.version\\)\")",
       "Bash(xargs ls -la)",
       "Bash(find /Users/huynhat/HCMUT/energy-app-source/android/app/src/main/res/drawable* -type f)",
-      "Bash(xargs cat)"
+      "Bash(xargs cat)",
+      "Bash(mkdir -p /Users/huynhat/HCMUT/energy-app-source/.github/workflows)",
+      "Bash(npx eas *)",
+      "Bash(npm list *)",
+      "Bash(npm --version)",
+      "Bash(nodenv version *)",
+      "Bash(nodenv versions *)"
+    ],
+    "additionalDirectories": [
+      "/Users/huynhat/HCMUT/energy-app-source/.github/workflows"
     ]
   }
 }

@@ -1,0 +1,395 @@
+# ============================================================
+#  Boot Energy — EAS Build & Deploy Pipeline
+#  File: .github/workflows/eas-build.yml
+#
+#  Pipeline stages
+#  ───────────────
+#  1. validate      → Jest tests + ESLint  (always runs)
+#  2. eas-update    → OTA push via expo-updates  (push to main only)
+#  3. eas-build-*   → EAS cloud builds (Android + optional iOS, parallel)
+#  4. notify        → Discord / Slack webhook summary  (optional)
+#
+#  Trigger matrix
+#  ──────────────
+#  pull_request → main : validate + preview Android build
+#  push         → main : validate + OTA update + production build
+#  workflow_dispatch   : manual run with profile/platform selection
+# ============================================================
+
+name: 🚀 EAS Build & Deploy
+
+on:
+  # ── Auto-trigger: PR targeting main ──────────────────────────
+  pull_request:
+    branches:
+      - main
+
+  # ── Auto-trigger: merged / pushed to main ────────────────────
+  push:
+    branches:
+      - main
+
+  # ── Manual trigger from GitHub UI (Actions → Run workflow) ───
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "EAS build profile"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+      platform:
+        description: "Target platform"
+        required: true
+        default: "android"
+        type: choice
+        options:
+          - android
+          - ios
+          - all
+
+# ── Shared environment variables ────────────────────────────────
+env:
+  NODE_VERSION: "20"          # Must match engines in package.json
+  EAS_CLI_VERSION: "latest"   # Pin (e.g. "16.x") for reproducible builds
+
+# ── Cancel in-flight runs for the same branch/PR ────────────────
+# Saves runner minutes when you push multiple commits quickly.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# ================================================================
+# JOB 1 — Validate (Test + Lint)
+# Runs on every trigger. All downstream jobs depend on this passing.
+# ================================================================
+jobs:
+  validate:
+    name: 🧪 Test & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1a. Check out source code ─────────────────────────────
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Full history so tools like Sonar can compare commits
+          fetch-depth: 0
+
+      # ── 1b. Install Node with npm cache ───────────────────────
+      # setup-node@v4 automatically caches ~/.npm using
+      # package-lock.json as the cache key, so repeated installs
+      # skip the registry network calls entirely.
+      - name: ⚙️ Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      # ── 1c. Deterministic, frozen install ─────────────────────
+      # `npm ci`  = clean install from package-lock.json (faster & stricter than npm install)
+      # `--legacy-peer-deps` = required because some deps have overlapping peer ranges
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      # ── 1d. ESLint ────────────────────────────────────────────
+      # expo lint = ESLint with the expo-config-expo ruleset.
+      # A non-zero exit code (lint errors) fails the job immediately.
+      - name: 🔍 Run ESLint
+        run: npm run lint
+
+      # ── 1e. Jest with coverage ────────────────────────────────
+      # --ci         : treats snapshot mismatches as failures
+      # --forceExit  : prevents Jest from hanging on open handles
+      # --passWithNoTests : don't fail if zero test files match
+      - name: 🧪 Run Jest tests
+        run: npm test -- --ci --forceExit --passWithNoTests
+        env:
+          CI: "true"
+
+      # ── 1f. Upload HTML coverage report as a build artifact ───
+      # Available in the GitHub UI: Actions → run → Artifacts
+      - name: 📊 Upload coverage report
+        uses: actions/upload-artifact@v4
+        # Upload even when tests fail so you can diagnose failures
+        if: always()
+        with:
+          name: coverage-report-${{ github.run_number }}
+          path: coverage/lcov-report
+          retention-days: 14
+
+  # ==============================================================
+  # JOB 2 — EAS OTA Update
+  # Publishes a JavaScript-only over-the-air update via expo-updates.
+  # No app store review needed; users receive it on next app launch.
+  # Runs ONLY when code is merged/pushed to main (not on PRs).
+  # ==============================================================
+  eas-update:
+    name: 🔄 EAS OTA Update (production channel)
+    runs-on: ubuntu-latest
+    needs: validate                       # ← only start after validate passes
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      # ── Setup the official Expo GitHub Action ─────────────────
+      # expo-github-action installs & authenticates the EAS CLI
+      # using the EXPO_TOKEN secret you store in GitHub.
+      # How to get EXPO_TOKEN → see SETUP_GUIDE.md
+      - name: 🚀 Setup Expo & EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: ${{ env.EAS_CLI_VERSION }}
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # ── Publish OTA update ────────────────────────────────────
+      # --auto         : derive update message from git commit message
+      # --non-interactive : no prompts in CI; fail fast on errors
+      # The update targets the 'production' channel (set in eas.json)
+      - name: 📡 Publish OTA update → production channel
+        run: eas update --auto --non-interactive
+
+  # ==============================================================
+  # JOB 3 — EAS Build: Android
+  # Queues an EAS cloud build. The build runs on Expo's servers;
+  # the CI runner exits immediately (--no-wait).
+  # Profile used:
+  #   • pull_request   → preview  (APK, internal distribution)
+  #   • push to main   → production (AAB, Play Store ready)
+  #   • manual trigger → user-selected profile
+  # ==============================================================
+  eas-build-android:
+    name: 🤖 EAS Build (Android)
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🚀 Setup Expo & EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: ${{ env.EAS_CLI_VERSION }}
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # ── PR build → preview APK (fast, internal distribution) ──
+      # Produces a sharable .apk download link in the Expo dashboard.
+      # Great for reviewers to install and test the PR on a real device.
+      - name: 🔨 Build Android preview (PR)
+        if: github.event_name == 'pull_request'
+        run: |
+          eas build \
+            --platform android \
+            --profile preview \
+            --non-interactive \
+            --no-wait
+        # --no-wait: CI runner exits right away; build continues on EAS servers.
+        # Remove --no-wait if you want the job to fail when the EAS build fails
+        # (increases job duration by ~10–20 min).
+
+      # ── Merge to main → production AAB (Play Store bundle) ────
+      - name: 🚀 Build Android production (push → main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          eas build \
+            --platform android \
+            --profile production \
+            --non-interactive \
+            --no-wait
+
+      # ── Manual trigger → user-chosen profile ──────────────────
+      - name: 🎛️ Build Android (manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          PLATFORM="${{ github.event.inputs.platform }}"
+          PROFILE="${{ github.event.inputs.profile }}"
+          # If user chose "all", build both platforms
+          if [ "$PLATFORM" = "all" ]; then
+            eas build --platform android --profile "$PROFILE" --non-interactive --no-wait
+          elif [ "$PLATFORM" = "android" ]; then
+            eas build --platform android --profile "$PROFILE" --non-interactive --no-wait
+          else
+            echo "Platform is iOS — skipping Android job."
+          fi
+
+  # ==============================================================
+  # JOB 4 — EAS Build: iOS  (OPTIONAL — disabled by default)
+  #
+  # Requirements before enabling:
+  #   1. Active Apple Developer account ($99/year)
+  #   2. Run `eas credentials` locally to provision certs
+  #   3. In GitHub: Settings → Variables → New → ENABLE_IOS_BUILD = true
+  #
+  # Runs in parallel with the Android job (same runner tier).
+  # ==============================================================
+  eas-build-ios:
+    name: 🍎 EAS Build (iOS)
+    runs-on: ubuntu-latest
+    needs: validate
+    # Guard: only activate when repo variable is explicitly set to 'true'
+    if: vars.ENABLE_IOS_BUILD == 'true'
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🚀 Setup Expo & EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: ${{ env.EAS_CLI_VERSION }}
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # ── PR → preview IPA (TestFlight internal) ────────────────
+      - name: 🔨 Build iOS preview (PR)
+        if: github.event_name == 'pull_request'
+        run: eas build --platform ios --profile preview --non-interactive --no-wait
+
+      # ── Push to main → production IPA ─────────────────────────
+      - name: 🚀 Build iOS production (push → main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: eas build --platform ios --profile production --non-interactive --no-wait
+
+      # ── Manual trigger ─────────────────────────────────────────
+      - name: 🎛️ Build iOS (manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          PLATFORM="${{ github.event.inputs.platform }}"
+          PROFILE="${{ github.event.inputs.profile }}"
+          if [ "$PLATFORM" = "all" ] || [ "$PLATFORM" = "ios" ]; then
+            eas build --platform ios --profile "$PROFILE" --non-interactive --no-wait
+          else
+            echo "Platform is Android — skipping iOS job."
+          fi
+
+  # ==============================================================
+  # JOB 5 — Notify  (Discord / Slack — optional)
+  #
+  # To enable Discord notifications:
+  #   GitHub → Settings → Secrets → New secret:
+  #   DISCORD_WEBHOOK_URL = https://discord.com/api/webhooks/...
+  #
+  # To enable Slack notifications:
+  #   SLACK_WEBHOOK_URL = https://hooks.slack.com/services/...
+  # ==============================================================
+  notify:
+    name: 📣 Notify Pipeline Result
+    runs-on: ubuntu-latest
+    # Run after all build jobs, regardless of their outcome
+    needs: [validate, eas-update, eas-build-android]
+    if: |
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main'
+
+    steps:
+      # ── Compute overall pipeline status ───────────────────────
+      - name: 🧮 Evaluate pipeline outcome
+        id: status
+        run: |
+          VALIDATE="${{ needs.validate.result }}"
+          UPDATE="${{ needs.eas-update.result }}"
+          BUILD="${{ needs.eas-build-android.result }}"
+
+          if [[ "$VALIDATE" == "success" && ("$BUILD" == "success" || "$BUILD" == "skipped") ]]; then
+            echo "result=success" >> $GITHUB_OUTPUT
+            echo "emoji=✅"       >> $GITHUB_OUTPUT
+          else
+            echo "result=failure" >> $GITHUB_OUTPUT
+            echo "emoji=❌"       >> $GITHUB_OUTPUT
+          fi
+
+      # ── Discord notification ───────────────────────────────────
+      # Uncomment when DISCORD_WEBHOOK_URL secret is configured
+      # - name: 📢 Send Discord notification
+      #   if: env.DISCORD_WEBHOOK_URL != ''
+      #   env:
+      #     DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      #   run: |
+      #     EMOJI="${{ steps.status.outputs.emoji }}"
+      #     RESULT="${{ steps.status.outputs.result }}"
+      #     RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      #     COMMIT_MSG="${{ github.event.head_commit.message }}"
+      #     AUTHOR="${{ github.event.head_commit.author.name }}"
+      #
+      #     curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+      #       -H "Content-Type: application/json" \
+      #       -d "{
+      #         \"content\": \"${EMOJI} **Boot Energy CI #${{ github.run_number }}** — ${RESULT^^}\",
+      #         \"embeds\": [{
+      #           \"color\": $([ \"$RESULT\" = \"success\" ] && echo 3066993 || echo 15158332),
+      #           \"fields\": [
+      #             {\"name\": \"Commit\",  \"value\": \"${COMMIT_MSG}\",          \"inline\": false},
+      #             {\"name\": \"Author\",  \"value\": \"${AUTHOR}\",              \"inline\": true},
+      #             {\"name\": \"Branch\",  \"value\": \"${{ github.ref_name }}\", \"inline\": true},
+      #             {\"name\": \"Details\", \"value\": \"[View run](${RUN_URL})\", \"inline\": false}
+      #           ]
+      #         }]
+      #       }"
+
+      # ── Slack notification ─────────────────────────────────────
+      # Uncomment when SLACK_WEBHOOK_URL secret is configured
+      # - name: 📢 Send Slack notification
+      #   if: env.SLACK_WEBHOOK_URL != ''
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #   run: |
+      #     RESULT="${{ steps.status.outputs.result }}"
+      #     EMOJI="${{ steps.status.outputs.emoji }}"
+      #     RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      #
+      #     curl -s -X POST "$SLACK_WEBHOOK_URL" \
+      #       -H "Content-Type: application/json" \
+      #       -d "{
+      #         \"text\": \"${EMOJI} Boot Energy CI #${{ github.run_number }} — *${RESULT}*\",
+      #         \"attachments\": [{
+      #           \"color\": \"$([ \"$RESULT\" = \"success\" ] && echo good || echo danger)\",
+      #           \"fields\": [
+      #             {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
+      #             {\"title\": \"Run\",    \"value\": \"<${RUN_URL}|View>\",      \"short\": true}
+      #           ]
+      #         }]
+      #       }"
+
+      # ── Always log the summary to the runner console ───────────
+      - name: 📋 Print pipeline summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "  ${{ steps.status.outputs.emoji }} Pipeline #${{ github.run_number }}: ${{ steps.status.outputs.result }}"
+          echo "  Validate : ${{ needs.validate.result }}"
+          echo "  OTA      : ${{ needs.eas-update.result }}"
+          echo "  Android  : ${{ needs.eas-build-android.result }}"
+          echo "  URL      : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
