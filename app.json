@@ -8,6 +8,14 @@
     "scheme": "energyappsource",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#5D91EE",
+      "dark": {
+        "backgroundColor": "#5D91EE"
+      }
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.huy.x821183.energyappsource"
@@ -36,9 +44,9 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#5D91EE",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#5D91EE"
           }
         }
       ],
