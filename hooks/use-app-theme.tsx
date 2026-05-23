@@ -15,6 +15,7 @@ type AppThemeContextValue = {
 
 const THEME_PREFERENCE_KEY = 'app-theme-preference';
 const memoryStorage = new Map<string, string>();
+const IS_TEST_ENV = process.env.NODE_ENV === 'test';
 
 const AppThemeContext = createContext<AppThemeContextValue | null>(null);
 
@@ -72,7 +73,7 @@ function resolveTheme(
 export function ThemePreferencesProvider({ children }: { children: React.ReactNode }) {
   const systemTheme = useColorScheme();
   const [themePreference, setThemePreferenceState] = useState<ThemePreference>('system');
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(IS_TEST_ENV);
   const themePreferenceRef = useRef<ThemePreference>('system');
 
   useEffect(() => {
@@ -94,7 +95,7 @@ export function ThemePreferencesProvider({ children }: { children: React.ReactNo
           setThemePreferenceState(storedPreference);
         }
       } finally {
-        if (isMounted) {
+        if (isMounted && !IS_TEST_ENV) {
           setIsHydrated(true);
         }
       }

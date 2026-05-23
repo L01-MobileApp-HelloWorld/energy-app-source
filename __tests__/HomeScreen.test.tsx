@@ -6,11 +6,20 @@ import { renderWithTheme } from "../test-utils";
 
 const mockIconSymbol = jest.fn((_props: any) => null);
 const mockPush = jest.fn();
+const mockUseAuth = jest.fn(() => ({
+  user: {
+    username: "Huy",
+  },
+}));
 
 jest.mock("expo-router", () => ({
   router: {
     push: (...args: any[]) => mockPush(...args),
   },
+}));
+
+jest.mock("@/hooks/auth-context", () => ({
+  useAuth: () => mockUseAuth(),
 }));
 
 jest.mock("react-native-safe-area-context", () => {
@@ -72,6 +81,11 @@ describe("HomeScreen", () => {
   beforeEach(() => {
     mockIconSymbol.mockClear();
     mockPush.mockClear();
+    mockUseAuth.mockReturnValue({
+      user: {
+        username: "Huy",
+      },
+    });
   });
 
   test("render without crash", () => {
@@ -101,7 +115,7 @@ describe("HomeScreen", () => {
 
   test("render avatar emoji", () => {
     const { getByText } = renderWithTheme(<HomeScreen />);
-    expect(getByText("🧑")).toBeTruthy();
+    expect(getByText("😊")).toBeTruthy();
   });
 
   test("render check-in heading", () => {

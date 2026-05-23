@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">71.42% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>5/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>2/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">71.42% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>5/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -94,22 +94,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Redirect } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
@@ -117,11 +117,11 @@ import { ActivityIndicator, View } from "react-native";
 import { useAuth } from "@/hooks/auth-context";
 import { useAppColors } from "@/hooks/use-app-theme";
 &nbsp;
-export default function <span class="fstat-no" title="function not covered" >Index(</span>) {
-  const { isAuthenticated, isLoading } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
-  const colors = <span class="cstat-no" title="statement not covered" >useAppColors();</span>
+export default function Index() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const colors = useAppColors();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (isLoading) {</span>
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (isLoading) {
 <span class="cstat-no" title="statement not covered" >    return (</span>
       &lt;View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.bgApp }}&gt;
         &lt;ActivityIndicator size="large" color={colors.primaryMain} /&gt;
@@ -129,11 +129,11 @@ export default function <span class="fstat-no" title="function not covered" >Ind
     );
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (isAuthenticated) {</span>
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (isAuthenticated) {
 <span class="cstat-no" title="statement not covered" >    return &lt;Redirect href="/(tabs)" /&gt;;</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return &lt;Redirect href="/onboarding" /&gt;;</span>
+  return &lt;Redirect href="/onboarding" /&gt;;
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -142,7 +142,7 @@ export default function <span class="fstat-no" title="function not covered" >Ind
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-17T08:12:29.490Z
+                at 2026-05-23T04:29:40.469Z
             </div>
         <script src="../prettify.js"></script>
         <script>

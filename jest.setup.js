@@ -68,6 +68,15 @@ jest.mock("expo-status-bar", () => ({
   StatusBar: () => null,
 }));
 
+jest.mock("expo-constants", () => ({
+  __esModule: true,
+  default: {
+    expoConfig: {
+      version: "1.0.0-test",
+    },
+  },
+}));
+
 jest.mock("expo-image", () => ({
   Image: "Image",
 }));

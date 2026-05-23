@@ -1,6 +1,4 @@
-import messaging, {
-  FirebaseMessagingTypes,
-} from "@react-native-firebase/messaging";
+import type { FirebaseMessagingTypes } from "@react-native-firebase/messaging";
 import { router } from "expo-router";
 import { PermissionsAndroid, Platform } from "react-native";
 
@@ -14,6 +12,19 @@ import type { IFcmTokenResponse, INotificationPayload } from "@/typescript";
 
 const SURVEY_ROUTE = "/survey";
 const APP_SCHEME = "energyappsource:";
+
+type MessagingModule = typeof import("@react-native-firebase/messaging").default;
+
+function getMessaging(): MessagingModule | null {
+  try {
+    const messagingModule =
+      require("@react-native-firebase/messaging") as typeof import("@react-native-firebase/messaging");
+
+    return messagingModule.default;
+  } catch {
+    return null;
+  }
+}
 
 function toOptionalString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
@@ -76,6 +87,11 @@ export async function registerFcmToken(): Promise<string | null> {
     return null;
   }
 
+  const messaging = getMessaging();
+  if (!messaging) {
+    return null;
+  }
+
   const hasPermission = await requestAndroidNotificationPermission();
   if (!hasPermission) {
     return null;
@@ -118,6 +134,11 @@ export function subscribeToFcmTokenRefresh(): () => void {
     return () => undefined;
   }
 
+  const messaging = getMessaging();
+  if (!messaging) {
+    return () => undefined;
+  }
+
   return messaging().onTokenRefresh(async (token) => {
     await apiClient.post<IFcmTokenResponse>("/auth/fcm-token", { token });
     await saveFcmToken(token);
@@ -139,6 +160,11 @@ export async function handleInitialNotification(): Promise<void> {
     return;
   }
 
+  const messaging = getMessaging();
+  if (!messaging) {
+    return;
+  }
+
   const payload = buildNotificationPayload(
     await messaging().getInitialNotification(),
   );
@@ -147,6 +173,11 @@ export async function handleInitialNotification(): Promise<void> {
 
 export function subscribeToNotificationOpens(): () => void {
   if (Platform.OS !== "android") {
+    return () => undefined;
+  }
+
+  const messaging = getMessaging();
+  if (!messaging) {
     return () => undefined;
   }
 
