@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1779524334371" clover="3.2.0">
-  <project timestamp="1779524334371" name="All files">
-    <metrics statements="796" coveredstatements="713" conditionals="525" coveredconditionals="404" methods="233" coveredmethods="181" elements="1554" coveredelements="1298" complexity="0" loc="796" ncloc="796" packages="9" files="22" classes="22"/>
+<coverage generated="1779524842112" clover="3.2.0">
+  <project timestamp="1779524842112" name="All files">
+    <metrics statements="796" coveredstatements="713" conditionals="527" coveredconditionals="406" methods="233" coveredmethods="181" elements="1556" coveredelements="1300" complexity="0" loc="796" ncloc="796" packages="9" files="22" classes="22"/>
     <package name="app">
-      <metrics statements="621" coveredstatements="552" conditionals="444" coveredconditionals="333" methods="182" coveredmethods="137"/>
+      <metrics statements="621" coveredstatements="552" conditionals="446" coveredconditionals="335" methods="182" coveredmethods="137"/>
       <file name="analystic.tsx" path="/Users/huynhat/HCMUT/energy-app-source/app/analystic.tsx">
         <metrics statements="40" coveredstatements="35" conditionals="14" coveredconditionals="8" methods="7" coveredmethods="6"/>
         <line num="21" count="1" type="stmt"/>
@@ -48,7 +48,7 @@
         <line num="163" count="3" type="stmt"/>
       </file>
       <file name="change-password.tsx" path="/Users/huynhat/HCMUT/energy-app-source/app/change-password.tsx">
-        <metrics statements="73" coveredstatements="63" conditionals="61" coveredconditionals="49" methods="24" coveredmethods="11"/>
+        <metrics statements="73" coveredstatements="63" conditionals="62" coveredconditionals="50" methods="24" coveredmethods="11"/>
         <line num="24" count="1" type="stmt"/>
         <line num="25" count="256" type="stmt"/>
         <line num="28" count="32" type="stmt"/>
@@ -209,7 +209,7 @@
         <line num="154" count="78" type="stmt"/>
       </file>
       <file name="profile-update.tsx" path="/Users/huynhat/HCMUT/energy-app-source/app/profile-update.tsx">
-        <metrics statements="42" coveredstatements="40" conditionals="47" coveredconditionals="38" methods="11" coveredmethods="9"/>
+        <metrics statements="42" coveredstatements="40" conditionals="48" coveredconditionals="39" methods="11" coveredmethods="9"/>
         <line num="24" count="1" type="stmt"/>
         <line num="25" count="285" type="stmt"/>
         <line num="28" count="19" type="stmt"/>

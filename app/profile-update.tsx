@@ -123,7 +123,7 @@ export default function ProfileUpdateScreen() {
           </View>
 
           <View style={styles.card}>
-            {(error || success) && (
+            {Boolean(error || success) && (
               <View
                 style={[
                   styles.messageBox,

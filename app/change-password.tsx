@@ -130,7 +130,7 @@ export default function ChangePasswordScreen() {
               Nhập mật khẩu hiện tại và đặt mật khẩu mới cho tài khoản của bạn.
             </Text>
 
-            {(error || success) && (
+            {Boolean(error || success) && (
               <View
                 style={[
                   styles.messageBox,
