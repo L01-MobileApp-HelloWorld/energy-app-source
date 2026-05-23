@@ -97,3 +97,11 @@ Khi muốn đẩy bản cập nhật mới để test nhanh qua Expo/EAS update 
 ```bash
 eas update --channel preview --message "commit message"
 ```
+
+Build apk
+
+```bash
+cd ~/HCMUT/energy-app-source/android
+./gradlew assembleRelease --no-daemon
+open /Users/huynhat/HCMUT/energy-app-source/android/app/build/outputs/apk/release/
+```

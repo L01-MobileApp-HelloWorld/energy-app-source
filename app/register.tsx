@@ -89,6 +89,7 @@ export default function RegisterScreen() {
         email.trim(),
         password,
       );
+      router.replace("/(tabs)");
     } catch (e) {
       console.log("e", e);
       if (e instanceof ApiError) {

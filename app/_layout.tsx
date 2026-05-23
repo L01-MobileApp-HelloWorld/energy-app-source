@@ -15,7 +15,7 @@ import {
   PlusJakartaSans_800ExtraBold,
 } from "@expo-google-fonts/plus-jakarta-sans";
 import { useFonts } from "expo-font";
-import { router, Stack, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -24,7 +24,7 @@ import "react-native-reanimated";
 import { Text } from "react-native";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { ThemePreferencesProvider, useAppTheme } from "@/hooks/use-app-theme";
-import { AuthProvider, useAuth } from "@/hooks/auth-context";
+import { AuthProvider } from "@/hooks/auth-context";
 import "@/global.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -72,21 +72,6 @@ export default function RootLayout() {
 
 function RootNavigator() {
   const { resolvedTheme } = useAppTheme();
-  const { isAuthenticated, isLoading } = useAuth();
-  const segments = useSegments();
-  const segment = segments[0];
-
-  useEffect(() => {
-    if (isLoading) return;
-
-    const inProtectedRoute = segment === "(tabs)";
-
-    if (isAuthenticated && !inProtectedRoute) {
-      router.replace("/(tabs)");
-    } else if (!isAuthenticated && inProtectedRoute) {
-      router.replace("/onboarding");
-    }
-  }, [isAuthenticated, isLoading, segment]);
 
   return (
     <GluestackUIProvider mode={resolvedTheme}>

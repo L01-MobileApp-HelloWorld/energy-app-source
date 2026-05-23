@@ -47,6 +47,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email.trim(), password);
+      router.replace("/(tabs)");
     } catch (e) {
       if (e instanceof ApiError) {
         setError(e.message || "Email hoặc mật khẩu không đúng");

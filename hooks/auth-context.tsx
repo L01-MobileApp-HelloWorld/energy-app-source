@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { apiClient } from '@/services/api-client';
 import { useAppTheme } from '@/hooks/use-app-theme';
@@ -42,7 +42,7 @@ function requireAccessToken(payload: IAuthApiResponse): string {
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { themePreference, setThemePreference } = useAppTheme();
+  const { setThemePreference } = useAppTheme();
   const [state, setState] = useState<IAuthState>({
     user: null,
     isAuthenticated: false,
@@ -60,13 +60,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [setThemePreference],
   );
 
+  const wasAuthenticatedRef = useRef(false);
+
   useEffect(() => {
-    if (state.isLoading || state.isAuthenticated || state.user || themePreference === 'system') {
+    if (state.isAuthenticated) {
+      wasAuthenticatedRef.current = true;
       return;
     }
-
+    if (state.isLoading || !wasAuthenticatedRef.current) {
+      return;
+    }
+    wasAuthenticatedRef.current = false;
     void setThemePreference('system');
-  }, [setThemePreference, state.isAuthenticated, state.isLoading, state.user, themePreference]);
+  }, [setThemePreference, state.isAuthenticated, state.isLoading]);
 
   // ── Restore session on app launch ──────────────────────────────────────────
   useEffect(() => {
