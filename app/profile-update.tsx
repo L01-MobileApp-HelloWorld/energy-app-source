@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -16,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ScreenBackTitle } from "@/components/ui/ScreenBackTitle";
+import { FormMessage } from "@/components/ui/form-message";
 import { AppColorsType, FontFamily } from "@/constants/theme";
 import { useAuth } from "@/hooks/auth-context";
 import { useAppColors, useAppTheme } from "@/hooks/use-app-theme";
@@ -32,7 +32,6 @@ export default function ProfileUpdateScreen() {
   const primaryForeground =
     resolvedTheme === "dark" ? colors.textPrimary : "#ffffff";
 
-  // const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [displayNameFocused, setDisplayNameFocused] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -41,8 +40,6 @@ export default function ProfileUpdateScreen() {
 
   useEffect(() => {
     if (!user) return;
-
-    // setUsername(user.username ?? "");
     setDisplayName(user.displayName ?? "");
   }, [user]);
 
@@ -61,9 +58,7 @@ export default function ProfileUpdateScreen() {
     setLoading(true);
 
     try {
-      await updateProfile({
-        displayName: displayName.trim(),
-      });
+      await updateProfile({ displayName: displayName.trim() });
       setSuccess("Cập nhật hồ sơ thành công");
     } catch (e) {
       if (e instanceof ApiError) {
@@ -123,38 +118,7 @@ export default function ProfileUpdateScreen() {
           </View>
 
           <View style={styles.card}>
-            {Boolean(error || success) && (
-              <View
-                style={[
-                  styles.messageBox,
-                  error ? styles.errorBox : styles.successBox,
-                ]}
-              >
-                <Ionicons
-                  name={error ? "alert-circle" : "checkmark-circle"}
-                  size={16}
-                  color={error ? colors.stateExhaustedText : colors.primaryMain}
-                />
-                <Text
-                  style={[
-                    styles.messageText,
-                    error ? styles.errorText : styles.successText,
-                  ]}
-                >
-                  {error || success}
-                </Text>
-              </View>
-            )}
-
-            {/* <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Tên người dùng</Text>
-              <View style={[styles.input, styles.readOnlyInput]}>
-                <Text style={styles.readOnlyText}>{username}</Text>
-              </View>
-              <Text style={styles.helperText}>
-                Username hiện chỉ xem, chưa hỗ trợ chỉnh sửa.
-              </Text>
-            </View> */}
+            <FormMessage error={error} success={success} />
 
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>Tên hiển thị</Text>
@@ -263,35 +227,6 @@ const createStyles = (colors: AppColorsType) =>
       paddingVertical: 22,
       gap: 18,
     },
-    messageBox: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      borderRadius: 14,
-      borderWidth: 1,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-    },
-    errorBox: {
-      backgroundColor: colors.bgSurface2,
-      borderColor: colors.stateExhaustedText,
-    },
-    successBox: {
-      backgroundColor: colors.primarySurface,
-      borderColor: colors.primaryLight,
-    },
-    messageText: {
-      flex: 1,
-      fontFamily: FontFamily.sansSemiBold,
-      fontSize: scale(13),
-      lineHeight: scale(18),
-    },
-    errorText: {
-      color: colors.stateExhaustedText,
-    },
-    successText: {
-      color: colors.primaryMain,
-    },
     fieldGroup: {
       gap: 8,
     },
@@ -324,12 +259,6 @@ const createStyles = (colors: AppColorsType) =>
       fontFamily: FontFamily.sans,
       fontSize: scale(15),
       color: colors.textPrimary,
-    },
-    helperText: {
-      fontFamily: FontFamily.sans,
-      fontSize: scale(12),
-      color: colors.textGhost,
-      lineHeight: scale(18),
     },
     saveBtn: {
       minHeight: 54,

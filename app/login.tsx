@@ -1,9 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -16,13 +14,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { FormMessage } from "@/components/ui/form-message";
+import { PasswordField } from "@/components/ui/password-field";
+import { createAuthBaseStyles, scaleAuth } from "@/constants/auth-form-styles";
 import { AppColorsType, FontFamily } from "@/constants/theme";
 import { useAuth } from "@/hooks/auth-context";
 import { useAppColors, useAppTheme } from "@/hooks/use-app-theme";
 import { ApiError } from "@/services/api-client";
 
-const { width } = Dimensions.get("window");
-const scale = (size: number) => (width / 390) * size;
+const scale = scaleAuth;
 
 export default function LoginScreen() {
   const colors = useAppColors();
@@ -33,9 +33,7 @@ export default function LoginScreen() {
     resolvedTheme === "dark" ? colors.textPrimary : "#ffffff";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -84,17 +82,7 @@ export default function LoginScreen() {
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Đăng nhập</Text>
 
-            {/* Error message */}
-            {error ? (
-              <View style={styles.errorBox}>
-                <Ionicons
-                  name="alert-circle"
-                  size={16}
-                  color={colors.stateExhaustedText}
-                />
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
-            ) : null}
+            <FormMessage error={error} />
 
             {/* Email */}
             <View style={styles.fieldGroup}>
@@ -117,50 +105,15 @@ export default function LoginScreen() {
               />
             </View>
 
-            {/* Password */}
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Mật khẩu</Text>
-              <View
-                style={[
-                  styles.input,
-                  styles.inputRow,
-                  passwordFocused && styles.inputFocused,
-                ]}
-              >
-                <TextInput
-                  style={styles.passwordInput}
-                  value={password}
-                  onChangeText={(v) => {
-                    setPassword(v);
-                    setError("");
-                  }}
-                  onFocus={() => setPasswordFocused(true)}
-                  onBlur={() => setPasswordFocused(false)}
-                  placeholder="••••••••"
-                  placeholderTextColor={colors.textGhost}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!loading}
-                />
-                <Pressable
-                  onPress={() => setShowPassword((v) => !v)}
-                  hitSlop={8}
-                  style={styles.eyeBtn}
-                >
-                  <Ionicons
-                    name={showPassword ? "eye-outline" : "eye-off-outline"}
-                    size={20}
-                    color={colors.textMuted}
-                  />
-                </Pressable>
-              </View>
-            </View>
-
-            {/* Forgot password */}
-            {/* <Pressable style={styles.forgotRow} hitSlop={8}>
-              <Text style={styles.forgotText}>Quên mật khẩu?</Text>
-            </Pressable> */}
+            <PasswordField
+              label="Mật khẩu"
+              value={password}
+              onChangeText={(v) => {
+                setPassword(v);
+                setError("");
+              }}
+              editable={!loading}
+            />
           </View>
 
           {/* Primary CTA */}
@@ -201,20 +154,12 @@ export default function LoginScreen() {
   );
 }
 
-const createStyles = (colors: AppColorsType) =>
-  StyleSheet.create({
-    screen: {
-      flex: 1,
-      backgroundColor: colors.bgApp,
-    },
-    scrollContent: {
-      paddingHorizontal: 20,
-      paddingTop: 40,
-      paddingBottom: 32,
-      gap: 20,
-    },
-
-    // Branding
+const createStyles = (colors: AppColorsType) => {
+  const base = createAuthBaseStyles(colors);
+  return StyleSheet.create({
+    ...base,
+    // login has more top padding for the logo
+    scrollContent: { ...base.scrollContent, paddingTop: 40 },
     brandSection: {
       alignItems: "center",
       gap: 8,
@@ -225,26 +170,10 @@ const createStyles = (colors: AppColorsType) =>
       height: scale(80),
       marginBottom: 4,
     },
-    appName: {
-      fontFamily: FontFamily.sansExtraBold,
-      fontSize: scale(28),
-      color: colors.textPrimary,
-      letterSpacing: -0.5,
-    },
     tagline: {
       fontFamily: FontFamily.sans,
       fontSize: scale(14),
       color: colors.textMuted,
-    },
-
-    // Form card
-    card: {
-      backgroundColor: colors.bgSurface1,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: colors.borderDefault,
-      padding: 20,
-      gap: 16,
     },
     cardTitle: {
       fontFamily: FontFamily.sansBold,
@@ -252,79 +181,6 @@ const createStyles = (colors: AppColorsType) =>
       color: colors.textPrimary,
       marginBottom: 4,
     },
-
-    // Error
-    errorBox: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      backgroundColor: colors.bgSurface2,
-      borderRadius: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      borderWidth: 1,
-      borderColor: colors.stateExhaustedText + "33",
-    },
-    errorText: {
-      fontFamily: FontFamily.sans,
-      fontSize: scale(13),
-      color: colors.stateExhaustedText,
-      flex: 1,
-    },
-
-    // Fields
-    fieldGroup: {
-      gap: 6,
-    },
-    label: {
-      fontFamily: FontFamily.sansSemiBold,
-      fontSize: scale(13),
-      color: colors.textSecondary,
-    },
-    input: {
-      backgroundColor: colors.bgSurface2,
-      borderWidth: 1,
-      borderColor: colors.borderDefault,
-      borderRadius: 10,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      fontFamily: FontFamily.sans,
-      fontSize: scale(15),
-      color: colors.textPrimary,
-    },
-    inputFocused: {
-      borderColor: colors.primaryMain,
-      backgroundColor: colors.bgSurface1,
-    },
-    inputRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: 0,
-      paddingHorizontal: 0,
-      paddingLeft: 14,
-    },
-    passwordInput: {
-      flex: 1,
-      fontFamily: FontFamily.sans,
-      fontSize: scale(15),
-      color: colors.textPrimary,
-      paddingVertical: 12,
-    },
-    eyeBtn: {
-      padding: 12,
-    },
-
-    // Forgot
-    forgotRow: {
-      alignSelf: "flex-end",
-    },
-    forgotText: {
-      fontFamily: FontFamily.sansSemiBold,
-      fontSize: scale(13),
-      color: colors.primaryMain,
-    },
-
-    // Login button
     loginBtn: {
       height: 52,
       backgroundColor: colors.primaryMain,
@@ -339,8 +195,6 @@ const createStyles = (colors: AppColorsType) =>
       fontFamily: FontFamily.sansBold,
       fontSize: scale(15),
     },
-
-    // Divider
     divider: {
       flexDirection: "row",
       alignItems: "center",
@@ -356,31 +210,6 @@ const createStyles = (colors: AppColorsType) =>
       fontSize: scale(13),
       color: colors.textMuted,
     },
-
-    // Google button
-    googleBtn: {
-      height: 52,
-      backgroundColor: colors.bgSurface1,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: colors.borderDefault,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 10,
-    },
-    googleIcon: {
-      fontFamily: FontFamily.sansBold,
-      fontSize: scale(16),
-      color: colors.textPrimary,
-    },
-    googleBtnText: {
-      fontFamily: FontFamily.sansSemiBold,
-      fontSize: scale(14),
-      color: colors.textPrimary,
-    },
-
-    // Sign up
     signupRow: {
       flexDirection: "row",
       justifyContent: "center",
@@ -398,3 +227,4 @@ const createStyles = (colors: AppColorsType) =>
       color: colors.primaryMain,
     },
   });
+};
