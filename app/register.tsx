@@ -25,9 +25,13 @@ const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 390) * size;
 
 function generateRegistrationUsername() {
-  return `user_${Date.now().toString(36)}_${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  const randomPart = Array.from(bytes)
+    .map((b) => b.toString(36).padStart(2, "0"))
+    .join("")
+    .slice(0, 8);
+  return `user_${Date.now().toString(36)}_${randomPart}`;
 }
 
 export default function RegisterScreen() {
@@ -38,7 +42,6 @@ export default function RegisterScreen() {
   const primaryForeground =
     resolvedTheme === "dark" ? colors.textPrimary : "#ffffff";
 
-  // const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,7 +49,6 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
-  // const [usernameFocused, setUsernameFocused] = useState(false);
   const [displayNameFocused, setDisplayNameFocused] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
@@ -56,7 +58,6 @@ export default function RegisterScreen() {
   const [error, setError] = useState("");
 
   const canSubmit =
-    // username.trim().length >= 3 &&
     email.trim().length > 0 &&
     password.length >= 6 &&
     passwordConfirmation.length > 0;

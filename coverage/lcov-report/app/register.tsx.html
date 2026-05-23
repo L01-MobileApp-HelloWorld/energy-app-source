@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.19% </span>
+                <span class="strong">83.11% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>60/73</span>
+                <span class='fraction'>64/77</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">52% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>12/24</span>
+                <span class='fraction'>13/25</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.29% </span>
+                <span class="strong">86.11% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>58/68</span>
+                <span class='fraction'>62/72</span>
             </div>
         
             
@@ -520,7 +520,8 @@
 <a name='L455'></a><a href='#L455'>455</a>
 <a name='L456'></a><a href='#L456'>456</a>
 <a name='L457'></a><a href='#L457'>457</a>
-<a name='L458'></a><a href='#L458'>458</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L458'></a><a href='#L458'>458</a>
+<a name='L459'></a><a href='#L459'>459</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -548,20 +549,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-yes">39x</span>
@@ -572,11 +568,17 @@
 <span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">39x</span>
@@ -1004,9 +1006,13 @@ const { width } = Dimensions.get("window");
 const scale = (size: number) =&gt; (width / 390) * size;
 &nbsp;
 function generateRegistrationUsername() {
-  return `user_${Date.now().toString(36)}_${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  const randomPart = Array.from(bytes)
+    .map((b) =&gt; b.toString(36).padStart(2, "0"))
+    .join("")
+    .slice(0, 8);
+  return `user_${Date.now().toString(36)}_${randomPart}`;
 }
 &nbsp;
 export default function RegisterScreen() {
@@ -1017,7 +1023,6 @@ export default function RegisterScreen() {
   const primaryForeground =
     resolvedTheme === "dark" ? <span class="branch-0 cbranch-no" title="branch not covered" >colors.textPrimary </span>: "#ffffff";
 &nbsp;
-  // const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -1025,7 +1030,6 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
-  // const [usernameFocused, setUsernameFocused] = useState(false);
   const [displayNameFocused, setDisplayNameFocused] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
@@ -1035,7 +1039,6 @@ export default function RegisterScreen() {
   const [error, setError] = useState("");
 &nbsp;
   const canSubmit =
-    // username.trim().length &gt;= 3 &amp;&amp;
     email.trim().length &gt; 0 &amp;&amp;
     password.length &gt;= 6 &amp;&amp;
     passwordConfirmation.length &gt; 0;
@@ -1441,7 +1444,7 @@ const createStyles = (colors: AppColorsType) =&gt;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-23T07:34:25.808Z
+                at 2026-05-23T08:18:54.324Z
             </div>
         <script src="../prettify.js"></script>
         <script>

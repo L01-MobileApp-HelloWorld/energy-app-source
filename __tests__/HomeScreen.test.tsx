@@ -89,7 +89,8 @@ describe("HomeScreen", () => {
   });
 
   test("render without crash", () => {
-    renderWithTheme(<HomeScreen />);
+    const { toJSON } = renderWithTheme(<HomeScreen />);
+    expect(toJSON()).not.toBeNull();
   });
 
   test("render welcome text", () => {

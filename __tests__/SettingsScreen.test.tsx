@@ -7,7 +7,7 @@ import { renderWithTheme } from "../test-utils";
 
 const mockLogout = jest.fn();
 const mockUpdateProfile = jest.fn(() => Promise.resolve());
-const mockUseAuth = jest.fn(() => ({
+const mockUseAuth = jest.fn<{ user: any; logout: jest.Mock; updateProfile: jest.Mock }, []>(() => ({
   user: null,
   logout: mockLogout,
   updateProfile: mockUpdateProfile,
@@ -20,6 +20,10 @@ jest.mock("react-native-safe-area-context", () => {
     SafeAreaView: ({ children, ...props }: any) => <View {...props}>{children}</View>,
   };
 });
+
+jest.mock("expo-router", () => ({
+  router: { push: jest.fn(), replace: jest.fn() },
+}));
 
 jest.mock("@/hooks/auth-context", () => ({
   useAuth: () => mockUseAuth(),
@@ -103,5 +107,83 @@ describe("SettingsScreen", () => {
     screen = renderWithTheme(<SettingsScreen />);
 
     await waitFor(() => expect(screen.UNSAFE_getByType(Switch).props.value).toBe(true));
+  });
+
+  test("shows user info when user is logged in", () => {
+    mockUseAuth.mockReturnValue({
+      user: {
+        _id: "user-1",
+        username: "tester",
+        email: "tester@example.com",
+        displayName: "Tester Name",
+        preferences: { darkMode: false },
+      },
+      logout: mockLogout,
+      updateProfile: mockUpdateProfile,
+    });
+    const { getByText } = renderWithTheme(<SettingsScreen />);
+    expect(getByText("Tester Name")).toBeTruthy();
+    expect(getByText("tester@example.com")).toBeTruthy();
+  });
+
+  test("pressing Đổi mật khẩu navigates to change-password", () => {
+    const { router } = require("expo-router");
+    const { getByText } = renderWithTheme(<SettingsScreen />);
+    fireEvent.press(getByText("Đổi mật khẩu"));
+    expect(router.push).toHaveBeenCalledWith("/change-password");
+  });
+
+  test("pressing Đăng xuất shows confirmation Alert", () => {
+    const { Alert } = require("react-native");
+    jest.spyOn(Alert, "alert");
+    const { getByText } = renderWithTheme(<SettingsScreen />);
+    fireEvent.press(getByText("Đăng xuất"));
+    expect(Alert.alert).toHaveBeenCalledWith(
+      "Đăng xuất",
+      "Bạn có chắc chắn muốn đăng xuất?",
+      expect.any(Array),
+    );
+  });
+
+  test("confirming logout calls logout and navigates to /login", async () => {
+    const { Alert } = require("react-native");
+    const { router } = require("expo-router");
+    mockLogout.mockResolvedValueOnce(undefined);
+
+    let alertButtons: any[] = [];
+    jest.spyOn(Alert, "alert").mockImplementation((_title, _msg, buttons: any) => {
+      alertButtons = buttons ?? [];
+    });
+
+    const { getByText } = renderWithTheme(<SettingsScreen />);
+    fireEvent.press(getByText("Đăng xuất"));
+
+    const confirmBtn = alertButtons.find((b: any) => b.text === "Đăng xuất");
+    await act(async () => {
+      await confirmBtn?.onPress?.();
+    });
+
+    expect(mockLogout).toHaveBeenCalled();
+    expect(router.replace).toHaveBeenCalledWith("/login");
+  });
+
+  test("logout failure resets loggingOut without crash", async () => {
+    const { Alert } = require("react-native");
+    mockLogout.mockRejectedValueOnce(new Error("network"));
+
+    let alertButtons: any[] = [];
+    jest.spyOn(Alert, "alert").mockImplementation((_title, _msg, buttons: any) => {
+      alertButtons = buttons ?? [];
+    });
+
+    const { getByText } = renderWithTheme(<SettingsScreen />);
+    fireEvent.press(getByText("Đăng xuất"));
+
+    const confirmBtn = alertButtons.find((b: any) => b.text === "Đăng xuất");
+    await act(async () => {
+      await confirmBtn?.onPress?.();
+    });
+
+    expect(getByText("Đăng xuất")).toBeTruthy();
   });
 });

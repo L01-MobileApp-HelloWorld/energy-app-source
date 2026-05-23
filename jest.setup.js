@@ -1,6 +1,14 @@
 import "@testing-library/jest-native/extend-expect";
 import { PermissionsAndroid, Platform } from "react-native";
 
+if (
+  typeof global.crypto === "undefined" ||
+  typeof global.crypto.getRandomValues === "undefined"
+) {
+  const nodeCrypto = require("crypto");
+  global.crypto = nodeCrypto.webcrypto ?? nodeCrypto;
+}
+
 const asyncStorageState = {};
 const secureStoreState = {};
 
@@ -33,7 +41,9 @@ jest.mock("@/hooks/use-color-scheme", () => ({
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
   default: {
-    getItem: jest.fn((key) => Promise.resolve(key in asyncStorageState ? asyncStorageState[key] : null)),
+    getItem: jest.fn((key) =>
+      Promise.resolve(key in asyncStorageState ? asyncStorageState[key] : null),
+    ),
     setItem: jest.fn((key, value) => {
       asyncStorageState[key] = value;
       return Promise.resolve();
@@ -43,7 +53,9 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
       return Promise.resolve();
     }),
     clear: jest.fn(() => {
-      Object.keys(asyncStorageState).forEach((key) => delete asyncStorageState[key]);
+      Object.keys(asyncStorageState).forEach(
+        (key) => delete asyncStorageState[key],
+      );
       return Promise.resolve();
     }),
   },
@@ -55,7 +67,7 @@ jest.mock("expo-secure-store", () => ({
     return Promise.resolve();
   }),
   getItemAsync: jest.fn((key) =>
-    Promise.resolve(key in secureStoreState ? secureStoreState[key] : null)
+    Promise.resolve(key in secureStoreState ? secureStoreState[key] : null),
   ),
   deleteItemAsync: jest.fn((key) => {
     delete secureStoreState[key];
@@ -109,7 +121,7 @@ jest.mock("@react-native-firebase/messaging", () => {
 });
 
 PermissionsAndroid.request = jest.fn(() =>
-  Promise.resolve(PermissionsAndroid.RESULTS.GRANTED)
+  Promise.resolve(PermissionsAndroid.RESULTS.GRANTED),
 );
 
 Object.defineProperty(Platform, "OS", {

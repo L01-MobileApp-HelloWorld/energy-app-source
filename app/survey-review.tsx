@@ -158,19 +158,22 @@ export default function SurveyReviewScreen() {
         <View style={styles.headerBtn} />
       </View>
 
-      {loading ? (
+      {loading && (
         <View style={styles.centerState}>
           <ActivityIndicator size="large" color={colors.primaryMain} />
         </View>
-      ) : error ? (
+      )}
+      {!loading && error ? (
         <View style={styles.centerState}>
           <Text style={styles.emptyTitle}>{error}</Text>
         </View>
-      ) : questions.length === 0 ? (
+      ) : null}
+      {!loading && !error && questions.length === 0 ? (
         <View style={styles.centerState}>
           <Text style={styles.emptyTitle}>Không có câu trả lời để hiển thị</Text>
         </View>
-      ) : (
+      ) : null}
+      {!loading && !error && questions.length > 0 ? (
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -238,7 +241,7 @@ export default function SurveyReviewScreen() {
             );
           })}
         </ScrollView>
-      )}
+      ) : null}
     </SafeAreaView>
   );
 }
