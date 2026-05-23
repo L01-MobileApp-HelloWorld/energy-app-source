@@ -24,6 +24,12 @@ import { ApiError } from "@/services/api-client";
 const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 390) * size;
 
+function generateRegistrationUsername() {
+  return `user_${Date.now().toString(36)}_${Math.random()
+    .toString(36)
+    .slice(2, 10)}`;
+}
+
 export default function RegisterScreen() {
   const colors = useAppColors();
   const { resolvedTheme } = useAppTheme();
@@ -75,9 +81,10 @@ export default function RegisterScreen() {
     setError("");
     setLoading(true);
     try {
+      const generatedUsername = generateRegistrationUsername();
+
       await register(
-        // username.trim(),
-        "",
+        generatedUsername,
         displayName.trim() || undefined,
         email.trim(),
         password,

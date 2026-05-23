@@ -14,7 +14,8 @@
       "Bash(npm list *)",
       "Bash(npm --version)",
       "Bash(nodenv version *)",
-      "Bash(nodenv versions *)"
+      "Bash(nodenv versions *)",
+      "Bash(node -e ' *)"
     ],
     "additionalDirectories": [
       "/Users/huynhat/HCMUT/energy-app-source/.github/workflows"

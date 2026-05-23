@@ -123,7 +123,12 @@ describe("RegisterScreen", () => {
       fireEvent.press(screen.getByText("Tạo tài khoản"));
     });
 
-    expect(mockRegister).toHaveBeenCalledWith("", "Tester", "user@example.com", "Password1");
+    expect(mockRegister).toHaveBeenCalledWith(
+      expect.stringMatching(/^user_[a-z0-9]+_[a-z0-9]+$/),
+      "Tester",
+      "user@example.com",
+      "Password1"
+    );
     expect(mockRouter.replace).toHaveBeenCalledWith("/(tabs)");
   });
 

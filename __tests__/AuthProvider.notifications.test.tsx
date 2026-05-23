@@ -5,7 +5,11 @@ import { Pressable, Text, View } from "react-native";
 import { AuthProvider, useAuth } from "@/hooks/auth-context";
 import { ThemePreferencesProvider } from "@/hooks/use-app-theme";
 import { apiClient } from "@/services/api-client";
-import { clearStoredFcmToken, getStoredFcmToken } from "@/services/auth-service";
+import {
+  clearAuth,
+  clearStoredFcmToken,
+  getStoredFcmToken,
+} from "@/services/auth-service";
 
 function AuthProbe() {
   const { isAuthenticated, isLoading, login, logout } = useAuth();
@@ -28,6 +32,7 @@ describe("AuthProvider FCM integration", () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     apiClient.clearAuthToken();
+    await clearAuth();
     await clearStoredFcmToken();
   });
 
