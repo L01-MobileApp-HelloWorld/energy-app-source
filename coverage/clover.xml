@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1779525753599" clover="3.2.0">
-  <project timestamp="1779525753599" name="All files">
-    <metrics statements="787" coveredstatements="719" conditionals="491" coveredconditionals="379" methods="216" coveredmethods="184" elements="1494" coveredelements="1282" complexity="0" loc="787" ncloc="787" packages="11" files="24" classes="24"/>
+<coverage generated="1780151813321" clover="3.2.0">
+  <project timestamp="1780151813321" name="All files">
+    <metrics statements="806" coveredstatements="734" conditionals="505" coveredconditionals="385" methods="219" coveredmethods="187" elements="1530" coveredelements="1306" complexity="0" loc="806" ncloc="806" packages="11" files="24" classes="24"/>
     <package name="app">
       <metrics statements="591" coveredstatements="539" conditionals="390" coveredconditionals="290" methods="155" coveredmethods="132"/>
       <file name="analystic.tsx" path="/Users/huynhat/HCMUT/energy-app-source/app/analystic.tsx">
@@ -633,24 +633,24 @@
       </file>
     </package>
     <package name="app.(tabs)">
-      <metrics statements="129" coveredstatements="115" conditionals="65" coveredconditionals="55" methods="32" coveredmethods="25"/>
+      <metrics statements="148" coveredstatements="130" conditionals="79" coveredconditionals="61" methods="35" coveredmethods="28"/>
       <file name="history.tsx" path="/Users/huynhat/HCMUT/energy-app-source/app/(tabs)/history.tsx">
-        <metrics statements="87" coveredstatements="78" conditionals="52" coveredconditionals="43" methods="17" coveredmethods="14"/>
+        <metrics statements="87" coveredstatements="77" conditionals="52" coveredconditionals="40" methods="17" coveredmethods="14"/>
         <line num="23" count="1" type="stmt"/>
         <line num="24" count="63" type="stmt"/>
         <line num="25" count="1" type="stmt"/>
         <line num="59" count="1" type="stmt"/>
         <line num="69" count="6" type="stmt"/>
         <line num="70" count="6" type="stmt"/>
-        <line num="72" count="6" type="cond" truecount="3" falsecount="0"/>
+        <line num="72" count="6" type="cond" truecount="1" falsecount="2"/>
         <line num="75" count="6" type="stmt"/>
         <line num="76" count="6" type="stmt"/>
         <line num="77" count="6" type="stmt"/>
         <line num="78" count="6" type="stmt"/>
-        <line num="84" count="6" type="cond" truecount="2" falsecount="0"/>
-        <line num="85" count="5" type="stmt"/>
-        <line num="88" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="89" count="1" type="stmt"/>
+        <line num="84" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="88" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="89" count="6" type="stmt"/>
         <line num="95" count="0" type="stmt"/>
         <line num="103" count="6" type="stmt"/>
         <line num="104" count="6" type="cond" truecount="1" falsecount="1"/>
@@ -725,25 +725,44 @@
         <line num="305" count="21" type="stmt"/>
       </file>
       <file name="index.tsx" path="/Users/huynhat/HCMUT/energy-app-source/app/(tabs)/index.tsx">
-        <metrics statements="18" coveredstatements="15" conditionals="3" coveredconditionals="2" methods="6" coveredmethods="4"/>
-        <line num="14" count="16" type="stmt"/>
-        <line num="15" count="16" type="stmt"/>
-        <line num="16" count="16" type="stmt"/>
-        <line num="17" count="16" type="stmt"/>
-        <line num="18" count="16" type="stmt"/>
-        <line num="19" count="16" type="stmt"/>
-        <line num="23" count="16" type="stmt"/>
-        <line num="24" count="16" type="stmt"/>
-        <line num="25" count="16" type="stmt"/>
-        <line num="26" count="16" type="cond" truecount="2" falsecount="1"/>
-        <line num="27" count="16" type="stmt"/>
-        <line num="38" count="16" type="stmt"/>
-        <line num="108" count="1" type="stmt"/>
-        <line num="167" count="0" type="stmt"/>
-        <line num="187" count="0" type="stmt"/>
-        <line num="188" count="0" type="stmt"/>
-        <line num="204" count="1" type="stmt"/>
-        <line num="205" count="16" type="stmt"/>
+        <metrics statements="37" coveredstatements="31" conditionals="17" coveredconditionals="11" methods="9" coveredmethods="7"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="35" count="32" type="stmt"/>
+        <line num="36" count="32" type="stmt"/>
+        <line num="37" count="32" type="stmt"/>
+        <line num="38" count="32" type="stmt"/>
+        <line num="39" count="32" type="stmt"/>
+        <line num="40" count="32" type="stmt"/>
+        <line num="44" count="16" type="stmt"/>
+        <line num="45" count="16" type="stmt"/>
+        <line num="47" count="16" type="cond" truecount="3" falsecount="0"/>
+        <line num="50" count="16" type="stmt"/>
+        <line num="51" count="16" type="stmt"/>
+        <line num="52" count="16" type="stmt"/>
+        <line num="58" count="16" type="cond" truecount="1" falsecount="1"/>
+        <line num="59" count="16" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="69" count="32" type="stmt"/>
+        <line num="70" count="32" type="stmt"/>
+        <line num="71" count="32" type="stmt"/>
+        <line num="72" count="32" type="cond" truecount="2" falsecount="1"/>
+        <line num="73" count="32" type="stmt"/>
+        <line num="76" count="32" type="stmt"/>
+        <line num="87" count="32" type="stmt"/>
+        <line num="88" count="16" type="stmt"/>
+        <line num="89" count="16" type="stmt"/>
+        <line num="100" count="16" type="cond" truecount="1" falsecount="1"/>
+        <line num="102" count="0" type="stmt"/>
+        <line num="103" count="0" type="stmt"/>
+        <line num="107" count="32" type="stmt"/>
+        <line num="109" count="16" type="stmt"/>
+        <line num="113" count="32" type="stmt"/>
+        <line num="183" count="1" type="stmt"/>
+        <line num="248" count="0" type="stmt"/>
+        <line num="268" count="0" type="stmt"/>
+        <line num="269" count="0" type="stmt"/>
+        <line num="285" count="1" type="stmt"/>
+        <line num="286" count="32" type="stmt"/>
       </file>
       <file name="settings.tsx" path="/Users/huynhat/HCMUT/energy-app-source/app/(tabs)/settings.tsx">
         <metrics statements="24" coveredstatements="22" conditionals="10" coveredconditionals="10" methods="9" coveredmethods="7"/>

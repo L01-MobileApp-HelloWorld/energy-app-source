@@ -6,6 +6,7 @@ import { renderWithTheme } from "../test-utils";
 
 const mockIconSymbol = jest.fn((_props: any) => null);
 const mockPush = jest.fn();
+const mockApiGet = jest.fn();
 const mockUseAuth = jest.fn(() => ({
   user: {
     username: "Huy",
@@ -18,8 +19,21 @@ jest.mock("expo-router", () => ({
   },
 }));
 
+jest.mock("@react-navigation/native", () => ({
+  useFocusEffect: (effect: () => void | (() => void)) => {
+    const React = require("react");
+    React.useEffect(effect, []);
+  },
+}));
+
 jest.mock("@/hooks/auth-context", () => ({
   useAuth: () => mockUseAuth(),
+}));
+
+jest.mock("@/services/api-client", () => ({
+  apiClient: {
+    get: (...args: any[]) => mockApiGet(...args),
+  },
 }));
 
 jest.mock("react-native-safe-area-context", () => {
@@ -81,9 +95,26 @@ describe("HomeScreen", () => {
   beforeEach(() => {
     mockIconSymbol.mockClear();
     mockPush.mockClear();
+    mockApiGet.mockReset();
     mockUseAuth.mockReturnValue({
       user: {
         username: "Huy",
+      },
+    });
+    mockApiGet.mockResolvedValue({
+      success: true,
+      data: {
+        histories: [
+          {
+            _id: "history-1",
+            state: "ready",
+            stateDetails: {
+              name: "Tỉnh táo, sẵn sàng",
+              emoji: "💪",
+            },
+            createdAt: "2026-04-27T05:00:00.000Z",
+          },
+        ],
       },
     });
   });
@@ -129,19 +160,19 @@ describe("HomeScreen", () => {
     expect(getByText("Dành 1 phút để thấu hiểm cảm xúc của mình")).toBeTruthy();
   });
 
-  test("render previous result label", () => {
-    const { getByText } = renderWithTheme(<HomeScreen />);
-    expect(getByText("Lần trước,")).toBeTruthy();
+  test("render previous result label", async () => {
+    const { findByText } = renderWithTheme(<HomeScreen />);
+    expect(await findByText("Lần trước,")).toBeTruthy();
   });
 
-  test("render previous result status", () => {
-    const { getByText } = renderWithTheme(<HomeScreen />);
-    expect(getByText("Tỉnh táo, sẵn sàng")).toBeTruthy();
+  test("render previous result status", async () => {
+    const { findByText } = renderWithTheme(<HomeScreen />);
+    expect(await findByText("Tỉnh táo, sẵn sàng")).toBeTruthy();
   });
 
-  test("render previous result time", () => {
-    const { getByText } = renderWithTheme(<HomeScreen />);
-    expect(getByText("Hôm nay, 12:00")).toBeTruthy();
+  test("render previous result time", async () => {
+    const { findByText } = renderWithTheme(<HomeScreen />);
+    expect(await findByText("Hôm nay, 12:00")).toBeTruthy();
   });
 
   test("render history menu item", () => {
@@ -154,10 +185,10 @@ describe("HomeScreen", () => {
     expect(getByText("Xem nhắc nhở")).toBeTruthy();
   });
 
-  test("render key emojis for the cards", () => {
-    const { getByText } = renderWithTheme(<HomeScreen />);
+  test("render key emojis for the cards", async () => {
+    const { getByText, findByText } = renderWithTheme(<HomeScreen />);
     expect(getByText("😊")).toBeTruthy();
-    expect(getByText("💪")).toBeTruthy();
+    expect(await findByText("💪")).toBeTruthy();
   });
 
   test("configure the scroll view without vertical indicator", () => {

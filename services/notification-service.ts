@@ -13,12 +13,12 @@ import type { IFcmTokenResponse, INotificationPayload } from "@/typescript";
 const SURVEY_ROUTE = "/survey";
 const APP_SCHEME = "energyappsource:";
 
-type MessagingModule = typeof import("@react-native-firebase/messaging").default;
+type MessagingModule =
+  typeof import("@react-native-firebase/messaging").default;
 
 function getMessaging(): MessagingModule | null {
   try {
-    const messagingModule =
-      require("@react-native-firebase/messaging") as typeof import("@react-native-firebase/messaging");
+    const messagingModule = require("@react-native-firebase/messaging");
 
     return messagingModule.default;
   } catch {
@@ -61,7 +61,9 @@ function buildNotificationPayload(
     data: {
       type: toOptionalString(remoteMessage.data?.type),
       reminderTime: toOptionalString(remoteMessage.data?.reminderTime),
-      reminderFrequency: toOptionalString(remoteMessage.data?.reminderFrequency),
+      reminderFrequency: toOptionalString(
+        remoteMessage.data?.reminderFrequency,
+      ),
     },
   };
 }
