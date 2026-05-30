@@ -97,14 +97,18 @@ describe("SettingsScreen", () => {
   });
 
   test("reopening the screen reads the persisted preference instead of resetting local state", async () => {
-    let screen = renderWithTheme(<SettingsScreen />);
+    let screen = renderWithTheme(<SettingsScreen />, {
+      hydrateOnMountInTest: true,
+    });
 
     await act(async () => {
       fireEvent(screen.UNSAFE_getByType(Switch), "valueChange", true);
     });
 
     screen.unmount();
-    screen = renderWithTheme(<SettingsScreen />);
+    screen = renderWithTheme(<SettingsScreen />, {
+      hydrateOnMountInTest: true,
+    });
 
     await waitFor(() => expect(screen.UNSAFE_getByType(Switch).props.value).toBe(true));
   });

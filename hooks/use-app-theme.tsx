@@ -49,7 +49,13 @@ function resolveTheme(
   return preference;
 }
 
-export function ThemePreferencesProvider({ children }: { children: React.ReactNode }) {
+export function ThemePreferencesProvider({
+  children,
+  hydrateOnMountInTest = false,
+}: {
+  children: React.ReactNode;
+  hydrateOnMountInTest?: boolean;
+}) {
   const systemTheme = useColorScheme();
   const [themePreference, setThemePreferenceState] = useState<ThemePreference>('system');
   const [isHydrated, setIsHydrated] = useState(IS_TEST_ENV);
@@ -60,6 +66,10 @@ export function ThemePreferencesProvider({ children }: { children: React.ReactNo
   }, [themePreference]);
 
   useEffect(() => {
+    if (IS_TEST_ENV && !hydrateOnMountInTest) {
+      return;
+    }
+
     let isMounted = true;
 
     async function hydratePreference() {
@@ -85,7 +95,7 @@ export function ThemePreferencesProvider({ children }: { children: React.ReactNo
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [hydrateOnMountInTest]);
 
   const setThemePreference = useCallback(async (preference: ThemePreference) => {
     if (themePreferenceRef.current === preference) {

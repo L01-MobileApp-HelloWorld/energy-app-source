@@ -49,27 +49,27 @@ describe("ThemePreferencesProvider", () => {
   test("hydrates a saved dark preference", async () => {
     await AsyncStorage.setItem("app-theme-preference", "dark");
 
-    const { getByText } = render(
-      <ThemePreferencesProvider>
+    const screen = render(
+      <ThemePreferencesProvider hydrateOnMountInTest>
         <ThemeProbe />
       </ThemePreferencesProvider>
     );
 
-    await waitFor(() => expect(getByText("preference:dark")).toBeTruthy());
-    expect(getByText("resolved:dark")).toBeTruthy();
+    await waitFor(() => expect(screen.getByText("preference:dark")).toBeTruthy());
+    expect(screen.getByText("resolved:dark")).toBeTruthy();
   });
 
   test("hydrates a saved light preference", async () => {
     await AsyncStorage.setItem("app-theme-preference", "light");
 
-    const { getByText } = render(
-      <ThemePreferencesProvider>
+    const screen = render(
+      <ThemePreferencesProvider hydrateOnMountInTest>
         <ThemeProbe />
       </ThemePreferencesProvider>
     );
 
-    await waitFor(() => expect(getByText("preference:light")).toBeTruthy());
-    expect(getByText("resolved:light")).toBeTruthy();
+    await waitFor(() => expect(screen.getByText("preference:light")).toBeTruthy());
+    expect(screen.getByText("resolved:light")).toBeTruthy();
   });
 
   test("setter updates state and persists the new preference", async () => {

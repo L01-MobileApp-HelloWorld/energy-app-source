@@ -3,6 +3,19 @@ import React from 'react';
 
 import { ThemePreferencesProvider } from '@/hooks/use-app-theme';
 
-export function renderWithTheme(ui: React.ReactElement) {
-  return render(<ThemePreferencesProvider>{ui}</ThemePreferencesProvider>);
+type RenderWithThemeOptions = {
+  hydrateOnMountInTest?: boolean;
+};
+
+export function renderWithTheme(
+  ui: React.ReactElement,
+  options?: RenderWithThemeOptions
+) {
+  return render(
+    <ThemePreferencesProvider
+      hydrateOnMountInTest={options?.hydrateOnMountInTest}
+    >
+      {ui}
+    </ThemePreferencesProvider>
+  );
 }
