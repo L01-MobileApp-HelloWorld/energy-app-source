@@ -189,6 +189,20 @@ describe("HomeScreen", () => {
     expect(await findByText(`Hôm nay, ${expectedTimeLabel}`)).toBeTruthy();
   });
 
+  test("press previous result navigates to history detail", async () => {
+    const { getByLabelText } = await renderHomeScreen();
+
+    fireEvent.press(getByLabelText("Xem chi tiết kết quả lần trước"));
+
+    expect(mockPush).toHaveBeenCalledWith({
+      pathname: "/result",
+      params: {
+        historyId: "history-1",
+        fromHistory: "1",
+      },
+    });
+  });
+
   test("render history menu item", async () => {
     const { getByText } = await renderHomeScreen();
     expect(getByText("Kiểm tra lịch sử")).toBeTruthy();

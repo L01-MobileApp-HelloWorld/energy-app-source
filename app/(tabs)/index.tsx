@@ -9,7 +9,13 @@ import { apiClient } from "@/services/api-client";
 import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type HistoryApiItem = {
@@ -110,6 +116,20 @@ export default function HomeScreen() {
     }, [fetchLatestHistory]),
   );
 
+  const handleLatestHistoryPress = useCallback(() => {
+    if (!latestHistory?._id) {
+      return;
+    }
+
+    router.push({
+      pathname: "/result",
+      params: {
+        historyId: latestHistory._id,
+        fromHistory: "1",
+      },
+    });
+  }, [latestHistory]);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bgApp }}>
       <ScrollView
@@ -188,7 +208,10 @@ export default function HomeScreen() {
 
         {/* Previous Result Card */}
         {latestHistory ? (
-          <View
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Xem chi tiết kết quả lần trước"
+            onPress={handleLatestHistoryPress}
             style={{
               backgroundColor: colors.bgSurface1,
               borderRadius: 8,
@@ -214,7 +237,7 @@ export default function HomeScreen() {
                 marginRight: 12,
               }}
             >
-              <Text style={{ fontSize: 20, paddingTop: 8 }}>
+              <Text style={{ fontSize: 20, paddingTop: 4 }}>
                 {latestHistory.stateDetails?.emoji ?? "💪"}
               </Text>
             </View>
@@ -238,7 +261,7 @@ export default function HomeScreen() {
                 {formatHistoryTimestamp(latestHistory.createdAt)}
               </Text>
             </View>
-          </View>
+          </Pressable>
         ) : null}
 
         {/* Kiểm tra lịch sử */}
