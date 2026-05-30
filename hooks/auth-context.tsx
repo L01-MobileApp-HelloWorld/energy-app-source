@@ -223,10 +223,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setState({ user, isAuthenticated: true, isLoading: false });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setThemePreference, syncThemePreferenceFromUser],
   );
 
-  // ── Register ───────────────────────────────────────────────────────────────
   const register = useCallback(
     async (
       username: string,
@@ -253,10 +253,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setState({ user, isAuthenticated: true, isLoading: false });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setThemePreference, syncThemePreferenceFromUser],
   );
 
-  // ── Logout ─────────────────────────────────────────────────────────────────
   const logout = useCallback(async () => {
     try {
       const fcmToken = await getStoredFcmToken();
@@ -278,7 +278,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState({ user: null, isAuthenticated: false, isLoading: false });
   }, [setThemePreference]);
 
-  // ── Refresh user profile ───────────────────────────────────────────────────
   const refreshUser = useCallback(async () => {
     try {
       const res = await apiClient.get<{
@@ -388,8 +387,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-
-// ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useAuth(): IAuthContextValue {
   const ctx = useContext(AuthContext);
