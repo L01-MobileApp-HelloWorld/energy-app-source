@@ -178,7 +178,15 @@ describe("HomeScreen", () => {
 
   test("render previous result time", async () => {
     const { findByText } = await renderHomeScreen();
-    expect(await findByText("Hôm nay, 12:00")).toBeTruthy();
+    const expectedTimeLabel = new Date("2026-04-27T05:00:00.000Z").toLocaleTimeString(
+      "vi-VN",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }
+    );
+    expect(await findByText(`Hôm nay, ${expectedTimeLabel}`)).toBeTruthy();
   });
 
   test("render history menu item", async () => {
