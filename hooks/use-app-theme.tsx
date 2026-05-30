@@ -14,44 +14,23 @@ type AppThemeContextValue = {
 };
 
 const THEME_PREFERENCE_KEY = 'app-theme-preference';
-const memoryStorage = new Map<string, string>();
 const IS_TEST_ENV = process.env.NODE_ENV === 'test';
 
 const AppThemeContext = createContext<AppThemeContextValue | null>(null);
-
-function getBrowserStorage() {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    return window.localStorage;
-  }
-
-  return null;
-}
 
 async function readStoredPreference(key: string) {
   try {
     return await AsyncStorage.getItem(key);
   } catch {
-    const browserStorage = getBrowserStorage();
-    if (browserStorage) {
-      return browserStorage.getItem(key);
-    }
-
-    return memoryStorage.get(key) ?? null;
+    return null;
   }
 }
 
 async function writeStoredPreference(key: string, value: string) {
   try {
     await AsyncStorage.setItem(key, value);
-    return;
   } catch {
-    const browserStorage = getBrowserStorage();
-    if (browserStorage) {
-      browserStorage.setItem(key, value);
-      return;
-    }
-
-    memoryStorage.set(key, value);
+    return;
   }
 }
 

@@ -1,61 +1,31 @@
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import * as SecureStore from "expo-secure-store";
 
-import type { IStoredUser } from '@/typescript';
+import type { IStoredUser } from "@/typescript";
 
-const ACCESS_TOKEN_KEY = 'auth_access_token';
-const REFRESH_TOKEN_KEY = 'auth_refresh_token';
-const USER_DATA_KEY = 'auth_user_data';
-const FCM_TOKEN_KEY = 'auth_fcm_token';
-
-// Fallback for web (SecureStore is native-only)
-const memoryStore = new Map<string, string>();
+const ACCESS_TOKEN_KEY = "auth_access_token";
+const REFRESH_TOKEN_KEY = "auth_refresh_token";
+const USER_DATA_KEY = "auth_user_data";
+const FCM_TOKEN_KEY = "auth_fcm_token";
 
 async function setItem(key: string, value: string): Promise<void> {
-  if (Platform.OS === 'web') {
-    try {
-      localStorage.setItem(key, value);
-    } catch {
-      memoryStore.set(key, value);
-    }
-    return;
-  }
   await SecureStore.setItemAsync(key, value);
 }
 
 async function getItem(key: string): Promise<string | null> {
-  if (Platform.OS === 'web') {
-    try {
-      return localStorage.getItem(key);
-    } catch {
-      return memoryStore.get(key) ?? null;
-    }
-  }
   return SecureStore.getItemAsync(key);
 }
 
 async function deleteItem(key: string): Promise<void> {
-  if (Platform.OS === 'web') {
-    try {
-      localStorage.removeItem(key);
-    } catch {
-      memoryStore.delete(key);
-    }
-    return;
-  }
   await SecureStore.deleteItemAsync(key);
 }
-
-// ─── Public API ───────────────────────────────────────────────────────────────
-
 
 export async function saveTokens(
   accessToken: string,
   refreshToken?: string | null,
 ): Promise<void> {
   const tasks: Array<Promise<void>> = [setItem(ACCESS_TOKEN_KEY, accessToken)];
-
-  if (typeof refreshToken === 'string' && refreshToken.length > 0) {
+  [];
+  if (typeof refreshToken === "string" && refreshToken.length > 0) {
     tasks.push(setItem(REFRESH_TOKEN_KEY, refreshToken));
   } else {
     tasks.push(deleteItem(REFRESH_TOKEN_KEY));

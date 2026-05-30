@@ -81,7 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     void setThemePreference("system");
   }, [setThemePreference, state.isAuthenticated, state.isLoading]);
 
-  // ── Restore session on app launch ──────────────────────────────────────────
   useEffect(() => {
     let mounted = true;
 
@@ -94,7 +93,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // Set token on api client
         apiClient.setAuthToken(token);
 
         // Try to get cached user first
@@ -185,12 +183,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     let active = true;
 
-    void handleInitialNotification();
+    handleInitialNotification();
 
     const unsubscribeTokenRefresh = subscribeToFcmTokenRefresh();
     const unsubscribeNotificationOpens = subscribeToNotificationOpens();
 
-    void (async () => {
+    (async () => {
       try {
         await registerFcmToken();
       } catch {

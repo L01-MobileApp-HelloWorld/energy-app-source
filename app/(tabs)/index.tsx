@@ -5,10 +5,31 @@ import { Text } from "@/components/ui/text";
 import { AppColorsType } from "@/constants/theme";
 import { useAuth } from "@/hooks/auth-context";
 import { useAppColors } from "@/hooks/use-app-theme";
+import { apiClient } from "@/services/api-client";
+import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+type HistoryApiItem = {
+  _id: string;
+  state: string;
+  stateDetails?: {
+    name?: string;
+    emoji?: string;
+  };
+  createdAt: string;
+};
+
+const BACKEND_STATE_LABEL_MAP: Record<string, string> = {
+  exhausted: "Kiệt sức",
+  tired: "Mệt mỏi",
+  lazy_with_deadline: "Trì hoãn",
+  ready: "Sẵn sàng",
+  focused: "Tập trung",
+  unmotivated: "Mất động lực",
+};
 
 function getCurrentDateTime() {
   const now = new Date();
@@ -19,11 +40,39 @@ function getCurrentDateTime() {
   return `${day}, ${h}:${m}`;
 }
 
+function formatHistoryTimestamp(isoString: string) {
+  const date = new Date(isoString);
+  const now = new Date();
+  const isSameDay =
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear();
+  const weekdayLabelMap = ["CN", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7"];
+  const weekdayLabel = weekdayLabelMap[date.getDay()];
+  const timeLabel = date.toLocaleTimeString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  if (isSameDay) {
+    return `Hôm nay, ${timeLabel}`;
+  }
+
+  return `${weekdayLabel}, ${date.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+  })}, ${timeLabel}`;
+}
+
 export default function HomeScreen() {
   const colors = useAppColors();
   const { user } = useAuth();
   const styles = createStyles(colors);
   const displayName = user?.displayName || user?.username || "bạn";
+  const [latestHistory, setLatestHistory] = useState<HistoryApiItem | null>(
+    null,
+  );
   const cardStyle = {
     backgroundColor: colors.bgSurface1,
     borderRadius: 16,
@@ -34,6 +83,32 @@ export default function HomeScreen() {
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   } as const;
+
+  const fetchLatestHistory = useCallback(async () => {
+    try {
+      const res = await apiClient.get<{
+        success: boolean;
+        data: { histories: HistoryApiItem[] };
+      }>("/histories", {
+        query: {
+          page: 1,
+          limit: 1,
+          sort: "createdAt:desc",
+        },
+      });
+
+      setLatestHistory(res.data.histories[0] ?? null);
+    } catch (error) {
+      console.warn("[Home] fetch latest history failed:", error);
+      setLatestHistory(null);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      void fetchLatestHistory();
+    }, [fetchLatestHistory]),
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bgApp }}>
@@ -112,53 +187,59 @@ export default function HomeScreen() {
         </View>
 
         {/* Previous Result Card */}
-        <View
-          style={{
-            backgroundColor: colors.bgSurface1,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: colors.primaryMain,
-            borderLeftWidth: 3,
-            borderLeftColor: colors.primaryMain,
-            paddingVertical: 16,
-            paddingHorizontal: 16,
-            marginBottom: 16,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
+        {latestHistory ? (
           <View
             style={{
-              width: 40,
-              height: 40,
+              backgroundColor: colors.bgSurface1,
               borderRadius: 8,
-              backgroundColor: colors.primaryMain,
+              borderWidth: 1,
+              borderColor: colors.primaryMain,
+              borderLeftWidth: 3,
+              borderLeftColor: colors.primaryMain,
+              paddingVertical: 16,
+              paddingHorizontal: 16,
+              marginBottom: 16,
+              flexDirection: "row",
               alignItems: "center",
-              justifyContent: "center",
-              marginRight: 12,
             }}
           >
-            <Text style={{ fontSize: 20 }}>💪</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text size="xs" style={{ color: colors.textDisabled }}>
-              Lần trước,
-            </Text>
-            <Text
-              size="lg"
-              bold
-              style={{ color: colors.primaryMain, marginTop: 2 }}
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 8,
+                backgroundColor: colors.primaryMain,
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 12,
+              }}
             >
-              Tỉnh táo, sẵn sàng
-            </Text>
-            <Text
-              size="xs"
-              style={{ color: colors.textDisabled, marginTop: 2 }}
-            >
-              Hôm nay, 12:00
-            </Text>
+              <Text style={{ fontSize: 20, paddingTop: 8 }}>
+                {latestHistory.stateDetails?.emoji ?? "💪"}
+              </Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text size="xs" style={{ color: colors.textDisabled }}>
+                Lần trước,
+              </Text>
+              <Text
+                size="lg"
+                bold
+                style={{ color: colors.primaryMain, marginTop: 2 }}
+              >
+                {latestHistory.stateDetails?.name ??
+                  BACKEND_STATE_LABEL_MAP[latestHistory.state] ??
+                  "Đã hoàn thành khảo sát"}
+              </Text>
+              <Text
+                size="xs"
+                style={{ color: colors.textDisabled, marginTop: 2 }}
+              >
+                {formatHistoryTimestamp(latestHistory.createdAt)}
+              </Text>
+            </View>
           </View>
-        </View>
+        ) : null}
 
         {/* Kiểm tra lịch sử */}
         <TouchableOpacity

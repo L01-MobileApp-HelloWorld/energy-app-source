@@ -1,6 +1,6 @@
 /**
  * Interface for a stored user in the app.
- * Persisted in SecureStore/localStorage.
+ * Persisted in SecureStore.
  */
 export interface IStoredUser {
   _id: string;
