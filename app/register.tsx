@@ -25,12 +25,7 @@ import { ApiError } from "@/services/api-client";
 const scale = scaleAuth;
 
 function generateRegistrationUsername() {
-  const bytes = new Uint8Array(6);
-  crypto.getRandomValues(bytes);
-  const randomPart = Array.from(bytes)
-    .map((b) => b.toString(36).padStart(2, "0"))
-    .join("")
-    .slice(0, 8);
+  const randomPart = Math.random().toString(36).slice(2, 10).padEnd(8, "0");
   return `user_${Date.now().toString(36)}_${randomPart}`;
 }
 
