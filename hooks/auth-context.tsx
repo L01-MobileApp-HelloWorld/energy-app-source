@@ -1,39 +1,46 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-import { apiClient } from '@/services/api-client';
-import { useAppTheme } from '@/hooks/use-app-theme';
+import { useAppTheme } from "@/hooks/use-app-theme";
+import { apiClient } from "@/services/api-client";
 import {
   clearAuth,
   getAccessToken,
-  getStoredFcmToken,
   getRefreshToken,
+  getStoredFcmToken,
   getStoredUser,
   saveTokens,
   saveUser,
-} from '@/services/auth-service';
+} from "@/services/auth-service";
 import {
   handleInitialNotification,
   registerFcmToken,
   subscribeToFcmTokenRefresh,
   subscribeToNotificationOpens,
   unregisterFcmToken,
-} from '@/services/notification-service';
+} from "@/services/notification-service";
 import type {
   IAuthApiResponse,
-  IChangePasswordPayload,
   IAuthContextValue,
   IAuthState,
+  IChangePasswordPayload,
   IStoredUser,
   IUpdateProfilePayload,
-} from '@/typescript';
+} from "@/typescript";
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
 const AuthContext = createContext<IAuthContextValue | null>(null);
 
 function requireAccessToken(payload: IAuthApiResponse): string {
-  if (typeof payload.token !== 'string' || payload.token.length === 0) {
-    throw new Error('Auth response is missing a valid access token');
+  if (typeof payload.token !== "string" || payload.token.length === 0) {
+    throw new Error("Auth response is missing a valid access token");
   }
 
   return payload.token;
@@ -51,11 +58,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const syncThemePreferenceFromUser = useCallback(
     async (user: IStoredUser) => {
-      if (typeof user.preferences?.darkMode !== 'boolean') {
+      if (typeof user.preferences?.darkMode !== "boolean") {
         return;
       }
 
-      await setThemePreference(user.preferences.darkMode ? 'dark' : 'light');
+      await setThemePreference(user.preferences.darkMode ? "dark" : "light");
     },
     [setThemePreference],
   );
@@ -71,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     wasAuthenticatedRef.current = false;
-    void setThemePreference('system');
+    void setThemePreference("system");
   }, [setThemePreference, state.isAuthenticated, state.isLoading]);
 
   // ── Restore session on app launch ──────────────────────────────────────────
@@ -82,7 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const token = await getAccessToken();
         if (!token) {
-          if (mounted) setState({ user: null, isAuthenticated: false, isLoading: false });
+          if (mounted)
+            setState({ user: null, isAuthenticated: false, isLoading: false });
           return;
         }
 
@@ -94,13 +102,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Verify token is still valid by fetching profile
         try {
-          const res = await apiClient.get<{ success: boolean; data: { user: IStoredUser } }>(
-            '/auth/profile',
-          );
+          const res = await apiClient.get<{
+            success: boolean;
+            data: { user: IStoredUser };
+          }>("/auth/profile");
           const user = res.data.user;
           await saveUser(user);
           await syncThemePreferenceFromUser(user);
-          if (mounted) setState({ user, isAuthenticated: true, isLoading: false });
+          if (mounted)
+            setState({ user, isAuthenticated: true, isLoading: false });
         } catch {
           // Token might be expired — try refresh
           const refreshToken = await getRefreshToken();
@@ -109,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               const refreshRes = await apiClient.post<{
                 success: boolean;
                 data: { token: string; refreshToken: string };
-              }>('/auth/refresh', { refreshToken });
+              }>("/auth/refresh", { refreshToken });
 
               const newToken = refreshRes.data.token;
               const newRefreshToken = refreshRes.data.refreshToken;
@@ -120,28 +130,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               const profileRes = await apiClient.get<{
                 success: boolean;
                 data: { user: IStoredUser };
-              }>('/auth/profile');
+              }>("/auth/profile");
               const user = profileRes.data.user;
               await saveUser(user);
               await syncThemePreferenceFromUser(user);
-              if (mounted) setState({ user, isAuthenticated: true, isLoading: false });
+              if (mounted)
+                setState({ user, isAuthenticated: true, isLoading: false });
             } catch {
               // Refresh also failed — clear session
               await clearAuth();
               apiClient.clearAuthToken();
-              if (mounted) setState({ user: null, isAuthenticated: false, isLoading: false });
+              if (mounted)
+                setState({
+                  user: null,
+                  isAuthenticated: false,
+                  isLoading: false,
+                });
             }
           } else if (cachedUser) {
             // No refresh token but have cached user — use offline
-            if (mounted) setState({ user: cachedUser, isAuthenticated: true, isLoading: false });
+            if (mounted)
+              setState({
+                user: cachedUser,
+                isAuthenticated: true,
+                isLoading: false,
+              });
           } else {
             await clearAuth();
             apiClient.clearAuthToken();
-            if (mounted) setState({ user: null, isAuthenticated: false, isLoading: false });
+            if (mounted)
+              setState({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+              });
           }
         }
       } catch {
-        if (mounted) setState({ user: null, isAuthenticated: false, isLoading: false });
+        if (mounted)
+          setState({ user: null, isAuthenticated: false, isLoading: false });
       }
     }
 
@@ -180,22 +207,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [state.isAuthenticated]);
 
-  // ── Login ──────────────────────────────────────────────────────────────────
-  const login = useCallback(async (email: string, password: string) => {
-    const res = await apiClient.post<{ success: boolean; data: IAuthApiResponse }>(
-      '/auth/login',
-      { email, password },
-    );
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const res = await apiClient.post<{
+        success: boolean;
+        data: IAuthApiResponse;
+      }>("/auth/login", { email, password });
 
-    const { user, refreshToken } = res.data;
-    const token = requireAccessToken(res.data);
-    await saveTokens(token, refreshToken);
-    await saveUser(user);
-    await syncThemePreferenceFromUser(user);
-    apiClient.setAuthToken(token);
+      const { user, refreshToken } = res.data;
+      const token = requireAccessToken(res.data);
+      await saveTokens(token, refreshToken);
+      await saveUser(user);
+      await syncThemePreferenceFromUser(user);
+      apiClient.setAuthToken(token);
 
-    setState({ user, isAuthenticated: true, isLoading: false });
-  }, [setThemePreference, syncThemePreferenceFromUser]);
+      setState({ user, isAuthenticated: true, isLoading: false });
+    },
+    [setThemePreference, syncThemePreferenceFromUser],
+  );
 
   // ── Register ───────────────────────────────────────────────────────────────
   const register = useCallback(
@@ -205,15 +234,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: string,
       password: string,
     ) => {
-      const res = await apiClient.post<{ success: boolean; data: IAuthApiResponse }>(
-        '/auth/register',
-        {
-          username,
-          email,
-          password,
-          ...(displayName ? { displayName } : {}),
-        },
-      );
+      const res = await apiClient.post<{
+        success: boolean;
+        data: IAuthApiResponse;
+      }>("/auth/register", {
+        username,
+        email,
+        password,
+        ...(displayName ? { displayName } : {}),
+      });
 
       const { user, refreshToken } = res.data;
       const token = requireAccessToken(res.data);
@@ -237,14 +266,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const refreshToken = await getRefreshToken();
       if (refreshToken) {
-        await apiClient.post('/auth/logout', { refreshToken });
+        await apiClient.post("/auth/logout", { refreshToken });
       }
     } catch {
       // Ignore API errors on logout — clear locally anyway
     }
 
     await clearAuth();
-    await setThemePreference('system');
+    await setThemePreference("system");
     apiClient.clearAuthToken();
     setState({ user: null, isAuthenticated: false, isLoading: false });
   }, [setThemePreference]);
@@ -252,9 +281,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Refresh user profile ───────────────────────────────────────────────────
   const refreshUser = useCallback(async () => {
     try {
-      const res = await apiClient.get<{ success: boolean; data: { user: IStoredUser } }>(
-        '/auth/profile',
-      );
+      const res = await apiClient.get<{
+        success: boolean;
+        data: { user: IStoredUser };
+      }>("/auth/profile");
       const user = res.data.user;
       await saveUser(user);
       await syncThemePreferenceFromUser(user);
@@ -264,76 +294,87 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [syncThemePreferenceFromUser]);
 
-  const updateProfile = useCallback(async (payload: IUpdateProfilePayload) => {
-    const normalizedPayload: IUpdateProfilePayload = {};
-    const normalizedPreferences: NonNullable<IUpdateProfilePayload['preferences']> = {};
+  const updateProfile = useCallback(
+    async (payload: IUpdateProfilePayload) => {
+      const normalizedPayload: IUpdateProfilePayload = {};
+      const normalizedPreferences: NonNullable<
+        IUpdateProfilePayload["preferences"]
+      > = {};
 
-    if (typeof payload.displayName === 'string') {
-      normalizedPayload.displayName = payload.displayName.trim();
-    }
+      if (typeof payload.displayName === "string") {
+        normalizedPayload.displayName = payload.displayName.trim();
+      }
 
-    if (typeof payload.preferences?.darkMode === 'boolean') {
-      normalizedPreferences.darkMode = payload.preferences.darkMode;
-    }
+      if (typeof payload.preferences?.darkMode === "boolean") {
+        normalizedPreferences.darkMode = payload.preferences.darkMode;
+      }
 
-    if (typeof payload.preferences?.notificationsEnabled === 'boolean') {
-      normalizedPreferences.notificationsEnabled = payload.preferences.notificationsEnabled;
-    }
+      if (typeof payload.preferences?.notificationsEnabled === "boolean") {
+        normalizedPreferences.notificationsEnabled =
+          payload.preferences.notificationsEnabled;
+      }
 
-    if (typeof payload.preferences?.reminderTime === 'string') {
-      normalizedPreferences.reminderTime = payload.preferences.reminderTime;
-    }
+      if (typeof payload.preferences?.reminderTime === "string") {
+        normalizedPreferences.reminderTime = payload.preferences.reminderTime;
+      }
 
-    if (typeof payload.preferences?.reminderFrequency === 'string') {
-      normalizedPreferences.reminderFrequency = payload.preferences.reminderFrequency;
-    }
+      if (typeof payload.preferences?.reminderFrequency === "string") {
+        normalizedPreferences.reminderFrequency =
+          payload.preferences.reminderFrequency;
+      }
 
-    if (Array.isArray(payload.preferences?.customReminderDays)) {
-      normalizedPreferences.customReminderDays = payload.preferences.customReminderDays;
-    }
+      if (Array.isArray(payload.preferences?.customReminderDays)) {
+        normalizedPreferences.customReminderDays =
+          payload.preferences.customReminderDays;
+      }
 
-    if (Object.keys(normalizedPreferences).length > 0) {
-      normalizedPayload.preferences = normalizedPreferences;
-    }
+      if (Object.keys(normalizedPreferences).length > 0) {
+        normalizedPayload.preferences = normalizedPreferences;
+      }
 
-    if (typeof normalizedPayload.preferences?.darkMode === 'boolean') {
-      setState((prev) => {
-        if (!prev.user) {
-          return prev;
-        }
+      if (typeof normalizedPayload.preferences?.darkMode === "boolean") {
+        setState((prev) => {
+          if (!prev.user) {
+            return prev;
+          }
 
-        const nextUser: IStoredUser = {
-          ...prev.user,
-          preferences: {
-            ...prev.user.preferences,
-            ...normalizedPayload.preferences,
-          },
-        };
+          const nextUser: IStoredUser = {
+            ...prev.user,
+            preferences: {
+              ...prev.user.preferences,
+              ...normalizedPayload.preferences,
+            },
+          };
 
-        void saveUser(nextUser);
-        return { ...prev, user: nextUser };
-      });
-    }
+          void saveUser(nextUser);
+          return { ...prev, user: nextUser };
+        });
+      }
 
-    const res = await apiClient.put<{ success: boolean; data: { user: IStoredUser } }>(
-      '/auth/profile',
-      normalizedPayload,
-    );
-    const user = res.data.user;
-    await saveUser(user);
-    await syncThemePreferenceFromUser(user);
-    setState((prev) => ({ ...prev, user }));
-  }, [syncThemePreferenceFromUser]);
+      const res = await apiClient.put<{
+        success: boolean;
+        data: { user: IStoredUser };
+      }>("/auth/profile", normalizedPayload);
+      const user = res.data.user;
+      await saveUser(user);
+      await syncThemePreferenceFromUser(user);
+      setState((prev) => ({ ...prev, user }));
+    },
+    [syncThemePreferenceFromUser],
+  );
 
-  const changePassword = useCallback(async (payload: IChangePasswordPayload) => {
-    await apiClient.put<{ success: boolean; message?: string }>(
-      '/auth/change-password',
-      {
-        currentPassword: payload.currentPassword,
-        newPassword: payload.newPassword,
-      },
-    );
-  }, []);
+  const changePassword = useCallback(
+    async (payload: IChangePasswordPayload) => {
+      await apiClient.put<{ success: boolean; message?: string }>(
+        "/auth/change-password",
+        {
+          currentPassword: payload.currentPassword,
+          newPassword: payload.newPassword,
+        },
+      );
+    },
+    [],
+  );
 
   const value: IAuthContextValue = {
     ...state,
@@ -353,7 +394,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth(): IAuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return ctx;
 }
